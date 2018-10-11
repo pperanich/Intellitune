@@ -1,6 +1,8 @@
 /*
  * Intellitune_msp project
  *
+ * File: intellitune.c
+ *
  * Date: 10/10/2018
  *
  * Author(s): Preston Peranich
@@ -24,16 +26,24 @@
  *     * Switch known impedance in / out, taking VSWR measurements for each
  *     * Tuning algorithm to meet required SWR
  *     * Drive 16x2 LED and update continuously
- *     *
+ *
+ * When implementing, it would be best to create separate files for each subsystem
+ * and implement all functions for a single subsystem into a single routine. For example,
+ * when frequency counter called, also update digipots to keep voltages at safe levels for ADC.
  *
  ******************************************************************************/
 
 #include "driverlib.h"
+#include "intellitune.h"
 
 void initSleepTimer(uint16_t);
 void enable_ADC10(void);
 void disable_ADC10(void);
 void initGPIO(void);
+
+
+void tune(void);
+
 
 /* FRAM Variable that stores ADC results*/
 #pragma PERSISTENT(ADC_Conversion_Result)
