@@ -13,6 +13,7 @@
 // Function Prototypes
 void switch_cap_relay(int relay_num, int position);
 void switch_net_config(void);
+void switch_kwown_impedance(void);
 
 
 // TODO: Binary sequenced capacitor relay function.
@@ -25,6 +26,14 @@ void switch_cap_relay(int relay_num, int position)
 
 // TODO: Function to switch capacitor to either side of inductor.
 void switch_net_config(void)
+{
+    // Not Implemented
+    asm("    NOP");
+}
+
+
+// TODO Implement function to switch known impedance in and out.
+void switch_kwown_impedance(void)
 {
     // Not Implemented
     asm("    NOP");

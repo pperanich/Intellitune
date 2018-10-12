@@ -24,6 +24,10 @@ SWR measure_swr(void)
 {
     // Not Implemented
     asm("    NOP");
+    SWR temp;
+    temp.fwd = 0;
+    temp.ref = 0;
+    return temp;
 }
 
 

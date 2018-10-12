@@ -1,10 +1,9 @@
 /*
- * File: lcd.c
+ * File: user_iface.c
  *
  * Author(s): Preston Peranich
  *
- * Description: This function will contain lcd functions. May be deprecated
- *              if library found is sufficient for our needs. (hd44780.*)
+ * Description: This file will include user interface functions.
  *
  ******************************************************************************/
 

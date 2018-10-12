@@ -13,7 +13,7 @@
 
 
 // Function Prototypes
-void step_motor(uint8_t motor, uint8_t dir, uint8_t );
+void step_motor(uint8_t motor, uint8_t dir, uint8_t amount);
 void current_setting(void);
 
 
@@ -26,7 +26,7 @@ void current_setting(void)
 
 
 // TODO: Implment stepper motor control function.
-void step_motor(uint8_t motor, uint8_t dir, uint8_t )
+void step_motor(uint8_t motor, uint8_t dir, uint8_t amount)
 {
     // Not Implemented
     asm("    NOP");
