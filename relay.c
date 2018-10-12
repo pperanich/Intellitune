@@ -1,3 +1,11 @@
+/*
+ * File: relay.c
+ *
+ * Author(s): Preston Peranich
+ *
+ * Description: This file will contain the functions to control the relays in the Intellitune.
+ *
+ ******************************************************************************/
 
 #include "intellitune.h"
 

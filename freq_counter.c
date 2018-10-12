@@ -1,3 +1,12 @@
+/*
+ * File: freq_counter.c
+ *
+ * Author(s): Preston Peranich
+ *
+ * Description: This file will contain the functions necessary to determine
+ *              the frequency of the transmitted RF wave.
+ *
+ ******************************************************************************/
 
 #include "intellitune.h"
 

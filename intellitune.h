@@ -10,6 +10,9 @@ typedef struct
 } SWR;
 
 
+// Globals
+
+
 // Subsystem function declarations
 
 // Stepper motor subsystem

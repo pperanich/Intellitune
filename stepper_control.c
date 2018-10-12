@@ -1,3 +1,13 @@
+/*
+ * File: stepper_control.c
+ *
+ * Author(s): Preston Peranich
+ *
+ * Description: This file will implement the functions to interface with the
+ *              stepper motors. This will include determining the position of the
+ *              motors and controlling them through the stepper motor drivers.
+ *
+ ******************************************************************************/
 
 #include "intellitune.h"
 

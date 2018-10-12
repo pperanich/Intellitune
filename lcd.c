@@ -1,3 +1,12 @@
+/*
+ * File: lcd.c
+ *
+ * Author(s): Preston Peranich
+ *
+ * Description: This function will contain lcd functions. May be deprecated
+ *              if library found is sufficient for our needs. (hd44780.*)
+ *
+ ******************************************************************************/
 
 #include "intellitune.h"
 
