@@ -37,9 +37,10 @@
 
 // Function Prototypes
 void tune(void);
+void clock_configure(void);
 
 
-// Main Program func
+// Main Program function
 int main(void) {
 
     volatile uint32_t i;
@@ -47,6 +48,8 @@ int main(void) {
 
     // Stop watchdog timer
     WDTCTL = WDTPW | WDTHOLD;
+
+    clock_configure();
 
     // Initialize the frequency counter
     initialize_freq_counter();
@@ -72,4 +75,36 @@ void tune(void)
 {
     // Not Implemented
     asm("    NOP");
+}
+
+
+
+void clock_configure(void)
+{
+    // Configure MCLK for 16MHz. FLL reference clock is XT1. At this
+    // speed, the FRAM requires wait states. ACLK = XT1 ~32768Hz, SMCLK = MCLK = 16MHz.
+
+    // Configure one FRAM waitstate as required by the device datasheet for MCLK
+    // operation beyond 8MHz _before_ configuring the clock system.
+    FRCTL0 = FRCTLPW | NWAITS_1;
+
+    P2SEL1 |= BIT6 | BIT7;                       // set XT1 pin as second function
+    do
+    {
+        CSCTL7 &= ~(XT1OFFG | DCOFFG);           // Clear XT1 and DCO fault flag
+        SFRIFG1 &= ~OFIFG;
+    } while (SFRIFG1 & OFIFG);                   // Test oscillator fault flag
+
+    __bis_SR_register(SCG0);                     // disable FLL
+    CSCTL3 |= SELREF__XT1CLK;                    // Set XT1 as FLL reference source
+    CSCTL0 = 0;                                  // clear DCO and MOD registers
+    CSCTL1 &= ~(DCORSEL_7);                      // Clear DCO frequency select bits first
+    CSCTL1 |= DCORSEL_5;                         // Set DCO = 16MHz
+    CSCTL2 = FLLD_0 + 487;                       // DCOCLKDIV = 16MHz
+    __delay_cycles(3);
+    __bic_SR_register(SCG0);                     // enable FLL
+    while(CSCTL7 & (FLLUNLOCK0 | FLLUNLOCK1));   // FLL locked
+
+    CSCTL4 = SELMS__DCOCLKDIV | SELA__XT1CLK;   // set XT1 (~32768Hz) as ACLK source, ACLK = 32768Hz
+                                                 // default DCOCLKDIV as MCLK and SMCLK source
 }
