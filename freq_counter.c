@@ -12,8 +12,8 @@
 
 // Globals
 uint16_t overflowCount;
-uint32_t frequency;
-uint8_t timing_correction = 13;
+uint16_t frequency;
+uint8_t timing_correction = 2;
 
 
 // Function Prototypes
@@ -79,5 +79,5 @@ __interrupt void Timer0_B3 (void)
     timer0_count = TB0R;
     timer1_count = TB1R;
     total_pulses = ((uint32_t)overflowCount << 16) | timer1_count;
-    frequency = ((total_pulses << 4));
+    frequency = ((total_pulses << 4)) / 1000;
 }

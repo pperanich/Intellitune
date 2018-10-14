@@ -20,7 +20,7 @@ typedef struct
 
 
 // Globals
-extern uint32_t frequency;
+extern uint16_t frequency;
 
 // Subsystem function declarations
 
