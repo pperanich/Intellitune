@@ -40,6 +40,7 @@ standing_wave_sensor.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/
 standing_wave_sensor.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tlv.h
 standing_wave_sensor.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tri.h
 standing_wave_sensor.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/wdt_a.h
+standing_wave_sensor.obj: ../hd44780.h
 
 ../standing_wave_sensor.c: 
 ../intellitune.h: 
@@ -81,3 +82,4 @@ C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tlv.h: 
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tri.h: 
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/wdt_a.h: 
+../hd44780.h: 

@@ -40,6 +40,7 @@ user_iface.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/
 user_iface.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tlv.h
 user_iface.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tri.h
 user_iface.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/wdt_a.h
+user_iface.obj: ../hd44780.h
 
 ../user_iface.c: 
 ../intellitune.h: 
@@ -81,3 +82,4 @@ C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tlv.h: 
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tri.h: 
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/wdt_a.h: 
+../hd44780.h: 

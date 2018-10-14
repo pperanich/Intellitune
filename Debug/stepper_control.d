@@ -40,6 +40,7 @@ stepper_control.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/drive
 stepper_control.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tlv.h
 stepper_control.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tri.h
 stepper_control.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/wdt_a.h
+stepper_control.obj: ../hd44780.h
 
 ../stepper_control.c: 
 ../intellitune.h: 
@@ -81,3 +82,4 @@ C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tlv.h: 
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tri.h: 
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/wdt_a.h: 
+../hd44780.h: 

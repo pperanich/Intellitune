@@ -34,6 +34,7 @@
  ******************************************************************************/
 
 #include "intellitune.h"
+#include <stdlib.h>
 
 // Function Prototypes
 void tune(void);
@@ -44,6 +45,7 @@ void clock_configure(void);
 int main(void) {
 
     volatile uint32_t i;
+    //char msg[32] = {'\0'};
 
     // Stop watchdog timer
     WDTCTL = WDTPW | WDTHOLD;
@@ -52,6 +54,9 @@ int main(void) {
 
     // Initialize the frequency counter
     initialize_freq_counter();
+
+    // Initialize the LCD
+    lcd_init();
 
     // Disable the GPIO power-on default high-impedance mode
     // to activate previously configured port settings
@@ -63,6 +68,7 @@ int main(void) {
     {
         measure_freq();
         while(TB0CTL != MC_0);
+        hd44780_write_string("Hello World!", 1, 1, NO_CR_LF ); // Write text string to first row and first column
         // Delay
         for(i=50000; i>0; i--);
     }

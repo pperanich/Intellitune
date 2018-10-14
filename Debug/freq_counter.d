@@ -40,6 +40,7 @@ freq_counter.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverli
 freq_counter.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tlv.h
 freq_counter.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tri.h
 freq_counter.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/wdt_a.h
+freq_counter.obj: ../hd44780.h
 
 ../freq_counter.c: 
 ../intellitune.h: 
@@ -81,3 +82,4 @@ C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tlv.h: 
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tri.h: 
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/wdt_a.h: 
+../hd44780.h: 

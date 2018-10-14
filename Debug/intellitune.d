@@ -40,6 +40,10 @@ intellitune.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib
 intellitune.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tlv.h
 intellitune.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tri.h
 intellitune.obj: C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/wdt_a.h
+intellitune.obj: ../hd44780.h
+intellitune.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.3.LTS/include/stdlib.h
+intellitune.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.3.LTS/include/_ti_config.h
+intellitune.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.3.LTS/include/linkage.h
 
 ../intellitune.c: 
 ../intellitune.h: 
@@ -81,3 +85,7 @@ C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tlv.h: 
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/tri.h: 
 C:/Users/Preston/source/senior-design-mcu/Intellitune/driverlib/MSP430FR2xx_4xx/wdt_a.h: 
+../hd44780.h: 
+C:/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.3.LTS/include/stdlib.h: 
+C:/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.3.LTS/include/_ti_config.h: 
+C:/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.3.LTS/include/linkage.h: 
