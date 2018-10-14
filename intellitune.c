@@ -34,7 +34,6 @@
  ******************************************************************************/
 
 #include "intellitune.h"
-#include <stdlib.h>
 
 // Function Prototypes
 void tune(void);
