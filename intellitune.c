@@ -44,7 +44,6 @@ void clock_configure(void);
 int main(void) {
 
     volatile uint32_t i;
-    uint16_t curr_freq=0;
 
     // Stop watchdog timer
     WDTCTL = WDTPW | WDTHOLD;
@@ -62,7 +61,8 @@ int main(void) {
 
     while(1)
     {
-        curr_freq = measure_freq();
+        measure_freq();
+        while(TB0CTL != MC_0);
         // Delay
         for(i=50000; i>0; i--);
     }

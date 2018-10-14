@@ -20,7 +20,7 @@ typedef struct
 
 
 // Globals
-
+extern uint32_t frequency;
 
 // Subsystem function declarations
 
@@ -29,7 +29,7 @@ extern void step_motor(uint8_t motor, uint8_t dir, uint8_t amount);
 extern void current_setting(void);
 
 // Frequency Counter subsystem
-extern uint16_t measure_freq(void);
+extern void measure_freq(void);
 extern void initialize_freq_counter(void);
 
 // Standing Wave Ratio subsystem

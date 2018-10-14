@@ -91,16 +91,16 @@
 
 // ########## MAKE A SELECTION: Define whether you use 4 bit or 8 bit mode ###################################################################################################
 //                                                                                                                                                                           #
-//#define HD44780_8BIT_MODE                                  // HD44780 is used in 8 bit mode                                                                                  #
-#define HD44780_4BIT_MODE                                // HD44780 is used in 4 bit mode                                                                                  #
+#define HD44780_8BIT_MODE                                  // HD44780 is used in 8 bit mode                                                                                  #
+//#define HD44780_4BIT_MODE                                // HD44780 is used in 4 bit mode                                                                                  #
 //                                                                                                                                                                           #
 // ###########################################################################################################################################################################
 
 
 // ########## MAKE A SELECTION: Define whether data lines of HD44780 are connected in consecutive order to MCU or shift register or if mixed ports / pins are used ###########
 //                                                                                                                                                                           #
-#define HD44780_CONSECUTIVE_PINS_MODE                      // D0 to D7 / D4 to D7 (8 / 4 bit) of HD44780 connected in consecutive order to MCU or shift register             #
-//#define HD44780_MIXED_PINS_MODE                          // D0 to D7 / D4 to D7 (8 / 4 bit) of HD44780 connected to mixed ports / pins of MCU or shift register            #
+//#define HD44780_CONSECUTIVE_PINS_MODE                      // D0 to D7 / D4 to D7 (8 / 4 bit) of HD44780 connected in consecutive order to MCU or shift register             #
+#define HD44780_MIXED_PINS_MODE                          // D0 to D7 / D4 to D7 (8 / 4 bit) of HD44780 connected to mixed ports / pins of MCU or shift register            #
 //                                                                                                                                                                           #
 // Info:                                                                                                                                                                     #
 // Allowed connections for consecutive 8 bit mode are D0 to D7 of HD44780 consecutively connected to Px.0 to Px.7 of one single port of MCU or to output Q0 to Q7 of shift   #
@@ -114,7 +114,7 @@
 // ########## INSERT YOUR CONFIGURATION: Define the hardware connection for ENABLE of HD44780 ################################################################################
 //                                                                                                                                                                           #
 #define HD44780_ENABLE_MCU_OUT_PORT         P2OUT          // Define MCU output port that is connected to ENABLE of HD44780                                                  #
-#define HD44780_ENABLE_MCU_OUT_PIN          BIT0           // Define MCU output pin that is connected to ENABLE of HD44780                                                   #
+#define HD44780_ENABLE_MCU_OUT_PIN          BIT1           // Define MCU output pin that is connected to ENABLE of HD44780                                                   #
 //#define HD44780_ENABLE_INVERTED                          // Enable if signal for ENABLE is inverted by external hardware                                                   #
 //                                                                                                                                                                           #
 // ###########################################################################################################################################################################
@@ -123,8 +123,8 @@
 
 // ########## INSERT YOUR CONFIGURATION: Define the hardware connection for RS of HD44780 ####################################################################################
 //                                                                                                                                                                           #
-#define HD44780_RS_MCU_OUT_PORT             P2OUT          // Define MCU output port that is connected to RS of HD44780                                                      #
-#define HD44780_RS_MCU_OUT_PIN              BIT1           // Define MCU output pin that is connected to RS of HD44780                                                       #
+#define HD44780_RS_MCU_OUT_PORT             P6OUT          // Define MCU output port that is connected to RS of HD44780                                                      #
+#define HD44780_RS_MCU_OUT_PIN              BIT0           // Define MCU output pin that is connected to RS of HD44780                                                       #
 //#define HD44780_RS_INVERTED                              // Enable if signal for RS is inverted by external hardware                                                       #
 //                                                                                                                                                                           #
 // ###########################################################################################################################################################################
@@ -152,20 +152,20 @@
 
 // ########## INSERT YOUR CONFIGURATION: Define the hardware connections for D0 to D3 of HD44780 #############################################################################
 //                                                                                                                                                                           #
-#define HD44780_D0_MCU_OUT_PORT            P1OUT           // Define MCU output port that is connected to DB0 of HD44780                                                     #
-#define HD44780_D0_MCU_OUT_PIN             BIT0            // Define MCU output pin that is connected to DB0 of HD44780                                                      #
+#define HD44780_D0_MCU_OUT_PORT            P6OUT           // Define MCU output port that is connected to DB0 of HD44780                                                     #
+#define HD44780_D0_MCU_OUT_PIN             BIT1            // Define MCU output pin that is connected to DB0 of HD44780                                                      #
 //#define HD44780_D0_INVERTED                              // Enable if signal for D0 is inverted by external hardware                                                       #
 //                                                                                                                                                                           #
-#define HD44780_D1_MCU_OUT_PORT            P1OUT           // Define MCU output port that is connected to DB1 of HD44780                                                     #
-#define HD44780_D1_MCU_OUT_PIN             BIT1            // Define MCU output pin that is connected to DB1 of HD44780                                                      #
+#define HD44780_D1_MCU_OUT_PORT            P6OUT           // Define MCU output port that is connected to DB1 of HD44780                                                     #
+#define HD44780_D1_MCU_OUT_PIN             BIT2            // Define MCU output pin that is connected to DB1 of HD44780                                                      #
 //#define HD44780_D1_INVERTED                              // Enable if signal for D1 is inverted by external hardware                                                       #
 //                                                                                                                                                                           #
-#define HD44780_D2_MCU_OUT_PORT            P1OUT           // Define MCU output port that is connected to DB2 of HD44780                                                     #
-#define HD44780_D2_MCU_OUT_PIN             BIT2            // Define MCU output pin that is connected to DB2 of HD44780                                                      #
+#define HD44780_D2_MCU_OUT_PORT            P6OUT           // Define MCU output port that is connected to DB2 of HD44780                                                     #
+#define HD44780_D2_MCU_OUT_PIN             BIT3            // Define MCU output pin that is connected to DB2 of HD44780                                                      #
 //#define HD44780_D2_INVERTED                              // Enable if signal for D2 is inverted by external hardware                                                       #
 //                                                                                                                                                                           #
-#define HD44780_D3_MCU_OUT_PORT            P1OUT           // Define MCU output port that is connected to DB3 of HD44780                                                     #
-#define HD44780_D3_MCU_OUT_PIN             BIT3            // Define MCU output pin that is connected to DB3 of HD44780                                                      #
+#define HD44780_D3_MCU_OUT_PORT            P6OUT           // Define MCU output port that is connected to DB3 of HD44780                                                     #
+#define HD44780_D3_MCU_OUT_PIN             BIT4            // Define MCU output pin that is connected to DB3 of HD44780                                                      #
 //#define HD44780_D3_INVERTED                              // Enable if signal for D3 is inverted by external hardware                                                       #
 //                                                                                                                                                                           #
 // ###########################################################################################################################################################################
@@ -174,20 +174,20 @@
 
 // ########## INSERT YOUR CONFIGURATION: Define the hardware connections for D4 to D7 of HD44780 #############################################################################
 //                                                                                                                                                                           #
-#define HD44780_D4_MCU_OUT_PORT            P1OUT           // Define MCU output port that is connected to DB4 of HD44780                                                     #
-#define HD44780_D4_MCU_OUT_PIN             BIT1            // Define MCU output pin that is connected to DB4 of HD44780                                                      #
+#define HD44780_D4_MCU_OUT_PORT            P3OUT           // Define MCU output port that is connected to DB4 of HD44780                                                     #
+#define HD44780_D4_MCU_OUT_PIN             BIT7            // Define MCU output pin that is connected to DB4 of HD44780                                                      #
 //#define HD44780_D4_INVERTED                              // Enable if signal for D4 is inverted by external hardware                                                       #
 //                                                                                                                                                                           #
-#define HD44780_D5_MCU_OUT_PORT            P1OUT           // Define MCU output port that is connected to DB5 of HD44780                                                     #
-#define HD44780_D5_MCU_OUT_PIN             BIT2            // Define MCU output pin that is connected to DB5 of HD44780                                                      #
+#define HD44780_D5_MCU_OUT_PORT            P2OUT           // Define MCU output port that is connected to DB5 of HD44780                                                     #
+#define HD44780_D5_MCU_OUT_PIN             BIT4            // Define MCU output pin that is connected to DB5 of HD44780                                                      #
 //#define HD44780_D5_INVERTED                              // Enable if signal for D5 is inverted by external hardware                                                       #
 //                                                                                                                                                                           #
-#define HD44780_D6_MCU_OUT_PORT            P1OUT           // Define MCU output port that is connected to DB6 of HD44780                                                     #
-#define HD44780_D6_MCU_OUT_PIN             BIT6            // Define MCU output pin that is connected to DB6 of HD44780                                                      #
+#define HD44780_D6_MCU_OUT_PORT            P3OUT           // Define MCU output port that is connected to DB6 of HD44780                                                     #
+#define HD44780_D6_MCU_OUT_PIN             BIT3            // Define MCU output pin that is connected to DB6 of HD44780                                                      #
 //#define HD44780_D6_INVERTED                              // Enable if signal for D6 is inverted by external hardware                                                       #
 //                                                                                                                                                                           #
-#define HD44780_D7_MCU_OUT_PORT            P1OUT           // Define MCU output port that is connected to DB7 of HD44780                                                     #
-#define HD44780_D7_MCU_OUT_PIN             BIT7            // Define MCU output pin that is connected to DB7 of HD44780                                                      #
+#define HD44780_D7_MCU_OUT_PORT            P3OUT           // Define MCU output port that is connected to DB7 of HD44780                                                     #
+#define HD44780_D7_MCU_OUT_PIN             BIT2            // Define MCU output pin that is connected to DB7 of HD44780                                                      #
 //#define HD44780_D7_INVERTED                              // Enable if signal for D7 is inverted by external hardware                                                       #
 //                                                                                                                                                                           #
 // ###########################################################################################################################################################################
