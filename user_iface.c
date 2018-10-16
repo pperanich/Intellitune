@@ -18,11 +18,10 @@ void lcd_update(void);
 // TODO: LCD initialize function
 void lcd_init(void)
 {
-    P2DIR |= 0x12;
     P6DIR |= 0x1F;
-    P3DIR |= 0x8C;
+    P3DIR |= 0x80;
 
-    TB3CCR1  = 4096; // Set CCR1 value for 1 ms interrupt (1000 / 1 MHz) = 0.001
+    TB3CCR1  = 48; // Set CCR1 value for 1 ms interrupt (1000 / 1 MHz) = 0.001
     TB3CCTL1 = CCIE; // Compare interrupt enable
     TB3CTL   = (TBSSEL_1 | MC_2 | TBCLR); // ACLK as clock source, continuous mode, timer clear
 
@@ -45,7 +44,7 @@ __interrupt void timer_3_b1_isr( void )
   {
     case TBIV_2: // CCR1 caused the interrupt
     {
-      TB3CCR1 += 4096; // Add CCR1 value for next interrupt in 1 ms
+      TB3CCR1 += 48; // Add CCR1 value for next interrupt in 1 ms
 
       hd44780_timer_isr(); // Call HD44780 state machine
 

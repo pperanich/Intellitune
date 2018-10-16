@@ -73,10 +73,10 @@
 //#define HD44780_TYPE_1x16                                // LCD has 1 line with 16 characters                                                                              #
 //#define HD44780_TYPE_1x20                                // LCD has 1 line with 20 characters                                                                              #
 //#define HD44780_TYPE_2x8                                 // LCD has 2 lines with 8 characters each                                                                         #
-//#define HD44780_TYPE_2x16                                // LCD has 2 lines with 16 characters each                                                                        #
+#define HD44780_TYPE_2x16                                // LCD has 2 lines with 16 characters each                                                                        #
 //#define HD44780_TYPE_2x20                                // LCD has 2 lines with 20 characters each                                                                        #
 //#define HD44780_TYPE_4x16                                // LCD has 4 lines with 16 characters each                                                                        #
-#define HD44780_TYPE_2x16                                  // LCD has 4 lines with 20 characters each                                                                        #
+//#define HD44780_TYPE_2x16                                  // LCD has 4 lines with 20 characters each                                                                        #
 //                                                                                                                                                                           #
 // ###########################################################################################################################################################################
 
@@ -91,16 +91,16 @@
 
 // ########## MAKE A SELECTION: Define whether you use 4 bit or 8 bit mode ###################################################################################################
 //                                                                                                                                                                           #
-#define HD44780_8BIT_MODE                                  // HD44780 is used in 8 bit mode                                                                                  #
-//#define HD44780_4BIT_MODE                                // HD44780 is used in 4 bit mode                                                                                  #
+//#define HD44780_8BIT_MODE                                  // HD44780 is used in 8 bit mode                                                                                  #
+#define HD44780_4BIT_MODE                                // HD44780 is used in 4 bit mode                                                                                  #
 //                                                                                                                                                                           #
 // ###########################################################################################################################################################################
 
 
 // ########## MAKE A SELECTION: Define whether data lines of HD44780 are connected in consecutive order to MCU or shift register or if mixed ports / pins are used ###########
 //                                                                                                                                                                           #
-//#define HD44780_CONSECUTIVE_PINS_MODE                      // D0 to D7 / D4 to D7 (8 / 4 bit) of HD44780 connected in consecutive order to MCU or shift register             #
-#define HD44780_MIXED_PINS_MODE                          // D0 to D7 / D4 to D7 (8 / 4 bit) of HD44780 connected to mixed ports / pins of MCU or shift register            #
+#define HD44780_CONSECUTIVE_PINS_MODE                      // D0 to D7 / D4 to D7 (8 / 4 bit) of HD44780 connected in consecutive order to MCU or shift register             #
+//#define HD44780_MIXED_PINS_MODE                          // D0 to D7 / D4 to D7 (8 / 4 bit) of HD44780 connected to mixed ports / pins of MCU or shift register            #
 //                                                                                                                                                                           #
 // Info:                                                                                                                                                                     #
 // Allowed connections for consecutive 8 bit mode are D0 to D7 of HD44780 consecutively connected to Px.0 to Px.7 of one single port of MCU or to output Q0 to Q7 of shift   #
@@ -114,7 +114,7 @@
 // ########## INSERT YOUR CONFIGURATION: Define the hardware connection for ENABLE of HD44780 ################################################################################
 //                                                                                                                                                                           #
 #define HD44780_ENABLE_MCU_OUT_PORT         P6OUT          // Define MCU output port that is connected to ENABLE of HD44780                                                  #
-#define HD44780_ENABLE_MCU_OUT_PIN          BIT0           // Define MCU output pin that is connected to ENABLE of HD44780                                                   #
+#define HD44780_ENABLE_MCU_OUT_PIN          BIT4           // Define MCU output pin that is connected to ENABLE of HD44780                                                   #
 //#define HD44780_ENABLE_INVERTED                          // Enable if signal for ENABLE is inverted by external hardware                                                   #
 //                                                                                                                                                                           #
 // ###########################################################################################################################################################################
@@ -123,8 +123,8 @@
 
 // ########## INSERT YOUR CONFIGURATION: Define the hardware connection for RS of HD44780 ####################################################################################
 //                                                                                                                                                                           #
-#define HD44780_RS_MCU_OUT_PORT             P2OUT          // Define MCU output port that is connected to RS of HD44780                                                      #
-#define HD44780_RS_MCU_OUT_PIN              BIT1           // Define MCU output pin that is connected to RS of HD44780                                                       #
+#define HD44780_RS_MCU_OUT_PORT             P3OUT          // Define MCU output port that is connected to RS of HD44780                                                      #
+#define HD44780_RS_MCU_OUT_PIN              BIT7           // Define MCU output pin that is connected to RS of HD44780                                                       #
 //#define HD44780_RS_INVERTED                              // Enable if signal for RS is inverted by external hardware                                                       #
 //                                                                                                                                                                           #
 // ###########################################################################################################################################################################
@@ -133,7 +133,7 @@
 
 // ########## INSERT YOUR CONFIGURATION: Define the port of the MCU that the HD44780 is connected to #########################################################################
 //                                                                                                                                                                           #
-#define HD44780_MCU_OUT_PORT                P1OUT          // Define MCU output port that is connected to HD44780                                                            #
+#define HD44780_MCU_OUT_PORT                P6OUT          // Define MCU output port that is connected to HD44780                                                            #
 //                                                                                                                                                                           #
 // ###########################################################################################################################################################################
 
@@ -141,8 +141,8 @@
 
 // ########## MAKE A SELECTION: DB4 to DB7 of HD44780 connected to lower (Px.0 to Px.3) or higher (Px.4 to Px.7) nibble of MCU port ##########################################
 //                                                                                                                                                                           #
-//#define HD44780_4BIT_MCU_LOWER_NIBBLE                    // D4 to D7 of HD44780 is connected to Px.0 to Px.3 of MCU port                                                   #
-#define HD44780_4BIT_MCU_HIGHER_NIBBLE                     // D4 to D7 of HD44780 is connected to Px.4 to Px.7 of MCU port                                                   #
+#define HD44780_4BIT_MCU_LOWER_NIBBLE                    // D4 to D7 of HD44780 is connected to Px.0 to Px.3 of MCU port                                                   #
+//#define HD44780_4BIT_MCU_HIGHER_NIBBLE                     // D4 to D7 of HD44780 is connected to Px.4 to Px.7 of MCU port                                                   #
 //                                                                                                                                                                           #
 // ###########################################################################################################################################################################
 

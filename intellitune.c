@@ -67,7 +67,7 @@ int main(void) {
     {
         measure_freq();
         while(TB0CTL != MC_0);
-        hd44780_write_string("Hello World!", 1, 1, NO_CR_LF ); // Write text string to first row and first column
+        hd44780_write_string("Hello world!", 1, 1, NO_CR_LF ); // Write text string to first row and first column
         // Delay
         for(i=50000; i>0; i--);
     }
