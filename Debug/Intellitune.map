@@ -1,10 +1,10 @@
 ******************************************************************************
                   MSP430 Linker PC v18.1.3                     
 ******************************************************************************
->> Linked Tue Oct 16 07:05:43 2018
+>> Linked Tue Oct 16 07:56:45 2018
 
 OUTPUT FILE NAME:   <Intellitune.out>
-ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 000086d4
+ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 000086ea
 
 
 MEMORY CONFIGURATION
@@ -17,7 +17,7 @@ MEMORY CONFIGURATION
   TLVMEM                00001a00   00000200  00000000  00000200  RWIX
   BOOTCODE              00001c00   00000400  00000000  00000400  RWIX
   RAM                   00002000   00001000  000000ca  00000f36  RWIX
-  FRAM                  00008000   00007f80  00000702  0000787e  RWIX
+  FRAM                  00008000   00007f80  00000718  00007868  RWIX
   JTAGSIGNATURE         0000ff80   00000004  00000004  00000000  RWIX  ffff 
   BSLSIGNATURE          0000ff84   00000004  00000004  00000000  RWIX  ffff 
   BSLCONFIGURATIONSIGNA 0000ff88   00000002  00000002  00000000  RWIX  ffff 
@@ -109,35 +109,36 @@ section   page    origin      length       input sections
                   0000802a    0000000e     intellitune.obj (.const:.string)
                   00008038    00000007     hd44780.obj (.const:.string:$P$T0$4)
 
-.text      0    00008040    00000630     
+.text      0    00008040    00000646     
                   00008040    00000174     hd44780.obj (.text:hd44780_timer_isr)
                   000081b4    000000ee     rts430x_lc_sd_eabi.lib : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
                   000082a2    000000ac     hd44780.obj (.text:hd44780_write_string)
-                  0000834e    0000006a     rts430x_lc_sd_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit_hold_wdt:__TI_auto_init_nobinit_nopinit_hold_wdt)
-                  000083b8    00000068     intellitune.obj (.text:main)
-                  00008420    00000058     rts430x_lc_sd_eabi.lib : div32u.asm.obj (.text)
-                  00008478    00000052     intellitune.obj (.text:clock_configure)
-                  000084ca    00000040     rts430x_lc_sd_eabi.lib : cpy_util.asm.obj (.text:__memcpy_far)
-                  0000850a    0000003e                            : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset:__TI_zero_init_nomemset)
-                  00008548    0000003e                            : lsl32.asm.obj (.text:l_lsl_const)
-                  00008586    0000003c                            : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
-                  000085c2    0000002c     freq_counter.obj (.text:measure_freq)
-                  000085ee    00000026     hd44780.obj (.text:hd44780_clear_screen)
-                  00008614    00000024     user_iface.obj (.text:lcd_init)
-                  00008638    00000014     freq_counter.obj (.text:initialize_freq_counter)
-                  0000864c    00000012     rts430x_lc_sd_eabi.lib : memcpy.c.obj (.text:memcpy)
-                  0000865e    00000006     pmm.obj (.text:PMM_unlockLPM5)
-                  00008664    00000006     rts430x_lc_sd_eabi.lib : exit.c.obj (.text:abort)
-                  0000866a    00000004                            : pre_init.c.obj (.text:_system_pre_init)
-                  0000866e    00000002                            : startup.c.obj (.text:_system_post_cinit)
+                  0000834e    0000006c     intellitune.obj (.text:main)
+                  000083ba    0000006a     rts430x_lc_sd_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit_hold_wdt:__TI_auto_init_nobinit_nopinit_hold_wdt)
+                  00008424    00000058                            : div32u.asm.obj (.text)
+                  0000847c    00000052     intellitune.obj (.text:clock_configure)
+                  000084ce    00000040     rts430x_lc_sd_eabi.lib : cpy_util.asm.obj (.text:__memcpy_far)
+                  0000850e    0000003e                            : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset:__TI_zero_init_nomemset)
+                  0000854c    0000003e                            : lsl32.asm.obj (.text:l_lsl_const)
+                  0000858a    0000003c                            : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
+                  000085c6    0000002c     freq_counter.obj (.text:measure_freq)
+                  000085f2    00000026     hd44780.obj (.text:hd44780_clear_screen)
+                  00008618    00000024     user_iface.obj (.text:lcd_init)
+                  0000863c    00000014     freq_counter.obj (.text:initialize_freq_counter)
+                  00008650    00000012     intellitune.obj (.text:initialize_unused_pins)
+                  00008662    00000012     rts430x_lc_sd_eabi.lib : memcpy.c.obj (.text:memcpy)
+                  00008674    00000006     pmm.obj (.text:PMM_unlockLPM5)
+                  0000867a    00000006     rts430x_lc_sd_eabi.lib : exit.c.obj (.text:abort)
+                  00008680    00000004                            : pre_init.c.obj (.text:_system_pre_init)
+                  00008684    00000002                            : startup.c.obj (.text:_system_post_cinit)
 
 .text:_isr 
-*          0    00008670    00000092     
-                  00008670    00000046     freq_counter.obj (.text:_isr:Timer0_B3)
-                  000086b6    0000001e     user_iface.obj (.text:_isr:timer_3_b1_isr)
-                  000086d4    0000001c     rts430x_lc_sd_eabi.lib : boot.c.obj (.text:_isr:_c_int00_noargs)
-                  000086f0    0000000a     freq_counter.obj (.text:_isr:Timer1_B3)
-                  000086fa    00000008     rts430x_lc_sd_eabi.lib : isr_trap.asm.obj (.text:_isr:__TI_ISR_TRAP)
+*          0    00008686    00000092     
+                  00008686    00000046     freq_counter.obj (.text:_isr:Timer0_B3)
+                  000086cc    0000001e     user_iface.obj (.text:_isr:timer_3_b1_isr)
+                  000086ea    0000001c     rts430x_lc_sd_eabi.lib : boot.c.obj (.text:_isr:_c_int00_noargs)
+                  00008706    0000000a     freq_counter.obj (.text:_isr:Timer1_B3)
+                  00008710    00000008     rts430x_lc_sd_eabi.lib : isr_trap.asm.obj (.text:_isr:__TI_ISR_TRAP)
 
 .bss       0    00002000    00000025     UNINITIALIZED
                   00002000    00000020     hd44780.obj (.bss:u8__hd44780_data_buffer)
@@ -260,11 +261,11 @@ MODULE SUMMARY
        ------                       ----   -------   -------
     .\
        hd44780.obj                  582    7         37     
-       intellitune.obj              186    14        0      
+       intellitune.obj              208    14        0      
        freq_counter.obj             144    4         5      
        user_iface.obj               66     2         0      
     +--+----------------------------+------+---------+---------+
-       Total:                       978    27        42     
+       Total:                       1000   27        42     
                                                             
     .\driverlib\MSP430FR2xx_4xx\
        pmm.obj                      6      0         0      
@@ -312,7 +313,7 @@ MODULE SUMMARY
        Stack:                       0      0         160    
        Linker Generated:            0      42        0      
     +--+----------------------------+------+---------+---------+
-       Grand Total:                 1730   113       202    
+       Grand Total:                 1752   113       202    
 
 
 LINKER GENERATED COPY TABLES
@@ -412,7 +413,7 @@ address   name
 00000672  BAKMEM9                                
 00000673  BAKMEM9_H                              
 00000672  BAKMEM9_L                              
-00008664  C$$EXIT                                
+0000867a  C$$EXIT                                
 000002ee  CAPTIOCTL                              
 000002ef  CAPTIOCTL_H                            
 000002ee  CAPTIOCTL_L                            
@@ -867,7 +868,7 @@ address   name
 0000012a  PMMIFG                                 
 0000012b  PMMIFG_H                               
 0000012a  PMMIFG_L                               
-0000865e  PMM_unlockLPM5                         
+00008674  PMM_unlockLPM5                         
 000004e4  RES0                                   
 000004e5  RES0_H                                 
 000004e4  RES0_L                                 
@@ -1165,8 +1166,8 @@ address   name
 00000450  TB3R                                   
 00000451  TB3R_H                                 
 00000450  TB3R_L                                 
-00008670  Timer0_B3                              
-000086f0  Timer1_B3                              
+00008686  Timer0_B3                              
+00008706  Timer1_B3                              
 00000510  UCA0ABCTL                              
 00000511  UCA0ABCTL_H                            
 00000510  UCA0ABCTL_L                            
@@ -1350,10 +1351,10 @@ address   name
 0000802a  __TI_CINIT_Limit                       
 00008000  __TI_Handler_Table_Base                
 0000800c  __TI_Handler_Table_Limit               
-000086fa  __TI_ISR_TRAP                          
-0000834e  __TI_auto_init_nobinit_nopinit_hold_wdt
+00008710  __TI_ISR_TRAP                          
+000083ba  __TI_auto_init_nobinit_nopinit_hold_wdt
 000081b4  __TI_decompress_lzss                   
-00008586  __TI_decompress_none                   
+0000858a  __TI_decompress_none                   
 0000ffce  __TI_int22                             
 0000ffd0  __TI_int23                             
 0000ffd2  __TI_int24                             
@@ -1381,46 +1382,47 @@ address   name
 ffffffff  __TI_pprof_out_hndl                    
 ffffffff  __TI_prof_data_size                    
 ffffffff  __TI_prof_data_start                   
-0000850a  __TI_zero_init_nomemset                
+0000850e  __TI_zero_init_nomemset                
 ffffffff  __c_args__                             
-000084ca  __memcpy_far                           
-00008420  __mspabi_divul                         
-00008420  __mspabi_remul                         
-00008580  __mspabi_slll_1                        
-0000855c  __mspabi_slll_10                       
-00008558  __mspabi_slll_11                       
-00008554  __mspabi_slll_12                       
-00008550  __mspabi_slll_13                       
-0000854c  __mspabi_slll_14                       
-00008548  __mspabi_slll_15                       
-0000857c  __mspabi_slll_2                        
-00008578  __mspabi_slll_3                        
-00008574  __mspabi_slll_4                        
-00008570  __mspabi_slll_5                        
-0000856c  __mspabi_slll_6                        
-00008568  __mspabi_slll_7                        
-00008564  __mspabi_slll_8                        
-00008560  __mspabi_slll_9                        
-000086d4  _c_int00_noargs                        
+000084ce  __memcpy_far                           
+00008424  __mspabi_divul                         
+00008424  __mspabi_remul                         
+00008584  __mspabi_slll_1                        
+00008560  __mspabi_slll_10                       
+0000855c  __mspabi_slll_11                       
+00008558  __mspabi_slll_12                       
+00008554  __mspabi_slll_13                       
+00008550  __mspabi_slll_14                       
+0000854c  __mspabi_slll_15                       
+00008580  __mspabi_slll_2                        
+0000857c  __mspabi_slll_3                        
+00008578  __mspabi_slll_4                        
+00008574  __mspabi_slll_5                        
+00008570  __mspabi_slll_6                        
+0000856c  __mspabi_slll_7                        
+00008568  __mspabi_slll_8                        
+00008564  __mspabi_slll_9                        
+000086ea  _c_int00_noargs                        
 0000fffe  _reset_vector                          
 00002f60  _stack                                 
-0000866e  _system_post_cinit                     
-0000866a  _system_pre_init                       
-00008664  abort                                  
-00008478  clock_configure                        
+00008684  _system_post_cinit                     
+00008680  _system_pre_init                       
+0000867a  abort                                  
+0000847c  clock_configure                        
 00008000  fram_rw_start                          
 00008000  fram_rx_start                          
 00002020  frequency                              
-000085ee  hd44780_clear_screen                   
+000085f2  hd44780_clear_screen                   
 00008040  hd44780_timer_isr                      
 000082a2  hd44780_write_string                   
-00008638  initialize_freq_counter                
-00008614  lcd_init                               
-000083b8  main                                   
-000085c2  measure_freq                           
-0000864c  memcpy                                 
+0000863c  initialize_freq_counter                
+00008650  initialize_unused_pins                 
+00008618  lcd_init                               
+0000834e  main                                   
+000085c6  measure_freq                           
+00008662  memcpy                                 
 00002022  overflowCount                          
-000086b6  timer_3_b1_isr                         
+000086cc  timer_3_b1_isr                         
 0000202a  timing_correction                      
 
 
@@ -2449,44 +2451,45 @@ address   name
 00008040  hd44780_timer_isr                      
 000081b4  __TI_decompress_lzss                   
 000082a2  hd44780_write_string                   
-0000834e  __TI_auto_init_nobinit_nopinit_hold_wdt
-000083b8  main                                   
-00008420  __mspabi_divul                         
-00008420  __mspabi_remul                         
-00008478  clock_configure                        
-000084ca  __memcpy_far                           
-0000850a  __TI_zero_init_nomemset                
-00008548  __mspabi_slll_15                       
-0000854c  __mspabi_slll_14                       
-00008550  __mspabi_slll_13                       
-00008554  __mspabi_slll_12                       
-00008558  __mspabi_slll_11                       
-0000855c  __mspabi_slll_10                       
-00008560  __mspabi_slll_9                        
-00008564  __mspabi_slll_8                        
-00008568  __mspabi_slll_7                        
-0000856c  __mspabi_slll_6                        
-00008570  __mspabi_slll_5                        
-00008574  __mspabi_slll_4                        
-00008578  __mspabi_slll_3                        
-0000857c  __mspabi_slll_2                        
-00008580  __mspabi_slll_1                        
-00008586  __TI_decompress_none                   
-000085c2  measure_freq                           
-000085ee  hd44780_clear_screen                   
-00008614  lcd_init                               
-00008638  initialize_freq_counter                
-0000864c  memcpy                                 
-0000865e  PMM_unlockLPM5                         
-00008664  C$$EXIT                                
-00008664  abort                                  
-0000866a  _system_pre_init                       
-0000866e  _system_post_cinit                     
-00008670  Timer0_B3                              
-000086b6  timer_3_b1_isr                         
-000086d4  _c_int00_noargs                        
-000086f0  Timer1_B3                              
-000086fa  __TI_ISR_TRAP                          
+0000834e  main                                   
+000083ba  __TI_auto_init_nobinit_nopinit_hold_wdt
+00008424  __mspabi_divul                         
+00008424  __mspabi_remul                         
+0000847c  clock_configure                        
+000084ce  __memcpy_far                           
+0000850e  __TI_zero_init_nomemset                
+0000854c  __mspabi_slll_15                       
+00008550  __mspabi_slll_14                       
+00008554  __mspabi_slll_13                       
+00008558  __mspabi_slll_12                       
+0000855c  __mspabi_slll_11                       
+00008560  __mspabi_slll_10                       
+00008564  __mspabi_slll_9                        
+00008568  __mspabi_slll_8                        
+0000856c  __mspabi_slll_7                        
+00008570  __mspabi_slll_6                        
+00008574  __mspabi_slll_5                        
+00008578  __mspabi_slll_4                        
+0000857c  __mspabi_slll_3                        
+00008580  __mspabi_slll_2                        
+00008584  __mspabi_slll_1                        
+0000858a  __TI_decompress_none                   
+000085c6  measure_freq                           
+000085f2  hd44780_clear_screen                   
+00008618  lcd_init                               
+0000863c  initialize_freq_counter                
+00008650  initialize_unused_pins                 
+00008662  memcpy                                 
+00008674  PMM_unlockLPM5                         
+0000867a  C$$EXIT                                
+0000867a  abort                                  
+00008680  _system_pre_init                       
+00008684  _system_post_cinit                     
+00008686  Timer0_B3                              
+000086cc  timer_3_b1_isr                         
+000086ea  _c_int00_noargs                        
+00008706  Timer1_B3                              
+00008710  __TI_ISR_TRAP                          
 0000ffce  __TI_int22                             
 0000ffd0  __TI_int23                             
 0000ffd2  __TI_int24                             
@@ -2517,4 +2520,4 @@ ffffffff  __TI_prof_data_size
 ffffffff  __TI_prof_data_start                   
 ffffffff  __c_args__                             
 
-[1088 symbols]
+[1089 symbols]

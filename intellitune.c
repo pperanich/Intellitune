@@ -38,6 +38,7 @@
 // Function Prototypes
 void tune(void);
 void clock_configure(void);
+void initialize_unused_pins(void);
 
 
 // Main Program function
@@ -50,6 +51,8 @@ int main(void) {
     WDTCTL = WDTPW | WDTHOLD;
 
     clock_configure();
+
+    initialize_unused_pins();
 
     // Initialize the frequency counter
     initialize_freq_counter();
@@ -112,4 +115,12 @@ void clock_configure(void)
 
     CSCTL4 = SELMS__DCOCLKDIV | SELA__XT1CLK;   // set XT1 (~32768Hz) as ACLK source, ACLK = 32768Hz
                                                  // default DCOCLKDIV as MCLK and SMCLK source
+}
+
+void initialize_unused_pins(void)
+{
+    // Configure unused pins as digital outputs.
+    P1DIR |= BIT1;
+    P3DIR |= (BIT2 | BIT3);
+    P2DIR |= BIT4;
 }
