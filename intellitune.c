@@ -64,7 +64,7 @@ int main(void) {
 
     // Disable the GPIO power-on default high-impedance mode
     // to activate previously configured port settings
-    PMM_unlockLPM5();
+    PM5CTL0 &= ~LOCKLPM5;
 
     __bis_SR_register(GIE);       // Enable interrupts
 

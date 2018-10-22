@@ -70,13 +70,13 @@ __interrupt void Timer1_B3 (void)
 #pragma vector=TIMER0_B0_VECTOR
 __interrupt void Timer0_B3 (void)
 {
-    uint16_t timer0_count;
+    //uint16_t timer0_count;
     uint16_t timer1_count;
     uint32_t  total_pulses;
 
     TB0CTL = MC_0;
     TB1CTL = MC_0;
-    timer0_count = TB0R;
+    //timer0_count = TB0R;
     timer1_count = TB1R;
     total_pulses = ((uint32_t)overflowCount << 16) | timer1_count;
     frequency = ((total_pulses << 4)) / 1000;

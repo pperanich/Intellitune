@@ -9,7 +9,7 @@
  *
  ******************************************************************************/
 
-#include "driverlib.h"
+//#include "driverlib.h"
 #include "hd44780.h"
 
 // All custom typedefs used for this project
