@@ -22,6 +22,8 @@ typedef struct
 
 // Globals
 extern uint16_t frequency;
+extern uint8_t CMD_BYTE;
+extern uint8_t DATA_BYTE;
 
 // Subsystem function declarations
 
@@ -35,6 +37,7 @@ extern void initialize_freq_counter(void);
 
 // Standing Wave Ratio subsystem
 extern SWR measure_swr(void);
+extern void initialize_spi(void);
 extern void update_digipot(void);
 
 // User Interface subsystem

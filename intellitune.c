@@ -45,7 +45,6 @@ void initialize_unused_pins(void);
 int main(void) {
 
     volatile uint32_t i;
-    //char msg[32] = {'\0'};
 
     // Stop watchdog timer
     WDTCTL = WDTPW | WDTHOLD;
@@ -56,6 +55,9 @@ int main(void) {
 
     // Initialize the frequency counter
     initialize_freq_counter();
+
+    // Initialize SPI communication to digital potentiometer
+    initialize_spi();
 
     // Initialize the LCD
     lcd_init();
@@ -72,6 +74,7 @@ int main(void) {
         while(TB0CTL != MC_0);
         hd44780_write_string("Hello world!", 1, 1, NO_CR_LF ); // Write text string to first row and first column
         // Delay
+        update_digipot();
         for(i=50000; i>0; i--);
     }
 

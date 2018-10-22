@@ -13,7 +13,7 @@
 // Globals
 uint16_t overflowCount;
 uint16_t frequency;
-uint8_t timing_correction = 2;
+static const uint8_t timing_correction = 2;
 
 
 // Function Prototypes
