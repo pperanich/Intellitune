@@ -28,7 +28,8 @@ extern uint8_t DATA_BYTE;
 // Subsystem function declarations
 
 // Stepper motor subsystem
-extern void step_motor(uint8_t motor, uint8_t dir, uint8_t amount);
+extern void initialize_stepper_control(void);
+extern void step_motor(uint8_t motor, uint8_t dir, uint16_t degrees);
 extern void current_setting(void);
 
 // Frequency Counter subsystem
@@ -45,6 +46,7 @@ extern void lcd_init(void);
 extern void lcd_update(void);
 
 // Relay subsystem
+extern void initialize_relay(void);
 extern void switch_relay(int relay_num, int position);
 extern void switch_net_config(void);
 extern void switch_known_impedance(void);

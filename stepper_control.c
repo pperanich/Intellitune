@@ -14,7 +14,7 @@
 
 // Function Prototypes
 void initialize_stepper_control(void);
-void step_motor(uint8_t motor, uint8_t dir, uint8_t amount);
+void step_motor(uint8_t motor, uint8_t dir, uint16_t degrees);
 void current_setting(void);
 
 
@@ -69,8 +69,58 @@ void current_setting(void)
 
 
 // TODO: Implement stepper motor control function.
-void step_motor(uint8_t motor, uint8_t dir, uint8_t amount)
+void step_motor(uint8_t motor, uint8_t dir, uint16_t degrees)
 {
-    // Not Implemented
-    asm("    NOP");
+    /*
+     * Inputs:
+     *      motor:
+     *          0 - inductor motor
+     *          1 - capacitor motor
+     *      dir:
+     *          0 - Forward
+     *          1 - reverse
+     *      degrees:
+     *          amount of degrees to rotate, shifted left 2 for more precision.
+     */
+
+    uint32_t step_cycles;
+
+    switch(motor)
+    {
+    case 0: // Inductor motor driver
+        P3OUT &= ~BIT2; // Enable FETs on driver
+        if(dir==0) { P2OUT &= ~BIT4; }
+        else if(dir==1) { P2OUT |= BIT4; }
+        step_cycles = (uint32_t)degrees * 10 / 18;
+        __delay_cycles(4);
+        while(step_cycles){
+            P3OUT |= BIT3;
+            __delay_cycles(20);
+            P3OUT &= ~BIT3;
+            __delay_cycles(20);
+            step_cycles--;
+        }
+        P3OUT |= BIT2; // Disable FETs on driver
+        break;
+
+    case 1: // Capacitor motor driver
+        P5OUT &= ~BIT4; // Enable FETs on driver
+        if(dir==0) { P1OUT &= ~BIT4; }
+        else if(dir==1) { P1OUT |= BIT4; }
+        step_cycles = (uint32_t)degrees * 1000 / 67;
+        __delay_cycles(4);
+        while(step_cycles){
+            P1OUT |= BIT1;
+            __delay_cycles(20);
+            P1OUT &= ~BIT1;
+            __delay_cycles(20);
+            step_cycles--;
+        }
+        P5OUT |= BIT4; // Disable FETs on driver
+        break;
+
+    default:
+        asm("    NOP");
+        break;
+    }
 }

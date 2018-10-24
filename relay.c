@@ -11,9 +11,18 @@
 
 
 // Function Prototypes
+void initialize_relay(void);
 void switch_cap_relay(int relay_num, int position);
 void switch_net_config(void);
 void switch_kwown_impedance(void);
+
+
+// TODO: Initialize relay outputs
+void initialize_relay(void)
+{
+    // Not Implemented
+    asm("    NOP");
+}
 
 
 // TODO: Binary sequenced capacitor relay function.

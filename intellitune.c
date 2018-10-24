@@ -53,11 +53,17 @@ int main(void) {
 
     initialize_unused_pins();
 
+    // Initialize relay pins and output states
+    initialize_relay();
+
     // Initialize the frequency counter
     initialize_freq_counter();
 
     // Initialize SPI communication to digital potentiometer
     initialize_spi();
+
+    // Initialize pins for stepper motor drivers
+    initialize_stepper_control();
 
     // Initialize the LCD
     lcd_init();
@@ -75,6 +81,10 @@ int main(void) {
         hd44780_write_string("Hello world!", 1, 1, NO_CR_LF ); // Write text string to first row and first column
         // Delay
         update_digipot();
+        step_motor(0, 0, 360);
+        step_motor(0, 1, 360);
+        step_motor(1, 0, 360);
+        step_motor(1, 1, 360);
         for(i=50000; i>0; i--);
     }
 
@@ -123,7 +133,5 @@ void clock_configure(void)
 void initialize_unused_pins(void)
 {
     // Configure unused pins as digital outputs.
-    P1DIR |= BIT1;
-    P3DIR |= (BIT2 | BIT3);
-    P2DIR |= BIT4;
+    P1DIR |= BIT3 | BIT2;
 }
