@@ -1,7 +1,7 @@
 /*
  * File: intellitune.h
  *
- * Author(s): Preston Peranich
+ * Author(s): Preston Peranich, Noah Ihediwa
  *
  * Description: This header file will serve to identify all functions that are defined
  *              across the project and declare external globals as well. The different functions
