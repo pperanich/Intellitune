@@ -33,7 +33,7 @@ void switch_net_config(void)
 
 
 // TODO Implement function to switch known impedance in and out.
-void switch_kwown_impedance(void)
+void switch_known_impedance(void)
 {
     // Not Implemented
     asm("    NOP");

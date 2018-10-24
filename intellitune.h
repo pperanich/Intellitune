@@ -47,4 +47,4 @@ extern void lcd_update(void);
 // Relay subsystem
 extern void switch_relay(int relay_num, int position);
 extern void switch_net_config(void);
-extern void switch_kwown_impedance(void);
+extern void switch_known_impedance(void);
