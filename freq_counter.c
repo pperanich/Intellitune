@@ -42,7 +42,7 @@ void measure_freq(void)
     TB0CTL = (CNTL_0 | TBSSEL_1 | MC__UP | ID_0);
 
     // 16-bit, TBxCLK, halt mode, divide by 4, enable Interrupt
-    TB1CTL = (CNTL_0 | TBSSEL_0 | MC__CONTINUOUS | ID_2 | TBIE);
+    TB1CTL = (CNTL_0 | TBSSEL_2 | MC__CONTINUOUS | ID_2 | TBIE);
 }
 
 

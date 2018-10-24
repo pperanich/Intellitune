@@ -43,7 +43,7 @@ void initialize_unused_pins(void);
 
 // Main Program function
 int main(void) {
-
+    char buf[16];
     volatile uint32_t i;
 
     // Stop watchdog timer
@@ -78,13 +78,16 @@ int main(void) {
     {
         measure_freq();
         while(TB0CTL != MC_0);
-        hd44780_write_string("Hello world!", 1, 1, NO_CR_LF ); // Write text string to first row and first column
+        hd44780_write_string("Freq:", 1, 1, NO_CR_LF ); // Write text string to first row and first column
+        //sprintf(buf,'%d',frequency);
+        //hd44780_write_string(*buf, 1, 6, NO_CR_LF ); // Write text string to first row and first column
         // Delay
-        update_digipot();
-        step_motor(0, 0, 360);
-        step_motor(0, 1, 360);
-        step_motor(1, 0, 360);
-        step_motor(1, 1, 360);
+        //update_digipot();
+        //step_motor(0, 0, 360);
+        //step_motor(0, 1, 360);
+        //step_motor(1, 0, 360);
+        //__delay_cycles(16000000);
+        //step_motor(1, 1, 360);
         for(i=50000; i>0; i--);
     }
 

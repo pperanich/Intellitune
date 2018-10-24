@@ -10,6 +10,7 @@
  ******************************************************************************/
 
 //#include "driverlib.h"
+#include <stdio.h>
 #include "hd44780.h"
 
 // All custom typedefs used for this project
@@ -24,6 +25,7 @@ typedef struct
 extern uint16_t frequency;
 extern uint8_t CMD_BYTE;
 extern uint8_t DATA_BYTE;
+extern const uint32_t DELAY_CYC_NUM;
 
 // Subsystem function declarations
 
