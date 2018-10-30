@@ -116,7 +116,7 @@ void step_motor(uint8_t motor, uint8_t dir, uint16_t degrees)
             P1OUT |= BIT1;
             __delay_cycles(DELAY_CYC_NUM);
             P1OUT &= ~BIT1;
-            __delay_cycles(DELAY_CYC_NUM);
+            __delay_cycles(4000);
             step_cycles--;
         }
         P5OUT |= BIT4; // Disable FETs on driver

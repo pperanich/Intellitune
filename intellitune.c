@@ -68,6 +68,8 @@ int main(void) {
     // Initialize the LCD
     lcd_init();
 
+    P1DIR |= BIT0;
+    P1OUT |= BIT0;
     // Disable the GPIO power-on default high-impedance mode
     // to activate previously configured port settings
     PM5CTL0 &= ~LOCKLPM5;
@@ -80,6 +82,8 @@ int main(void) {
         while(TB0CTL != MC_0);
         hd44780_write_string("Freq:", 1, 1, NO_CR_LF ); // Write text string to first row and first column
         //sprintf(buf,'%d',frequency);
+        uint8_t freq_whole = frequency / 1000;
+        uint8_t freq_decimal = frequency % 1000;
         //hd44780_write_string(*buf, 1, 6, NO_CR_LF ); // Write text string to first row and first column
         // Delay
         //update_digipot();

@@ -24,6 +24,8 @@ __interrupt void Timer0_B3 (void);
 // TODO: Implement frequency measuring
 void measure_freq(void)
 {
+    static const uint8_t timing_correction = 2;
+
     // Timer1_B3 and Timer0_B3 setup
 
     overflowCount = 0;
