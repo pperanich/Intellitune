@@ -128,6 +128,7 @@ __interrupt void ADC_ISR(void)
     break;
   case ADCIV_ADCIFG:
     ADC_Result[i] = ADCMEM0;
+
      if i = 0,means:
      (1)sequence ADC channels sample has been completed,
      (2)you can stop ADC conversion here to ignore data overwrite to the ADC result array

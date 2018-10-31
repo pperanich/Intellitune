@@ -47,9 +47,9 @@ void reverse(char s[]);
 int main(void) {
     char buf1[12] = {'\0'};
     char buf2[3];
-    char period[1];
+    char period[1] = {46};
     char f_unit[3] = "MHz";
-    period[0] = 46;
+    uint8_t str_length = 0;
     volatile uint32_t i;
 
     // Stop watchdog timer
@@ -82,6 +82,9 @@ int main(void) {
     // to activate previously configured port settings
     PM5CTL0 &= ~LOCKLPM5;
 
+    PMMCTL0_H = PMMPW_H;  // Unlock the PMM registers
+    PMMCTL2 |= INTREFEN;   // Enable internal reference
+
     __bis_SR_register(GIE);       // Enable interrupts
 
     hd44780_write_string("Hello World!", 2, 1, NO_CR_LF ); // Write text string to first row and first column
@@ -98,6 +101,7 @@ int main(void) {
         strcat(buf1, period);
         strcat(buf1, buf2);
         strcat(buf1, f_unit);
+        str_length = strlen(buf1);
         hd44780_write_string(buf1, 1, 1, NO_CR_LF ); // Write text string to first row and first column
         //step_motor(0, 0, 360);
         //step_motor(0, 1, 360);
@@ -118,7 +122,7 @@ void tune(void)
 }
 
 
-
+// TODO: Change clock speed to 24MHz.
 void clock_configure(void)
 {
     // Configure MCLK for 16MHz. FLL reference clock is XT1. At this

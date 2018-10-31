@@ -9,8 +9,6 @@
  *
  ******************************************************************************/
 
-//#include "driverlib.h"
-//#include <stdlib.h>
 #include <string.h>
 #include "hd44780.h"
 

@@ -60,6 +60,11 @@ void initialize_stepper_control(void)
     // Initialize direction pins low (Forward)
     P1OUT &= ~BIT4;
     P2OUT &= ~BIT4;
+
+    // Configure ADC pins for reference potentiometers
+    P5DIR &= ~BIT0 & ~BIT1;
+    ADCCTL0 |= ADCON | ADCSHT_8;
+    ADCCTL1 |= ADCSHP;
 }
 
 

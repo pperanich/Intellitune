@@ -20,6 +20,13 @@ void switch_kwown_impedance(void);
 // TODO: Initialize relay outputs
 void initialize_relay(void)
 {
+    // Configure relay pins as outputs
+    P1DIR |= BIT5 | BIT6 | BIT7;
+    P3DIR |= BIT4 | BIT6;
+    // Set pins low
+    P1OUT &= ~BIT5 & ~BIT6 & ~BIT7;
+    P3OUT &= ~BIT4 & ~BIT7;
+
     // Not Implemented
     asm("    NOP");
 }

@@ -78,7 +78,7 @@ __interrupt void Timer3_B1( void )
       break; // CCR1 interrupt handling done
 
     case TBIV_4:
-        MODE_SWITCH = 1;
+        MODE_SWITCH += 1;
         TB3CCTL2 = CCIE_0; // Compare interrupt disable
         break;
 
@@ -87,14 +87,6 @@ __interrupt void Timer3_B1( void )
         else P1OUT |= BIT0;
         break;
   }
-}
-
-
-#pragma vector = TIMER3_B0_VECTOR
-__interrupt void Timer3_B0(void)
-{
-    if(P1OUT & BIT0) P1OUT &= ~BIT0;
-    else P1OUT |= BIT0;
 }
 
 
