@@ -66,7 +66,7 @@ int main(void) {
     initialize_stepper_control();
 
     // Initialize the LCD
-    lcd_init();
+    ui_init();
 
     P1DIR |= BIT0;
     P1OUT |= BIT0;

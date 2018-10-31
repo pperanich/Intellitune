@@ -44,7 +44,7 @@ extern void initialize_spi(void);
 extern void update_digipot(void);
 
 // User Interface subsystem
-extern void lcd_init(void);
+extern void ui_init(void);
 extern void lcd_update(void);
 
 // Relay subsystem
