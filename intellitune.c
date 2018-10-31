@@ -39,11 +39,17 @@
 void tune(void);
 void clock_configure(void);
 void initialize_unused_pins(void);
+void utoa(unsigned int n, char s[]);
+void reverse(char s[]);
 
 
 // Main Program function
 int main(void) {
-    char buf[16];
+    char buf1[12] = {'\0'};
+    char buf2[3];
+    char period[1];
+    char f_unit[3] = "MHz";
+    period[0] = 46;
     volatile uint32_t i;
 
     // Stop watchdog timer
@@ -65,28 +71,34 @@ int main(void) {
     // Initialize pins for stepper motor drivers
     initialize_stepper_control();
 
-    // Initialize the LCD
+    // Initialize the user interface buttons and lcd
     ui_init();
 
+    // Set output LED
     P1DIR |= BIT0;
     P1OUT |= BIT0;
+
     // Disable the GPIO power-on default high-impedance mode
     // to activate previously configured port settings
     PM5CTL0 &= ~LOCKLPM5;
 
     __bis_SR_register(GIE);       // Enable interrupts
 
+    hd44780_write_string("Hello World!", 2, 1, NO_CR_LF ); // Write text string to first row and first column
+
     while(1)
     {
         measure_freq();
         while(TB0CTL != MC_0);
-        hd44780_write_string("Freq:", 1, 1, NO_CR_LF ); // Write text string to first row and first column
-        //sprintf(buf,'%d',frequency);
+
         uint8_t freq_whole = frequency / 1000;
-        uint8_t freq_decimal = frequency % 1000;
-        //hd44780_write_string(*buf, 1, 6, NO_CR_LF ); // Write text string to first row and first column
-        // Delay
-        //update_digipot();
+        uint16_t freq_decimal = frequency % 1000;
+        utoa(freq_whole, buf1);
+        utoa(freq_decimal, buf2);
+        strcat(buf1, period);
+        strcat(buf1, buf2);
+        strcat(buf1, f_unit);
+        hd44780_write_string(buf1, 1, 1, NO_CR_LF ); // Write text string to first row and first column
         //step_motor(0, 0, 360);
         //step_motor(0, 1, 360);
         //step_motor(1, 0, 360);
@@ -141,4 +153,30 @@ void initialize_unused_pins(void)
 {
     // Configure unused pins as digital outputs.
     P1DIR |= BIT3 | BIT2;
+}
+
+
+// utoa:  convert n to characters in s
+void utoa(unsigned int n, char s[])
+{
+    int i = 0;
+    do {       // generate digits in reverse order
+        s[i++] = n % 10 + '0';   // get next digit
+    } while ((n /= 10) > 0);     // delete it
+    s[i] = '\0';
+    reverse(s);
+}
+
+
+// reverse string s in place
+void reverse(char s[])
+{
+    int i, j;
+    char c;
+
+    for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+        c = s[i];
+        s[i] = s[j];
+        s[j] = c;
+    }
 }

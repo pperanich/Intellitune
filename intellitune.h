@@ -10,7 +10,8 @@
  ******************************************************************************/
 
 //#include "driverlib.h"
-#include <stdio.h>
+//#include <stdlib.h>
+#include <string.h>
 #include "hd44780.h"
 
 // All custom typedefs used for this project

@@ -13,7 +13,6 @@
 // Globals
 uint16_t overflowCount;
 uint16_t frequency;
-static const uint8_t timing_correction = 2;
 
 
 // Function Prototypes
@@ -44,7 +43,7 @@ void measure_freq(void)
     TB0CTL = (CNTL_0 | TBSSEL_1 | MC__UP | ID_0);
 
     // 16-bit, TBxCLK, halt mode, divide by 4, enable Interrupt
-    TB1CTL = (CNTL_0 | TBSSEL_0 | MC__CONTINUOUS | ID_2 | TBIE);
+    TB1CTL = (CNTL_0 | TBSSEL_2 | MC__CONTINUOUS | ID_2 | TBIE);
 }
 
 
@@ -63,14 +62,14 @@ void initialize_freq_counter(void)
 
 
 #pragma vector=TIMER1_B1_VECTOR
-__interrupt void Timer1_B3 (void)
+__interrupt void Timer1_B3(void)
 {
     overflowCount++;
     TB1IV = 0;
 }
 
 #pragma vector=TIMER0_B0_VECTOR
-__interrupt void Timer0_B3 (void)
+__interrupt void Timer0_B3(void)
 {
     //uint16_t timer0_count;
     uint16_t timer1_count;

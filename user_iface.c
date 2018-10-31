@@ -49,9 +49,10 @@ void ui_init(void)
     P6DIR |= BIT0 | BIT1 | BIT2 | BIT3 | BIT4;
     P3DIR |= BIT7;
 
+    TB3R = 0;
     TB3CCR1  = 48; // Set CCR1 value for 1.46 ms interrupt (48 / 32768 Hz) = 0.00146
     TB3CCTL1 = CCIE; // Compare interrupt enable
-    TB3CTL   = (TBSSEL_1 | MC_2 | TBCLR); // ACLK as clock source, continuous mode, timer clear
+    TB3CTL   = (CNTL_0 | TBSSEL_1 | MC__CONTINUOUS | TBIE); // ACLK as clock source, continuous mode, timer clear
 
     hd44780_clear_screen(); // Clear display content
 }
@@ -67,7 +68,7 @@ void lcd_update(void)
 
 // Directive for timer interrupt
 #pragma vector = TIMER3_B1_VECTOR
-__interrupt void timer_3_b1_isr( void )
+__interrupt void Timer3_B1( void )
 {
   switch( TB3IV ) // Determine interrupt source
   {
@@ -80,7 +81,20 @@ __interrupt void timer_3_b1_isr( void )
         MODE_SWITCH = 1;
         TB3CCTL2 = CCIE_0; // Compare interrupt disable
         break;
+
+    case TBIV_14:
+        if(P1OUT & BIT0) P1OUT &= ~BIT0;
+        else P1OUT |= BIT0;
+        break;
   }
+}
+
+
+#pragma vector = TIMER3_B0_VECTOR
+__interrupt void Timer3_B0(void)
+{
+    if(P1OUT & BIT0) P1OUT &= ~BIT0;
+    else P1OUT |= BIT0;
 }
 
 
@@ -144,7 +158,7 @@ __interrupt void Port_4( void )
   switch( P4IV )
   {
     case P3IV_2:
-        BUTTON_PRESS |= (BIT0 << 15)
+        BUTTON_PRESS |= (BIT0 << 12);
         break;
   }
 }
