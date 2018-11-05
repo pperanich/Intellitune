@@ -24,4 +24,17 @@
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib</name>
+			<type>1</type>
+			<locationURI>PARENT-5-PROJECT_LOC/ti/tirex-content/msp/MSP430Ware_3_60_00_10/iqmathlib/libraries/CCS/MPY32/5xx_6xx/IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib</locationURI>
+		</link>
+	</linkedResources>
+	<variableList>
+		<variable>
+			<name>MSP430WARE</name>
+			<value>file:/C:/ti/tirex-content/msp/MSP430Ware_3_60_00_10</value>
+		</variable>
+	</variableList>
 </projectDescription>

@@ -1,5 +1,5 @@
 /*
- * Intellitune_msp project
+ * Intellitune project
  *
  * File: intellitune.c
  *
@@ -39,17 +39,10 @@
 void tune(void);
 void clock_configure(void);
 void initialize_unused_pins(void);
-void utoa(unsigned int n, char s[]);
-void reverse(char s[]);
 
 
 // Main Program function
 int main(void) {
-    char buf1[12] = {'\0'};
-    char buf2[3];
-    char period[1] = {46};
-    char f_unit[3] = "MHz";
-    uint8_t str_length = 0;
     volatile uint32_t i;
 
     // Stop watchdog timer
@@ -87,27 +80,22 @@ int main(void) {
 
     __bis_SR_register(GIE);       // Enable interrupts
 
-    hd44780_write_string("Hello World!", 2, 1, NO_CR_LF ); // Write text string to first row and first column
+    hd44780_write_string("Intellitune", 2, 1, NO_CR_LF ); // Write text string to first row and first column
 
     while(1)
     {
         measure_freq();
         while(TB0CTL != MC_0);
 
-        uint8_t freq_whole = frequency / 1000;
-        uint16_t freq_decimal = frequency % 1000;
-        utoa(freq_whole, buf1);
-        utoa(freq_decimal, buf2);
-        strcat(buf1, period);
-        strcat(buf1, buf2);
-        strcat(buf1, f_unit);
-        str_length = strlen(buf1);
-        hd44780_write_string(buf1, 1, 1, NO_CR_LF ); // Write text string to first row and first column
-        //step_motor(0, 0, 360);
-        //step_motor(0, 1, 360);
+        lcd_update();
+        //step_motor(0, 0, 60);
+        //__delay_cycles(16000000);
+        //step_motor(0, 1, 60);
+        //__delay_cycles(10000);
         //step_motor(1, 0, 360);
         //__delay_cycles(16000000);
         //step_motor(1, 1, 360);
+        tune();
         for(i=50000; i>0; i--);
     }
 
@@ -117,7 +105,73 @@ int main(void) {
 // TODO: Implement tuning algorithm
 void tune(void)
 {
-    // Not Implemented
+    _iq16 Q_factor, temp, Z_load, ind_react, cap_react, estimated_inductance, estimated_capacitance,
+    angular_frequency, gamma_1, gamma_2, vswr, numerator, denominator, div_res;
+    char test[12] = {'\0'};
+    char cap_val[7] = {'\0'};
+    char cap2_val[7] = {'\0'};
+    char ind_val[7] = {'\0'};
+    char ind2_val[7] = {'\0'};
+    char q_val[6] = {'\0'};
+    char swr_val[6] = {'\0'};
+    static const _iq16 Z_source = _IQ16(50.0);
+    static const _iq16 iq_one = _IQ16(1.0);
+    uint8_t error;
+
+    measure_freq();
+    _iq16 iq_freq = _IQ16div(_IQ16(frequency), _IQ16(1000));
+    angular_frequency = _IQ16mpy(_IQ16(2*PI), iq_freq); // in Mega rad/s
+
+    gamma_1 = _IQ16(0.818182);//measure_ref_coeff();
+    //switch_known_impedance(); This will be pin 3.6
+    gamma_2 = _IQ16(0.826);//measure_ref_coeff();
+    //switch_known_impedance();
+    numerator = iq_one + gamma_1;
+    denominator = iq_one - gamma_1;
+    vswr = _IQ16div(numerator, denominator);
+    error = _IQ16toa(swr_val,"%2.3f", vswr);
+    div_res = vswr;
+    if(gamma_2 > gamma_1)
+    {
+        Z_load = _IQ16mpy(Z_source, div_res);
+        error = _IQ16toa(test, "%4.4f", Z_load);
+        temp = _IQ16div(Z_load, Z_source);
+        temp = temp - iq_one;
+        Q_factor = _IQ16sqrt(temp);
+        error = _IQ16toa(q_val, "%2.2f", Q_factor);
+        ind_react = _IQ16mpy(Q_factor, Z_source);
+        error = _IQ16toa(ind_val, "%4.2f", ind_react);
+        cap_react = _IQ16div(Z_load, Q_factor);
+        error = _IQ16toa(cap_val, "%4.2f", cap_react);
+        P3OUT &= ~BIT4; // Capacitors switched to output side.
+    } else if(gamma_2 < gamma_1)
+    {
+        //switch_cap_side(INPUT);
+        div_res = _IQ16div(iq_one, div_res);
+        Z_load = _IQ16mpy(Z_source, div_res);
+        error = _IQ16toa(test, "%4.4f", Z_load);
+        temp = _IQ16div(Z_source, Z_load);
+        temp = temp - iq_one;
+        Q_factor = _IQ16sqrt(temp);
+        error = _IQ16toa(q_val, "%2.2f", Q_factor);
+        ind_react = _IQ16mpy(Q_factor, Z_load);
+        error = _IQ16toa(ind_val, "%4.2f", ind_react);
+        cap_react = _IQ16div(Z_source, Q_factor);
+        error = _IQ16toa(cap_val, "%4.2f", cap_react);
+        P3OUT |= BIT4; // Capacitors switched to input side.
+    } else { return; }
+
+
+    estimated_capacitance = _IQ16div(iq_one, cap_react);
+    estimated_capacitance = _IQ16mpy(estimated_capacitance, _IQ16(10000));
+    estimated_capacitance = _IQ16div(estimated_capacitance, angular_frequency);
+    estimated_capacitance = _IQ16mpy(estimated_capacitance, _IQ16(100)); // in pF
+    error = _IQ16toa(cap2_val, "%4.2f", estimated_capacitance);
+
+    estimated_inductance = _IQ16div(ind_react, angular_frequency); // in uH
+    error = _IQ16toa(ind2_val, "%4.2f", estimated_inductance);
+
+    if(error) return;
     asm("    NOP");
 }
 
@@ -125,14 +179,11 @@ void tune(void)
 // TODO: Change clock speed to 24MHz.
 void clock_configure(void)
 {
-    // Configure MCLK for 16MHz. FLL reference clock is XT1. At this
-    // speed, the FRAM requires wait states. ACLK = XT1 ~32768Hz, SMCLK = MCLK = 16MHz.
+    // Configure two FRAM waitstate as required by the device datasheet for MCLK
+    // operation at 24MHz(beyond 8MHz) _before_ configuring the clock system.
+    FRCTL0 = FRCTLPW | NWAITS_2 ;
 
-    // Configure one FRAM waitstate as required by the device datasheet for MCLK
-    // operation beyond 8MHz _before_ configuring the clock system.
-    FRCTL0 = FRCTLPW | NWAITS_1;
-
-    P2SEL1 |= BIT6 | BIT7;                       // set XT1 pin as second function
+    P2SEL1 |= BIT6 | BIT7;                       // P2.6~P2.7: crystal pins
     do
     {
         CSCTL7 &= ~(XT1OFFG | DCOFFG);           // Clear XT1 and DCO fault flag
@@ -142,10 +193,9 @@ void clock_configure(void)
     __bis_SR_register(SCG0);                     // disable FLL
     CSCTL3 |= SELREF__XT1CLK;                    // Set XT1 as FLL reference source
     CSCTL0 = 0;                                  // clear DCO and MOD registers
-    CSCTL1 &= ~(DCORSEL_7);                      // Clear DCO frequency select bits first
-    CSCTL1 |= DCORSEL_5;                         // Set DCO = 16MHz
-    CSCTL2 = FLLD_0 + 487;                       // DCOCLKDIV = 16MHz
-    __delay_cycles(3);
+    CSCTL1 |= DCORSEL_7;                         // Set DCO = 24MHz
+    CSCTL2 = FLLD_0 + 731;                       // DCOCLKDIV = 24MHz
+    __delay_cycles(10);
     __bic_SR_register(SCG0);                     // enable FLL
     while(CSCTL7 & (FLLUNLOCK0 | FLLUNLOCK1));   // FLL locked
 
@@ -157,30 +207,4 @@ void initialize_unused_pins(void)
 {
     // Configure unused pins as digital outputs.
     P1DIR |= BIT3 | BIT2;
-}
-
-
-// utoa:  convert n to characters in s
-void utoa(unsigned int n, char s[])
-{
-    int i = 0;
-    do {       // generate digits in reverse order
-        s[i++] = n % 10 + '0';   // get next digit
-    } while ((n /= 10) > 0);     // delete it
-    s[i] = '\0';
-    reverse(s);
-}
-
-
-// reverse string s in place
-void reverse(char s[])
-{
-    int i, j;
-    char c;
-
-    for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
-        c = s[i];
-        s[i] = s[j];
-        s[j] = c;
-    }
 }

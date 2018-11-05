@@ -17,6 +17,8 @@ uint16_t BUTTON_PRESS = 0;
 // Function Prototypes
 void ui_button_init(void);
 void lcd_update(void);
+void utoa(unsigned int n, char s[]);
+void reverse(char s[]);
 
 
 // TODO: User interface button configuration
@@ -50,7 +52,7 @@ void ui_init(void)
     P3DIR |= BIT7;
 
     TB3R = 0;
-    TB3CCR1  = 48; // Set CCR1 value for 1.46 ms interrupt (48 / 32768 Hz) = 0.00146
+    TB3CCR1  = 64; // Set CCR1 value for 1.46 ms interrupt (48 / 32768 Hz) = 0.00146
     TB3CCTL1 = CCIE; // Compare interrupt enable
     TB3CTL   = (CNTL_0 | TBSSEL_1 | MC__CONTINUOUS | TBIE); // ACLK as clock source, continuous mode, timer clear
 
@@ -61,8 +63,67 @@ void ui_init(void)
 // TODO: LCD update function
 void lcd_update(void)
 {
-    // Not Implemented
-    asm("    NOP");
+    char buf1[17] = {'\0'};
+    char buf2[4] = {'\0'};
+    char buf3[3] = {'\0'};
+    const char period[2] = {'.', '\0'};
+    const char f_unit[3] = "MHz";
+    uint8_t str_length = 0;
+
+    uint8_t freq_whole = frequency / 1000;
+    uint16_t freq_decimal = frequency % 1000;
+    utoa(freq_whole, buf1);
+    utoa(freq_decimal, buf2);
+
+    char temp1, temp2;
+    if(buf2[1] == '\0'){
+        temp1 = buf2[0];
+        buf2[0] = '0';
+        buf2[1] = '0';
+        buf2[2] = temp1;
+    } else if(buf2[2] == '\0'){
+        temp1 = buf2[0]; temp2 = buf2[1];
+        buf2[0] = '0';
+        buf2[1] = temp1;
+        buf2[2] = temp2;
+    }
+    strcat(buf1, period);
+    strcat(buf1, buf2);
+    strcat(buf1, f_unit);
+    str_length = strlen(buf1);
+    // Write text string to first row and first column
+    hd44780_write_string(buf1, 1, 1, CR_LF );
+    hd44780_blank_out_remaining_row(1,str_length+1);
+    utoa(str_length, buf3);
+    if(buf3[0]!='1') buf3[1] = ' ';
+    // Write text string to first row and first column
+    hd44780_write_string(buf3, 2, 14, NO_CR_LF );
+}
+
+
+// utoa:  convert n to characters in s
+void utoa(unsigned int n, char s[])
+{
+    int i = 0;
+    do {  // generate digits in reverse order
+        s[i++] = n % 10 + '0';  // get next digit
+    } while ((n /= 10) > 0);  // delete it
+    s[i] = '\0';
+    reverse(s);
+}
+
+
+// reverse string s in place
+void reverse(char s[])
+{
+    int i, j;
+    char c;
+
+    for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+        c = s[i];
+        s[i] = s[j];
+        s[j] = c;
+    }
 }
 
 
@@ -73,7 +134,7 @@ __interrupt void Timer3_B1( void )
   switch( TB3IV ) // Determine interrupt source
   {
     case TBIV_2: // CCR1 caused the interrupt
-      TB3CCR1 += 48; // Add CCR1 value for next interrupt in 1 ms
+      TB3CCR1 += 64; // Add CCR1 value for next interrupt in 1 ms
       hd44780_timer_isr(); // Call HD44780 state machine
       break; // CCR1 interrupt handling done
 
@@ -118,14 +179,14 @@ __interrupt void Port_3( void )
   switch( P3IV )
   {
     case P3IV_2:
-        if(P2IN & BIT0)
+        if(P3IN & BIT0)
         {
-            P2IES |= BIT0;
+            P3IES |= BIT0;
             BUTTON_PRESS &= ~(BIT0 << 8);
             TB3CCTL2 = CCIE_0; // Compare interrupt enable
         }
         else {
-            P2IES &= ~BIT0;
+            P3IES &= ~BIT0;
             BUTTON_PRESS |= (BIT0 << 8);
             TB3CCR2  = TB3R + 65530; // Set CCR2 value for 2 s interrupt
             TB3CCTL2 = CCIE; // Compare interrupt enable
@@ -149,7 +210,7 @@ __interrupt void Port_4( void )
 {
   switch( P4IV )
   {
-    case P3IV_2:
+    case P4IV_2:
         BUTTON_PRESS |= (BIT0 << 12);
         break;
   }

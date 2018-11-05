@@ -10,7 +10,10 @@
  ******************************************************************************/
 
 #include <string.h>
+#include <IQmathLib.h>
 #include "hd44780.h"
+
+
 
 // All custom typedefs used for this project
 typedef struct
@@ -19,6 +22,8 @@ typedef struct
     uint32_t ref;
 } SWR;
 
+
+#define PI      3.1415926536
 
 // Globals
 extern uint16_t frequency;
@@ -38,13 +43,15 @@ extern void measure_freq(void);
 extern void initialize_freq_counter(void);
 
 // Standing Wave Ratio subsystem
-extern SWR measure_swr(void);
+extern _iq measure_ref_coeff(void);
 extern void initialize_spi(void);
 extern void update_digipot(void);
 
 // User Interface subsystem
 extern void ui_init(void);
 extern void lcd_update(void);
+extern void utoa(unsigned int n, char s[]);
+extern void reverse(char s[]);
 
 // Relay subsystem
 extern void initialize_relay(void);

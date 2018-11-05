@@ -24,13 +24,11 @@ uint8_t DATA_BYTE = 0x80;
 uint8_t CMD_BYTE = 0x13;
 
 // TODO: Implement SWR measurement function
-SWR measure_swr(void)
+_iq measure_ref_coeff(void)
 {
     // Not Implemented
     asm("    NOP");
-    SWR temp;
-    temp.fwd = 0;
-    temp.ref = 0;
+    _iq temp;
     return temp;
 }
 
