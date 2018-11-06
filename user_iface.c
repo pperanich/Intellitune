@@ -13,6 +13,7 @@
 // Globals
 uint8_t MODE_SWITCH = 0;
 uint16_t BUTTON_PRESS = 0;
+_iq16 cap_sample, ind_sample;
 
 // Function Prototypes
 void ui_button_init(void);
@@ -136,6 +137,20 @@ __interrupt void Timer3_B1( void )
     case TBIV_2: // CCR1 caused the interrupt
       TB3CCR1 += 64; // Add CCR1 value for next interrupt in 1 ms
       hd44780_timer_isr(); // Call HD44780 state machine
+
+      ADCCTL0 &= ~ADCENC;
+      ADCMCTL0 &= ~ADCINCH_9 & ~ADCINCH_10 & ~ADCINCH_11;
+      ADCMCTL0 |= ADCINCH_8; // A8
+      ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
+      while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
+      cap_sample = _IQ16(adc_result);
+
+      ADCCTL0 &= ~ADCENC;
+      ADCMCTL0 &= ~ADCINCH_8 & ~ADCINCH_10 & ~ADCINCH_11;
+      ADCMCTL0 |= ADCINCH_9; // A9
+      ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
+      while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
+      ind_sample = _IQ16(adc_result);
       break; // CCR1 interrupt handling done
 
     case TBIV_4:

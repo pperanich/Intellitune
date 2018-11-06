@@ -30,6 +30,8 @@ extern uint16_t frequency;
 extern uint8_t CMD_BYTE;
 extern uint8_t DATA_BYTE;
 extern const uint32_t DELAY_CYC_NUM;
+extern _iq16 cap_sample, ind_sample;
+extern unsigned int adc_result;
 
 // Subsystem function declarations
 
@@ -43,8 +45,9 @@ extern void measure_freq(void);
 extern void initialize_freq_counter(void);
 
 // Standing Wave Ratio subsystem
-extern _iq measure_ref_coeff(void);
+extern _iq16 measure_ref_coeff(void);
 extern void initialize_spi(void);
+extern void initialize_adc(void);
 extern void update_digipot(void);
 
 // User Interface subsystem

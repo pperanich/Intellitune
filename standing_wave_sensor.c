@@ -17,19 +17,56 @@
 // Function Prototypes
 SWR measure_swr(void);
 void initialize_spi(void);
+void initialize_adc(void);
 void update_digipot(void);
 
 // Globals
 uint8_t DATA_BYTE = 0x80;
 uint8_t CMD_BYTE = 0x13;
+unsigned int adc_result;
+
+
+// TODO: Initialize ADC module
+void initialize_adc(void)
+{
+    // Configure ADC
+    ADCCTL0 |= ADCSHT_2 | ADCMSC | ADCON;                       // 16ADCclks, MSC, ADC ON
+    ADCCTL1 |= ADCSHP;                                          // s/w trig, single ch/conv, MODOSC
+    ADCCTL2 &= ~ADCRES;                                         // clear ADCRES in ADCCTL
+    ADCCTL2 |= ADCRES_2;                                        // 12-bit conversion results
+    ADCMCTL0 |= ADCSREF_1; // Vref=1.5V
+    ADCIE |= ADCIE0;                                            // Enable ADC conv complete interrupt
+
+    // Configure reference
+    PMMCTL0_H = PMMPW_H;                                        // Unlock the PMM registers
+    PMMCTL2 |= INTREFEN | REFVSEL_0;                            // Enable internal 1.5V reference
+    while(!(PMMCTL2 & REFGENRDY));                            // Poll till internal reference settles
+}
+
 
 // TODO: Implement SWR measurement function
-_iq measure_ref_coeff(void)
+_iq16 measure_ref_coeff(void)
 {
-    // Not Implemented
-    asm("    NOP");
-    _iq temp;
-    return temp;
+    unsigned int fwd_sample, ref_sample;
+    _iq19 numerator, denominator, reflection_coefficient;
+    ADCCTL0 &= ~ADCENC;
+    ADCMCTL0 &= ~ADCINCH_8 & ~ADCINCH_9 & ~ADCINCH_11;
+    ADCMCTL0 |= ADCINCH_10; // A10
+    ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
+    while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
+    fwd_sample = adc_result;
+
+    ADCCTL0 &= ~ADCENC;
+    ADCMCTL0 &= ~ADCINCH_8 & ~ADCINCH_9 & ~ADCINCH_10;
+    ADCMCTL0 |= ADCINCH_11; // A11
+    ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
+    while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
+    ref_sample = adc_result;
+
+    numerator = _IQ19(ref_sample);
+    denominator = _IQ19(fwd_sample);
+    reflection_coefficient = _IQ19div(numerator, denominator);
+    return _IQ19toIQ(reflection_coefficient);
 }
 
 
@@ -84,32 +121,11 @@ void update_digipot(void)
     asm("    NOP");
 }
 
-/*
-unsigned char ADC_Result[8]={0};
-void init_ADC_using_TA1_trigger()
-{
-  // Configure ADC A0~7 pins
-  SYSCFG2  = ADCPCTL0 | ADCPCTL1 | ADCPCTL2 | ADCPCTL3 | ADCPCTL4 | ADCPCTL5 | ADCPCTL6 | ADCPCTL7;
-
-
-  // Configure ADC
-
-  //@\!   change ADCSHTx bits to change the sample time to get  presicion ADC result
-
-  ADCCTL0 |= ADCSHT_2 |  ADCON;                          // 16ADCclks, , ADC ON
-  ADCCTL1 |= ADCSHS_2 |  ADCSHP | ADCCONSEQ_3 | ADCSSEL_0;     // ADC clock MODCLK, sampling timer, TA1 trig.,repeat  sequence channel
-  ADCCTL2 &= ~ADCRES;                                         // 8-bit conversion results
-  ADCMCTL0 |= ADCINCH_7 | ADCSREF_0;        // A7~0(EoS); Vref=Vcc
-  ADCIE |= ADCIE0;                                                 // Enable ADC conv complete interrupt
-  ADCCTL0 |= ADCENC;                                           // ADC Enable
-}
 
 // ADC interrupt service routine
-
 #pragma vector=ADC_VECTOR
 __interrupt void ADC_ISR(void)
 {
-  static char i = 7;
   switch(__even_in_range(ADCIV,ADCIV_ADCIFG))
   {
   case ADCIV_NONE:
@@ -125,25 +141,10 @@ __interrupt void ADC_ISR(void)
   case ADCIV_ADCINIFG:
     break;
   case ADCIV_ADCIFG:
-    ADC_Result[i] = ADCMEM0;
+    adc_result = ADCMEM0;
 
-     if i = 0,means:
-     (1)sequence ADC channels sample has been completed,
-     (2)you can stop ADC conversion here to ignore data overwrite to the ADC result array
-
-    if(i == 0)
-    {
-        i = 7;
-
-        //P2OUT ^= BIT0;//toggle P2.0 to see whether the period of the ADC sample is correct
-         __no_operation();
-    }
-    else
-    {
-      i--;
-    }
     break;
   default:
     break;
   }
-}*/
+}

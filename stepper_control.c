@@ -71,8 +71,7 @@ void initialize_stepper_control(void)
 // TODO: Implement current settings function.
 void current_setting(void)
 {
-    // Not Implemented
-    asm("    NOP");
+    asm("   NOP");
 }
 
 

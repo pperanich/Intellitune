@@ -67,6 +67,9 @@ int main(void) {
     // Initialize the user interface buttons and lcd
     ui_init();
 
+    //Initialize ADC for position tracking and SWR sensing.
+    initialize_adc();
+
     // Set output LED
     P1DIR |= BIT0;
     P1OUT |= BIT0;
@@ -75,8 +78,8 @@ int main(void) {
     // to activate previously configured port settings
     PM5CTL0 &= ~LOCKLPM5;
 
-    PMMCTL0_H = PMMPW_H;  // Unlock the PMM registers
-    PMMCTL2 |= INTREFEN;   // Enable internal reference
+    //PMMCTL0_H = PMMPW_H;  // Unlock the PMM registers
+    //PMMCTL2 |= INTREFEN;   // Enable internal reference
 
     __bis_SR_register(GIE);       // Enable interrupts
 
@@ -86,15 +89,8 @@ int main(void) {
     {
         measure_freq();
         while(TB0CTL != MC_0);
-
+        measure_ref_coeff();
         lcd_update();
-        //step_motor(0, 0, 60);
-        //__delay_cycles(16000000);
-        //step_motor(0, 1, 60);
-        //__delay_cycles(10000);
-        //step_motor(1, 0, 360);
-        //__delay_cycles(16000000);
-        //step_motor(1, 1, 360);
         tune();
         for(i=50000; i>0; i--);
     }
@@ -119,12 +115,14 @@ void tune(void)
     uint8_t error;
 
     measure_freq();
+    while(TB0CTL != MC_0);
     _iq16 iq_freq = _IQ16div(_IQ16(frequency), _IQ16(1000));
     angular_frequency = _IQ16mpy(_IQ16(2*PI), iq_freq); // in Mega rad/s
 
-    gamma_1 = _IQ16(0.818182);//measure_ref_coeff();
+    gamma_1 = measure_ref_coeff();//_IQ16(0.818182);
     //switch_known_impedance(); This will be pin 3.6
-    gamma_2 = _IQ16(0.826);//measure_ref_coeff();
+    asm("   NOP");
+    gamma_2 = measure_ref_coeff();//_IQ16(0.826);
     //switch_known_impedance();
     numerator = iq_one + gamma_1;
     denominator = iq_one - gamma_1;
@@ -172,18 +170,20 @@ void tune(void)
     error = _IQ16toa(ind2_val, "%4.2f", estimated_inductance);
 
     if(error) return;
-    asm("    NOP");
 }
 
 
 // TODO: Change clock speed to 24MHz.
 void clock_configure(void)
 {
-    // Configure two FRAM waitstate as required by the device datasheet for MCLK
-    // operation at 24MHz(beyond 8MHz) _before_ configuring the clock system.
-    FRCTL0 = FRCTLPW | NWAITS_2 ;
+    // Configure MCLK for 16MHz. FLL reference clock is XT1. At this
+    // speed, the FRAM requires wait states. ACLK = XT1 ~32768Hz, SMCLK = MCLK = 16MHz.
 
-    P2SEL1 |= BIT6 | BIT7;                       // P2.6~P2.7: crystal pins
+    // Configure one FRAM waitstate as required by the device datasheet for MCLK
+    // operation beyond 8MHz _before_ configuring the clock system.
+    FRCTL0 = FRCTLPW | NWAITS_1;
+
+    P2SEL1 |= BIT6 | BIT7;                       // set XT1 pin as second function
     do
     {
         CSCTL7 &= ~(XT1OFFG | DCOFFG);           // Clear XT1 and DCO fault flag
@@ -193,9 +193,10 @@ void clock_configure(void)
     __bis_SR_register(SCG0);                     // disable FLL
     CSCTL3 |= SELREF__XT1CLK;                    // Set XT1 as FLL reference source
     CSCTL0 = 0;                                  // clear DCO and MOD registers
-    CSCTL1 |= DCORSEL_7;                         // Set DCO = 24MHz
-    CSCTL2 = FLLD_0 + 731;                       // DCOCLKDIV = 24MHz
-    __delay_cycles(10);
+    CSCTL1 &= ~(DCORSEL_7);                      // Clear DCO frequency select bits first
+    CSCTL1 |= DCORSEL_5;                         // Set DCO = 16MHz
+    CSCTL2 = FLLD_0 + 487;                       // DCOCLKDIV = 16MHz
+    __delay_cycles(3);
     __bic_SR_register(SCG0);                     // enable FLL
     while(CSCTL7 & (FLLUNLOCK0 | FLLUNLOCK1));   // FLL locked
 
