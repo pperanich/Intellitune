@@ -40,6 +40,10 @@ void tune(void);
 void clock_configure(void);
 void initialize_unused_pins(void);
 
+char cap2_val[8] = {'\0'};
+char ind2_val[6] = {'\0'};
+char swr_val[5] = {'\0'};
+char load_imp[7] = {'\0'};
 
 // Main Program function
 int main(void) {
@@ -83,16 +87,16 @@ int main(void) {
 
     __bis_SR_register(GIE);       // Enable interrupts
 
-    hd44780_write_string("Intellitune", 2, 1, NO_CR_LF ); // Write text string to first row and first column
+    //hd44780_write_string("Intellitune", 2, 1, NO_CR_LF ); // Write text string to first row and first column
 
     while(1)
     {
-        measure_freq();
-        while(TB0CTL != MC_0);
-        measure_ref_coeff();
+        //measure_freq();
+        //while(TB0CTL != MC_0);
+        //measure_ref_coeff();
         lcd_update();
         tune();
-        for(i=50000; i>0; i--);
+        for(i=500000; i>0; i--);
     }
 
 }
@@ -103,13 +107,14 @@ void tune(void)
 {
     _iq16 Q_factor, temp, Z_load, ind_react, cap_react, estimated_inductance, estimated_capacitance,
     angular_frequency, gamma_1, gamma_2, vswr, numerator, denominator, div_res;
-    char test[12] = {'\0'};
     char cap_val[7] = {'\0'};
-    char cap2_val[7] = {'\0'};
     char ind_val[7] = {'\0'};
-    char ind2_val[7] = {'\0'};
     char q_val[6] = {'\0'};
-    char swr_val[6] = {'\0'};
+    memset(&cap2_val[0], 0, sizeof(cap2_val));
+    memset(&ind2_val[0], 0, sizeof(ind2_val));
+    memset(&swr_val[0], 0, sizeof(swr_val));
+    memset(&load_imp[0], 0, sizeof(load_imp));
+
     static const _iq16 Z_source = _IQ16(50.0);
     static const _iq16 iq_one = _IQ16(1.0);
     uint8_t error;
@@ -121,18 +126,21 @@ void tune(void)
 
     gamma_1 = measure_ref_coeff();//_IQ16(0.818182);
     //switch_known_impedance(); This will be pin 3.6
-    asm("   NOP");
+    __delay_cycles(16000000);
+    P3OUT |= BIT6;
+    __delay_cycles(16000000);
     gamma_2 = measure_ref_coeff();//_IQ16(0.826);
+    P3OUT &= ~BIT6;
     //switch_known_impedance();
     numerator = iq_one + gamma_1;
     denominator = iq_one - gamma_1;
     vswr = _IQ16div(numerator, denominator);
-    error = _IQ16toa(swr_val,"%2.3f", vswr);
+    error = _IQ16toa(swr_val,"%2.1f", vswr);
     div_res = vswr;
     if(gamma_2 > gamma_1)
     {
         Z_load = _IQ16mpy(Z_source, div_res);
-        error = _IQ16toa(test, "%4.4f", Z_load);
+        error = _IQ16toa(load_imp, "%4.4f", Z_load);
         temp = _IQ16div(Z_load, Z_source);
         temp = temp - iq_one;
         Q_factor = _IQ16sqrt(temp);
@@ -147,7 +155,7 @@ void tune(void)
         //switch_cap_side(INPUT);
         div_res = _IQ16div(iq_one, div_res);
         Z_load = _IQ16mpy(Z_source, div_res);
-        error = _IQ16toa(test, "%4.4f", Z_load);
+        error = _IQ16toa(load_imp, "%3.2f", Z_load);
         temp = _IQ16div(Z_source, Z_load);
         temp = temp - iq_one;
         Q_factor = _IQ16sqrt(temp);
@@ -167,7 +175,7 @@ void tune(void)
     error = _IQ16toa(cap2_val, "%4.2f", estimated_capacitance);
 
     estimated_inductance = _IQ16div(ind_react, angular_frequency); // in uH
-    error = _IQ16toa(ind2_val, "%4.2f", estimated_inductance);
+    error = _IQ16toa(ind2_val, "%2.2f", estimated_inductance);
 
     if(error) return;
 }

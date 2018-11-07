@@ -9,11 +9,13 @@
 
 #include "intellitune.h"
 
+#define NUM_DISPLAY_MENUS 1
 
 // Globals
 uint8_t MODE_SWITCH = 0;
 uint16_t BUTTON_PRESS = 0;
 _iq16 cap_sample, ind_sample;
+uint8_t display_mode = 0;
 
 // Function Prototypes
 void ui_button_init(void);
@@ -64,41 +66,72 @@ void ui_init(void)
 // TODO: LCD update function
 void lcd_update(void)
 {
-    char buf1[17] = {'\0'};
     char buf2[4] = {'\0'};
     char buf3[3] = {'\0'};
-    const char period[2] = {'.', '\0'};
-    const char f_unit[3] = "MHz";
-    uint8_t str_length = 0;
+    static const char period[2] = {'.', '\0'};
+    static const char f_unit[4] = {'M', 'H', 'z', '\0'};
+    static const char cap_disp[3] = {'C', ':', '\0'};
+    static const char ind_disp[3] = {'L', ':', '\0'};
+    static const char cap_unit[4] = {'p', 'F', ' ', '\0'};
+    static const char ind_unit[4] = {'u', 'H', ' ', '\0'};
+    static const char name[13] = "Intellitune\0";
 
+    char row1[17] = {'\0'};
+    char row2[17] = {'\0'};
+
+    uint8_t str_length = 0;
     uint8_t freq_whole = frequency / 1000;
     uint16_t freq_decimal = frequency % 1000;
-    utoa(freq_whole, buf1);
-    utoa(freq_decimal, buf2);
 
-    char temp1, temp2;
-    if(buf2[1] == '\0'){
-        temp1 = buf2[0];
-        buf2[0] = '0';
-        buf2[1] = '0';
-        buf2[2] = temp1;
-    } else if(buf2[2] == '\0'){
-        temp1 = buf2[0]; temp2 = buf2[1];
-        buf2[0] = '0';
-        buf2[1] = temp1;
-        buf2[2] = temp2;
+    switch(display_mode)
+    {
+    case 0:
+        utoa(freq_whole, row1);
+        utoa(freq_decimal, buf2);
+
+        char temp1, temp2;
+        if(buf2[1] == '\0'){
+            temp1 = buf2[0];
+            buf2[0] = '0';
+            buf2[1] = '0';
+            buf2[2] = temp1;
+        } else if(buf2[2] == '\0'){
+            temp1 = buf2[0]; temp2 = buf2[1];
+            buf2[0] = '0';
+            buf2[1] = temp1;
+            buf2[2] = temp2;
+        }
+        strcat(row1, period);
+        strcat(row1, buf2);
+        strcat(row1, f_unit);
+        str_length = strlen(row1);
+        // Write text string to first row and first column
+        hd44780_write_string(row1, 1, 1, CR_LF );
+        hd44780_blank_out_remaining_row(1,str_length+1);
+        utoa(str_length, buf3);
+        if(buf3[0]!='1') buf3[1] = ' ';
+        // Write text string to first row and first column
+        hd44780_write_string(buf3, 2, 14, CR_LF );
+        strcat(row2, name);
+        hd44780_write_string(row2, 2, 1, NO_CR_LF );
+        break;
+    case 1:
+        strcat(row1, cap_disp);
+        strcat(row2, ind_disp);
+
+        strcat(row1, cap2_val);
+        strcat(row2, ind2_val);
+
+        strcat(row1, cap_unit);
+        strcat(row2, ind_unit);
+
+        strcat(row1, swr_val);
+        strcat(row2, load_imp);
+
+        hd44780_write_string(row1, 1, 1, NO_CR_LF );
+        hd44780_write_string(row2, 2, 1, NO_CR_LF );
     }
-    strcat(buf1, period);
-    strcat(buf1, buf2);
-    strcat(buf1, f_unit);
-    str_length = strlen(buf1);
-    // Write text string to first row and first column
-    hd44780_write_string(buf1, 1, 1, CR_LF );
-    hd44780_blank_out_remaining_row(1,str_length+1);
-    utoa(str_length, buf3);
-    if(buf3[0]!='1') buf3[1] = ' ';
-    // Write text string to first row and first column
-    hd44780_write_string(buf3, 2, 14, NO_CR_LF );
+
 }
 
 
@@ -182,6 +215,8 @@ __interrupt void Port_2( void )
 
     case P2IV_12:
         BUTTON_PRESS |= BIT5;
+        if(display_mode == NUM_DISPLAY_MENUS) display_mode = 0;
+        else display_mode++;
         break;
   }
 }

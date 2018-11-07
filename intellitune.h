@@ -32,6 +32,11 @@ extern uint8_t DATA_BYTE;
 extern const uint32_t DELAY_CYC_NUM;
 extern _iq16 cap_sample, ind_sample;
 extern unsigned int adc_result;
+extern uint8_t display_mode;
+extern char cap2_val[8];
+extern char ind2_val[6];
+extern char swr_val[5];
+extern char load_imp[7];
 
 // Subsystem function declarations
 

@@ -30,7 +30,8 @@ unsigned int adc_result;
 void initialize_adc(void)
 {
     // Configure ADC
-    ADCCTL0 |= ADCSHT_2 | ADCMSC | ADCON;                       // 16ADCclks, MSC, ADC ON
+    ADCCTL0 &= ~ADCENC;                     // Disable ADC
+    ADCCTL0 |= ADCSHT_4 | ADCON;                       // 16ADCclks, MSC, ADC ON
     ADCCTL1 |= ADCSHP;                                          // s/w trig, single ch/conv, MODOSC
     ADCCTL2 &= ~ADCRES;                                         // clear ADCRES in ADCCTL
     ADCCTL2 |= ADCRES_2;                                        // 12-bit conversion results
@@ -50,17 +51,17 @@ _iq16 measure_ref_coeff(void)
     unsigned int fwd_sample, ref_sample;
     _iq19 numerator, denominator, reflection_coefficient;
     ADCCTL0 &= ~ADCENC;
-    ADCMCTL0 &= ~ADCINCH_8 & ~ADCINCH_9 & ~ADCINCH_11;
+    ADCMCTL0 &= ~ADCINCH;
     ADCMCTL0 |= ADCINCH_10; // A10
-    ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
-    while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
+    ADCCTL0 |= ADCENC | ADCSC; // Sampling and conversion start
+    while(ADCCTL1 & ADCBUSY); // Wait if ADC core is active
     fwd_sample = adc_result;
 
     ADCCTL0 &= ~ADCENC;
-    ADCMCTL0 &= ~ADCINCH_8 & ~ADCINCH_9 & ~ADCINCH_10;
+    ADCMCTL0 &= ~ADCINCH;
     ADCMCTL0 |= ADCINCH_11; // A11
-    ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
-    while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
+    ADCCTL0 |= ADCENC | ADCSC; // Sampling and conversion start
+    while(ADCCTL1 & ADCBUSY); // Wait if ADC core is active
     ref_sample = adc_result;
 
     numerator = _IQ19(ref_sample);
@@ -142,7 +143,6 @@ __interrupt void ADC_ISR(void)
     break;
   case ADCIV_ADCIFG:
     adc_result = ADCMEM0;
-
     break;
   default:
     break;
