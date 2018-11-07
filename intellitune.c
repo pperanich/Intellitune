@@ -93,6 +93,8 @@ int main(void) {
 
     __bis_SR_register(GIE);       // Enable interrupts
 
+    //hd44780_write_string("Intellitune", 2, 1, NO_CR_LF ); // Write text string to first row and first column
+
     while(1)
     {
         // State machine entry & exit point
@@ -100,6 +102,7 @@ int main(void) {
         (*Alpha_State_Ptr)();   // jump to an Alpha state (A0,B0,...)
         //===========================================================
     }
+
 }
 
 
@@ -210,22 +213,6 @@ void clock_configure(void)
     while(CSCTL7 & (FLLUNLOCK0 | FLLUNLOCK1));   // FLL locked
 
     CSCTL4 = SELMS__DCOCLKDIV | SELA__XT1CLK;   // set XT1 (~32768Hz) as ACLK source, ACLK = 32768Hz
-                                                 // default DCOCLKDIV as MCLK and SMCLK source
-}
-
-void initialize_unused_pins(void)
-{
-    // Configure unused pins as digital outputs.
-    P1DIR |= BIT3 | BIT2;
-}
-                                                 // default DCOCLKDIV as MCLK and SMCLK source
-}
-
-void initialize_unused_pins(void)
-{
-    // Configure unused pins as digital outputs.
-    P1DIR |= BIT3 | BIT2;
-}
                                                  // default DCOCLKDIV as MCLK and SMCLK source
 }
 

@@ -84,7 +84,6 @@ void ui_init(void)
     hd44780_clear_screen(); // Clear display content
 }
 
-
 // TODO: LCD update function
 void lcd_update(void)
 {
@@ -298,8 +297,8 @@ __interrupt void Port_2( void )
         break;
 
     case P2IV_12: // Pin 2.5: Tune btn
-        display_mode = 1;
         BUTTON_PRESS |= BIT5;
+        display_mode = 1;
         break;
   }
 }
@@ -316,7 +315,7 @@ __interrupt void Port_3( void )
         {
             P3IES |= BIT0;
             BUTTON_PRESS &= ~(BIT0 << 8);
-            TB3CCTL6 = CCIE_0; // Compare interrupt enable
+            TB3CCTL6 = CCIE_0; // Compare interrupt disable
             if (PREV_MODE == MODE_SWITCH){
                 if(display_mode == NUM_QUICK_MENUS && !(MODE_SWITCH % 2)) display_mode = 0;
                 else if(display_mode == NUM_SETUP_MENUS && (MODE_SWITCH % 2)) display_mode = 2;
