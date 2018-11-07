@@ -30,18 +30,29 @@ unsigned int adc_result;
 void initialize_adc(void)
 {
     // Configure ADC
-    ADCCTL0 &= ~ADCENC;                     // Disable ADC
-    ADCCTL0 |= ADCSHT_4 | ADCON;                       // 16ADCclks, MSC, ADC ON
-    ADCCTL1 |= ADCSHP;                                          // s/w trig, single ch/conv, MODOSC
-    ADCCTL2 &= ~ADCRES;                                         // clear ADCRES in ADCCTL
-    ADCCTL2 |= ADCRES_2;                                        // 12-bit conversion results
+    ADCCTL0 &= ~ADCENC; // Disable ADC
+    ADCCTL0 |= ADCSHT_14 | ADCON; // 16ADCclks, MSC, ADC ON
+    ADCCTL1 |= ADCSHP; // s/w trig, single ch/conv, MODOSC
+    ADCCTL2 &= ~ADCRES; // clear ADCRES in ADCCTL
+    ADCCTL2 |= ADCRES_2; // 12-bit conversion results
     ADCMCTL0 |= ADCSREF_1; // Vref=1.5V
-    ADCIE |= ADCIE0;                                            // Enable ADC conv complete interrupt
+    ADCIE |= ADCIE0; // Enable ADC conv complete interrupt
 
     // Configure reference
     PMMCTL0_H = PMMPW_H;                                        // Unlock the PMM registers
     PMMCTL2 |= INTREFEN | REFVSEL_0;                            // Enable internal 1.5V reference
     while(!(PMMCTL2 & REFGENRDY));                            // Poll till internal reference settles
+}
+
+
+//TODO: Sample ADC function
+void sample_adc_channel(uint16_t channel)
+{
+    ADCCTL0 &= ~ADCENC;
+    ADCMCTL0 &= ~ADCINCH;
+    ADCMCTL0 |= channel; // A10
+    ADCCTL0 |= ADCENC | ADCSC; // Sampling and conversion start
+    adc_ready = 0;
 }
 
 
@@ -148,3 +159,20 @@ __interrupt void ADC_ISR(void)
     break;
   }
 }
+
+
+
+
+ADCCTL0 &= ~ADCENC;
+ADCMCTL0 &= ~ADCINCH_9 & ~ADCINCH_10 & ~ADCINCH_11;
+ADCMCTL0 |= ADCINCH_8; // A8
+ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
+while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
+cap_sample = _IQ16(adc_result);
+
+ADCCTL0 &= ~ADCENC;
+ADCMCTL0 &= ~ADCINCH_8 & ~ADCINCH_10 & ~ADCINCH_11;
+ADCMCTL0 |= ADCINCH_9; // A9
+ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
+while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
+ind_sample = _IQ16(adc_result);
