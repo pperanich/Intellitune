@@ -14,7 +14,21 @@
 #include "hd44780.h"
 
 
+
 #define PI      3.1415926536
+// Macros for ADC flags
+#define FWD_SENSE   BIT0
+#define REF_SENSE   BIT1
+#define FWD_WITH_25 BIT2
+#define REF_WITH_25 BIT3
+#define CAP_POT     BIT4
+#define IND_POT     BIT5
+#define ADC_STATUS  BIT6
+// Macros for task flags
+#define A_TASK      BIT0
+#define B_TASK      BIT1
+#define C_TASK      BIT2
+
 
 // Globals
 extern uint16_t frequency;

@@ -46,9 +46,9 @@ char swr_val[5] = {'\0'};
 char load_imp[7] = {'\0'};
 
 // This global will be used to notify user that a new adc value has been sampled
-uint8_t adc_value_update = 0;
-// Broken down as follows:  BIT0  |  BIT1  |  BIT2  |  BIT3  |  BIT4  |  BIT5  |  BIT6  |  BIT7
-//                          FWD      REF      FWD      REF     CAP POT  IND POT  unused   unused
+uint8_t adc_flg = 0;
+// Broken down as follows:  BIT0  |  BIT1  |  BIT2  |  BIT3  |  BIT4  |  BIT5  |    BIT6    |  BIT7
+//                          FWD      REF      FWD      REF     CAP POT  IND POT  ADC Status   unused
 //                         (w/o 25ohm res)   (with 25ohm res)
 
 // Main Program function

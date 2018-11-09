@@ -169,22 +169,18 @@ __interrupt void Timer3_B1( void )
   {
     case TBIV_2: // CCR1 caused the interrupt
       TB3CCR1 += 64; // Add CCR1 value for next interrupt in 1 ms
-      task_flag |= BIT0;
+      task_flag |= A_TASK;
       break; // CCR1 interrupt handling done
 
     case TBIV_4: // CCR2 caused the interrupt
       TB3CCR2 += 328; // Add CCR2 value for next interrupt in 5 ms
-      task_flag |= BIT1;
+      task_flag |= B_TASK;
       break; // CCR2 interrupt handling done
 
     case TBIV_6: // CCR3 caused the interrupt
       TB3CCR3 += 3277; // Add CCR3 value for next interrupt in 50 ms
-      task_flag |= BIT2;
+      task_flag |= C_TASK;
       break; // CCR3 interrupt handling done
-
-    case TBIV_6:
-        TB3CCR3 += 132;
-        break;
 
     case TBIV_12:
         MODE_SWITCH += 1;

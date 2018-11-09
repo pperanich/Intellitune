@@ -29,6 +29,10 @@ unsigned int adc_result;
 // TODO: Initialize ADC module
 void initialize_adc(void)
 {
+    // Configure pins 5.0->5.3 ADC inputs
+    P5SEL0 |= 0x0f;
+    P5SEL1 |= 0x0f;
+
     // Configure ADC
     ADCCTL0 &= ~ADCENC; // Disable ADC
     ADCCTL0 |= ADCSHT_14 | ADCON; // 16ADCclks, MSC, ADC ON
