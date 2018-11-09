@@ -73,9 +73,9 @@ void initialize_task_manager(void)
 void A0(void)
 {
     // loop rate synchronizer for A-tasks
-    if(task_flag & BIT0)
+    if(task_flag & A_TASK)
     {
-        task_flag &= ~BIT0; // Clear flag
+        task_flag &= ~A_TASK; // Clear flag
 
         //-----------------------------------------------------------
         (*A_Task_Ptr)();        // jump to an A Task (A1,A2,A3,...)
@@ -87,9 +87,9 @@ void A0(void)
 void B0(void)
 {
     // loop rate synchronizer for B-tasks
-    if(task_flag & BIT1)
+    if(task_flag & B_TASK)
     {
-        task_flag &= ~BIT1; // Clear flag
+        task_flag &= ~B_TASK; // Clear flag
 
         //-----------------------------------------------------------
         (*B_Task_Ptr)();        // jump to a B Task (B1,B2,B3,...)
@@ -102,9 +102,9 @@ void B0(void)
 void C0(void)
 {
     // loop rate synchronizer for C-tasks
-    if(task_flag & BIT2)
+    if(task_flag & C_TASK)
     {
-        task_flag &= ~BIT2; // Clear flag
+        task_flag &= ~C_TASK; // Clear flag
 
         //-----------------------------------------------------------
         (*C_Task_Ptr)();        // jump to a C Task (C1,C2,C3,...)
