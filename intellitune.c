@@ -57,13 +57,13 @@ int main(void) {
     initialize_unused_pins();
 
     // Initialize relay pins and output states
-    initialize_relay();
+    //initialize_relay();
 
     // Initialize the frequency counter
-    initialize_freq_counter();
+    //initialize_freq_counter();
 
     // Initialize SPI communication to digital potentiometer
-    initialize_spi();
+    //initialize_spi();
 
     // Initialize pins for stepper motor drivers
     initialize_stepper_control();
@@ -72,7 +72,7 @@ int main(void) {
     ui_init();
 
     //Initialize ADC for position tracking and SWR sensing.
-    initialize_adc();
+    //initialize_adc();
 
     // Set output LED
     P1DIR |= BIT0;
@@ -82,23 +82,23 @@ int main(void) {
     // to activate previously configured port settings
     PM5CTL0 &= ~LOCKLPM5;
 
-    //PMMCTL0_H = PMMPW_H;  // Unlock the PMM registers
-    //PMMCTL2 |= INTREFEN;   // Enable internal reference
-
     __bis_SR_register(GIE);       // Enable interrupts
-
-    //hd44780_write_string("Intellitune", 2, 1, NO_CR_LF ); // Write text string to first row and first column
-
+    uint16_t test_degrees = 90;
     while(1)
     {
-        //measure_freq();
-        //while(TB0CTL != MC_0);
-        //measure_ref_coeff();
-        lcd_update();
-        tune();
-        for(i=500000; i>0; i--);
-    }
 
+        asm("    NOP");
+        step_motor(0, 0, test_degrees);
+        __delay_cycles(8000000);
+        step_motor(0, 1, test_degrees);
+        __delay_cycles(8000000);
+        /*asm("    NOP");
+        step_motor(1, 0, 180);
+        __delay_cycles(8000000);
+        step_motor(1, 1, 180);
+        __delay_cycles(8000000);
+        asm("    NOP");*/
+    }
 }
 
 
@@ -215,5 +215,5 @@ void clock_configure(void)
 void initialize_unused_pins(void)
 {
     // Configure unused pins as digital outputs.
-    P1DIR |= BIT3 | BIT2;
+    P1DIR |= BIT2;
 }

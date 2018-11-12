@@ -19,7 +19,8 @@ void current_setting(void);
 
 
 // Globals
-const uint32_t DELAY_CYC_NUM = 12000;
+const uint32_t CAP_CYC_NUM = 12000;
+const uint32_t IND_CYC_NUM = 12000; // 24V for smooth operation and increment through all values in under 10sec
 
 // TODO: Initialize stepper control
 void initialize_stepper_control(void)
@@ -40,9 +41,9 @@ void initialize_stepper_control(void)
      */
 
     // Configure pins connected to stepper driver as output
-    P1DIR |= BIT1 | BIT4;
+    P1DIR |= BIT1 | BIT3 | BIT4;
     P2DIR |= BIT4;
-    P3DIR |= BIT2 | BIT3;
+    P3DIR |= BIT2;
     P4DIR |= BIT7;
     P5DIR |= BIT4;
 
@@ -55,7 +56,7 @@ void initialize_stepper_control(void)
 
     // Initialize step pins low
     P1OUT &= ~BIT1;
-    P3OUT &= ~BIT3;
+    P1OUT &= ~BIT3;
 
     // Initialize direction pins low (Forward)
     P1OUT &= ~BIT4;
@@ -63,8 +64,6 @@ void initialize_stepper_control(void)
 
     // Configure ADC pins for reference potentiometers
     P5DIR &= ~BIT0 & ~BIT1;
-    ADCCTL0 |= ADCON | ADCSHT_8;
-    ADCCTL1 |= ADCSHP;
 }
 
 
@@ -99,12 +98,12 @@ void step_motor(uint8_t motor, uint8_t dir, uint16_t degrees)
         if(dir==0) { P2OUT &= ~BIT4; }
         else if(dir==1) { P2OUT |= BIT4; }
         step_cycles = (uint32_t)degrees * 10 / 18;
-        __delay_cycles(DELAY_CYC_NUM);
+        __delay_cycles(4000);
         while(step_cycles){
-            P3OUT |= BIT3;
-            __delay_cycles(DELAY_CYC_NUM);
-            P3OUT &= ~BIT3;
-            __delay_cycles(DELAY_CYC_NUM);
+            P1OUT |= BIT3;
+            __delay_cycles(IND_CYC_NUM);
+            P1OUT &= ~BIT3;
+            __delay_cycles(IND_CYC_NUM);
             step_cycles--;
         }
         P3OUT |= BIT2; // Disable FETs on driver
@@ -118,9 +117,9 @@ void step_motor(uint8_t motor, uint8_t dir, uint16_t degrees)
         __delay_cycles(4000);
         while(step_cycles){
             P1OUT |= BIT1;
-            __delay_cycles(DELAY_CYC_NUM);
+            __delay_cycles(CAP_CYC_NUM);
             P1OUT &= ~BIT1;
-            __delay_cycles(DELAY_CYC_NUM);
+            __delay_cycles(CAP_CYC_NUM);
             step_cycles--;
         }
         P5OUT |= BIT4; // Disable FETs on driver

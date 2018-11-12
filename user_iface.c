@@ -53,13 +53,14 @@ void ui_init(void)
     // Initialize pins for the LCD module
     P6DIR |= BIT0 | BIT1 | BIT2 | BIT3 | BIT4;
     P3DIR |= BIT7;
-
+/*
     TB3R = 0;
     TB3CCR1  = 64; // Set CCR1 value for 1.46 ms interrupt (48 / 32768 Hz) = 0.00146
     TB3CCTL1 = CCIE; // Compare interrupt enable
     TB3CTL   = (CNTL_0 | TBSSEL_1 | MC__CONTINUOUS | TBIE); // ACLK as clock source, continuous mode, timer clear
 
     hd44780_clear_screen(); // Clear display content
+    */
 }
 
 
@@ -262,6 +263,7 @@ __interrupt void Port_4( void )
   {
     case P4IV_2:
         BUTTON_PRESS |= (BIT0 << 12);
+        P3OUT |= BIT2;
         break;
   }
 }
