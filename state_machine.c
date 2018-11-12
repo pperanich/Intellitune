@@ -10,6 +10,8 @@
  *              Timer 3 Counter/Compare 3 is used for C tasks.
  *
  ******************************************************************************/
+#include "intellitune.h"
+
 
 // Function Prototypes
 void initialize_task_manager(void);
@@ -133,7 +135,6 @@ void A1(void)
 void A2(void)
 //--------------------------------------------------------
 {
-    if(!(ADCCTL1 & ADCBUSY)) {adc_ready = 1;} // Wait if ADC core is active
     //-------------------
     //the next time Timer3 counter 1 reaches Period value go to A1
     A_Task_Ptr = &A1;
@@ -150,26 +151,7 @@ void A2(void)
 void B1(void)
 //----------------------------------------
 {
-    updateBoardStatus();
-#if INCR_BUILD==1
-    #if DC_CHECK==1
-        BuildInfo=BuildLevel1_OpenLoop_DC;
-    #else
-        BuildInfo=BuildLevel1_OpenLoop_AC;
-    #endif
-#elif INCR_BUILD==2
-    #if DC_CHECK==1
-        BuildInfo=BuildLevel2_CurrentLoop_DC;
-    #else
-        BuildInfo=BuildLevel2_CurrentLoop_AC;
-    #endif
-#elif INCR_BUILD==3
-    #if DC_CHECK==1
-        BuildInfo=BuildLevel3_VoltageLoop_DC;
-    #else
-        BuildInfo=BuildLevel3_VoltageLoop_AC;
-    #endif
-#endif
+
     //-----------------
     //the next time Timer3 counter 2 reaches period value go to B2
     B_Task_Ptr = &B2;
@@ -180,72 +162,7 @@ void B1(void)
 void B2(void) //  SPARE
 //----------------------------------------
 {
-    switch(boardState)
-    {
-        case boardState_InverterOFF:
-            if (guiInvStart==1)
-                {
-                    guiInvStart=0;
-                    boardState=boardState_CheckDCBus;
-                }
-            break;
-        case boardState_CheckDCBus:
-            // assuming a ~10% margin on the DC Bus vs Typical AC Output Max
-            // Only start the inverter if the DC Bus is higher than that
-            if(guiVbus>(float)1.55*VAC_TYPICAL && guiVbus<VAC_MAX_SENSE)
-            {
-                boardState=boardState_RlyConnect;
-                rlyConnect=1;
-                slewState=20;
-            }
-            break;
-        case boardState_RlyConnect:
-            slewState--;
-            if(slewState==0)
-            {
-                boardState=boardState_InverterON;
-                invVoRef=0;
-                clearInvTrip=1;
-            }
-            break;
-        case boardState_InverterON:
-            if(invVoRef<((float)VAC_TYPICAL*(float)1.414/(float)VAC_MAX_SENSE))
-            {
-                invVoRef=invVoRef+0.005;
-            }
-            if(guiInvStop==1)
-                {
-                    guiInvStop=0;
-                    boardState=boardState_InverterOFF;
-                    invVoRef=0;
-                    rlyConnect=0;
-                    closeILoopInv=0;
-                    DINT;
-                    //CNTL3P3Z Inverter Current Loop
-                    CNTL_3P3Z_F_VARS_init(&cntl3p3z_InvI_vars);
-                    //CNTL2P2Z PR 1H Controller
-                    CNTL_2P2Z_F_VARS_init(&cntl2p2z_PRV_vars);
-                    //CNTL2P2Z R 3HController
-                    CNTL_2P2Z_F_VARS_init(&cntl2p2z_RV3_vars);
-                    //CNTL2P2Z R 5H Controller
-                    CNTL_2P2Z_F_VARS_init(&cntl2p2z_RV5_vars);
-                    //CNTL2P2Z R 7H Controller
-                    CNTL_2P2Z_F_VARS_init(&cntl2p2z_RV7_vars);
-                    //CNTL2P2Z R 9H Controller
-                    CNTL_2P2Z_F_VARS_init(&cntl2p2z_RV9_vars);
-                    //CNTL2P2Z R 11H Controller
-                    CNTL_2P2Z_F_VARS_init(&cntl2p2z_RV11_vars);
-                    //CNTL2P2Z Lead Lag Controller
-                    CNTL_2P2Z_F_VARS_init(&cntl2p2z_LeadLag_vars);
-                    EINT;
-                }
-            if(boardStatus==boardStatus_OverCurrentTrip ||boardStatus== boardStatus_EmulatorStopTrip)
-            {
-                boardState= boardState_TripCondition;
-            }
-            break;
-        case boardState_TripCondition: break;
-    }
+
     //-----------------
     //the next time Timer3 counter 2 reaches period value go to B3
     B_Task_Ptr = &B3;

@@ -182,12 +182,23 @@ __interrupt void Timer3_B1( void )
       task_flag |= C_TASK;
       break; // CCR3 interrupt handling done
 
-    case TBIV_12:
-        MODE_SWITCH += 1;
-        TB3CCTL2 = CCIE_0; // Compare interrupt disable
-        break;
+    case TBIV_8: // CCR4 caused the interrupt
 
-    case TBIV_14:
+
+      break;
+
+    case TBIV_10: // CCR5 caused the interrupt
+      TB1CTL = MC_0;
+      total_pulses = ((uint32_t)overflowCount << 16) | TB1R;
+      frequency = ((total_pulses << 4)) / 1000;
+      break;
+
+    case TBIV_12: // CCR6 caused the interrupt
+      MODE_SWITCH += 1;
+      TB3CCTL6 = CCIE_0; // Compare interrupt disable
+      break;
+
+    case TBIV_14: // timer overflow caused the interrupt
         if(P1OUT & BIT0) P1OUT &= ~BIT0;
         else P1OUT |= BIT0;
         break;

@@ -14,7 +14,7 @@
 #include "hd44780.h"
 
 
-
+// Macro definitions to improve readability of code
 #define PI      3.1415926536
 // Macros for ADC flags
 #define FWD_SENSE   BIT0
@@ -28,27 +28,34 @@
 #define A_TASK      BIT0
 #define B_TASK      BIT1
 #define C_TASK      BIT2
+// Macros for Stepper Motors
+#define CAPACITOR_MOTOR 1
+#define INDUCTOR_MOTOR  0
+#define STEP_DUTY_CYCLE 12000
 
 
 // Globals
 extern uint16_t frequency;
-extern uint8_t CMD_BYTE;
-extern uint8_t DATA_BYTE;
-extern const uint32_t DELAY_CYC_NUM;
+extern const uint8_t CMD_BYTE;
+extern const uint8_t DATA_BYTE;
 extern _iq16 cap_sample, ind_sample;
-extern unsigned int adc_result;
+extern uint16_t adc_result;
 extern uint8_t display_menu;
 extern char cap2_val[8];
 extern char ind2_val[6];
 extern char swr_val[5];
 extern char load_imp[7];
 extern uint8_t task_flag;
+extern uint8_t adc_ready;
+extern uint16_t overflowCount;
+extern uint32_t  total_pulses;
+
 
 // Subsystem function declarations
 
 // Stepper motor subsystem
 extern void initialize_stepper_control(void);
-extern void step_motor(uint8_t motor, uint8_t dir, uint16_t degrees);
+void step_motor(uint16_t command);
 extern void current_setting(void);
 
 // Frequency Counter subsystem
@@ -76,6 +83,13 @@ extern void switch_known_impedance(void);
 // State Machine function prototypes
 //------------------------------------
 extern void initialize_task_manager(void);
+
+// Variable declarations for state machine
+extern void (*Alpha_State_Ptr)(void);  // Base States pointer
+extern void (*A_Task_Ptr)(void);       // State pointer A branch
+extern void (*B_Task_Ptr)(void);       // State pointer B branch
+extern void (*C_Task_Ptr)(void);       // State pointer C branch
+
 // Alpha states
 extern void A0(void);  //state A0
 extern void B0(void);  //state B0

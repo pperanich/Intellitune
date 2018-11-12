@@ -15,49 +15,13 @@
 
 
 // Function Prototypes
-SWR measure_swr(void);
 void initialize_spi(void);
-void initialize_adc(void);
 void update_digipot(void);
 
 // Globals
-uint8_t DATA_BYTE = 0x80;
-uint8_t CMD_BYTE = 0x13;
-unsigned int adc_result;
-
-
-// TODO: Initialize ADC module
-void initialize_adc(void)
-{
-    // Configure pins 5.0->5.3 ADC inputs
-    P5SEL0 |= 0x0f;
-    P5SEL1 |= 0x0f;
-
-    // Configure ADC
-    ADCCTL0 &= ~ADCENC; // Disable ADC
-    ADCCTL0 |= ADCSHT_14 | ADCON; // 16ADCclks, MSC, ADC ON
-    ADCCTL1 |= ADCSHP; // s/w trig, single ch/conv, MODOSC
-    ADCCTL2 &= ~ADCRES; // clear ADCRES in ADCCTL
-    ADCCTL2 |= ADCRES_2; // 12-bit conversion results
-    ADCMCTL0 |= ADCSREF_1; // Vref=1.5V
-    ADCIE |= ADCIE0; // Enable ADC conv complete interrupt
-
-    // Configure reference
-    PMMCTL0_H = PMMPW_H;                                        // Unlock the PMM registers
-    PMMCTL2 |= INTREFEN | REFVSEL_0;                            // Enable internal 1.5V reference
-    while(!(PMMCTL2 & REFGENRDY));                            // Poll till internal reference settles
-}
-
-
-//TODO: Sample ADC function
-void sample_adc_channel(uint16_t channel)
-{
-    ADCCTL0 &= ~ADCENC;
-    ADCMCTL0 &= ~ADCINCH;
-    ADCMCTL0 |= channel; // A10
-    ADCCTL0 |= ADCENC | ADCSC; // Sampling and conversion start
-    adc_ready = 0;
-}
+const uint8_t DATA_BYTE = 0x80;
+const uint8_t CMD_BYTE = 0x13;
+uint16_t adc_result;
 
 
 // TODO: Implement SWR measurement function
@@ -136,47 +100,3 @@ void update_digipot(void)
 
     asm("    NOP");
 }
-
-
-// ADC interrupt service routine
-#pragma vector=ADC_VECTOR
-__interrupt void ADC_ISR(void)
-{
-  switch(__even_in_range(ADCIV,ADCIV_ADCIFG))
-  {
-  case ADCIV_NONE:
-    break;
-  case ADCIV_ADCOVIFG:
-    break;
-  case ADCIV_ADCTOVIFG:
-    break;
-  case ADCIV_ADCHIIFG:
-    break;
-  case ADCIV_ADCLOIFG:
-    break;
-  case ADCIV_ADCINIFG:
-    break;
-  case ADCIV_ADCIFG:
-    adc_result = ADCMEM0;
-    break;
-  default:
-    break;
-  }
-}
-
-
-
-
-ADCCTL0 &= ~ADCENC;
-ADCMCTL0 &= ~ADCINCH_9 & ~ADCINCH_10 & ~ADCINCH_11;
-ADCMCTL0 |= ADCINCH_8; // A8
-ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
-while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
-cap_sample = _IQ16(adc_result);
-
-ADCCTL0 &= ~ADCENC;
-ADCMCTL0 &= ~ADCINCH_8 & ~ADCINCH_10 & ~ADCINCH_11;
-ADCMCTL0 |= ADCINCH_9; // A9
-ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
-while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
-ind_sample = _IQ16(adc_result);
