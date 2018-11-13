@@ -84,6 +84,7 @@ void ui_init(void)
     hd44780_clear_screen(); // Clear display content
 }
 
+
 // TODO: LCD update function
 void lcd_update(void)
 {
@@ -252,24 +253,24 @@ __interrupt void Timer3_B1( void )
   {
     case TBIV_2: // CCR1 caused the interrupt
       TB3CCR1 += 64; // Add CCR1 value for next interrupt in 1 ms
-      hd44780_timer_isr(); // Call HD44780 state machine
-
-      ADCCTL0 &= ~ADCENC;
-      ADCMCTL0 &= ~ADCINCH_9 & ~ADCINCH_10 & ~ADCINCH_11;
-      ADCMCTL0 |= ADCINCH_8; // A8
-      ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
-      while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
-      cap_sample = _IQ16(adc_result);
-
-      ADCCTL0 &= ~ADCENC;
-      ADCMCTL0 &= ~ADCINCH_8 & ~ADCINCH_10 & ~ADCINCH_11;
-      ADCMCTL0 |= ADCINCH_9; // A9
-      ADCCTL0 |= ADCENC | ADCSC;         // Sampling and conversion start
-      while(ADCCTL1 & ADCBUSY);                                // Wait if ADC core is active
-      ind_sample = _IQ16(adc_result);
+      task_flag |= BIT0;
       break; // CCR1 interrupt handling done
 
-    case TBIV_4:
+    case TBIV_4: // CCR2 caused the interrupt
+      TB3CCR2 += 328; // Add CCR2 value for next interrupt in 5 ms
+      task_flag |= BIT1;
+      break; // CCR2 interrupt handling done
+
+    case TBIV_6: // CCR3 caused the interrupt
+      TB3CCR3 += 3277; // Add CCR3 value for next interrupt in 50 ms
+      task_flag |= BIT2;
+      break; // CCR3 interrupt handling done
+
+    case TBIV_6:
+        TB3CCR3 += 132;
+        break;
+
+    case TBIV_12:
         MODE_SWITCH += 1;
         TB3CCTL2 = CCIE_0; // Compare interrupt disable
         break;
@@ -288,17 +289,17 @@ __interrupt void Port_2( void )
 {
   switch( P2IV )
   {
-    case P2IV_2:
-        BUTTON_PRESS |= BIT0;  // C-Up button
+    case P2IV_2: // Pin 2.0: C-Up btn
+        BUTTON_PRESS |= BIT0;
         break;
 
-    case P2IV_4:
-        BUTTON_PRESS |= BIT1;  // ANT button
+    case P2IV_4: // Pin 2.1: Antenna btn
+        BUTTON_PRESS |= BIT1;
         break;
 
-    case P2IV_12:
-        BUTTON_PRESS |= BIT5;  // TUNE Button
+    case P2IV_12: // Pin 2.5: Tune btn
         display_mode = 1;
+        BUTTON_PRESS |= BIT5;
         break;
   }
 }
@@ -310,12 +311,12 @@ __interrupt void Port_3( void )
 {
   switch( P3IV )
   {
-    case P3IV_2:
-        if(P3IN & BIT0)  // MODE button
+    case P3IV_2: // Pin 3.0: Mode btn
+        if(P3IN & BIT0)
         {
             P3IES |= BIT0;
             BUTTON_PRESS &= ~(BIT0 << 8);
-            TB3CCTL2 = CCIE_0; // Compare interrupt enable
+            TB3CCTL6 = CCIE_0; // Compare interrupt enable
             if (PREV_MODE == MODE_SWITCH){
                 if(display_mode == NUM_QUICK_MENUS && !(MODE_SWITCH % 2)) display_mode = 0;
                 else if(display_mode == NUM_SETUP_MENUS && (MODE_SWITCH % 2)) display_mode = 2;
@@ -328,20 +329,20 @@ __interrupt void Port_3( void )
         else {
             P3IES &= ~BIT0;
             BUTTON_PRESS |= (BIT0 << 8);
-            TB3CCR2  = TB3R + 65530; // Set CCR2 value for 2 s interrupt
-            TB3CCTL2 = CCIE; // Compare interrupt enable
+            TB3CCR6  = TB3R + 65530; // Set CCR2 value for 2 s interrupt
+            TB3CCTL6 = CCIE; // Compare interrupt enable
             PREV_MODE = MODE_SWITCH;
             if(display_mode == NUM_QUICK_MENUS) display_mode = 0;
             else display_mode++;
         }
         break;
 
-    case P3IV_4:
-        BUTTON_PRESS |= (BIT1 << 8);  // L-Dn button
+    case P3IV_4: // Pin 3.1: L-Dn btn
+        BUTTON_PRESS |= (BIT1 << 8);
         break;
 
-    case P3IV_12:
-        BUTTON_PRESS |= (BIT5 << 8);  // L-Up button
+    case P3IV_12: // Pin 3.5: L-Up btn
+        BUTTON_PRESS |= (BIT5 << 8);
         break;
   }
 }
@@ -353,8 +354,8 @@ __interrupt void Port_4( void )
 {
   switch( P4IV )
   {
-    case P4IV_2:
-        BUTTON_PRESS |= (BIT0 << 12);  // C-Dn button
+    case P4IV_2: // Pin 4.0: C-Dn btn
+        BUTTON_PRESS |= (BIT0 << 14);
         break;
   }
 }

@@ -45,6 +45,12 @@ char ind2_val[6] = {'\0'};
 char swr_val[5] = {'\0'};
 char load_imp[7] = {'\0'};
 
+// This global will be used to notify user that a new adc value has been sampled
+uint8_t adc_value_update = 0;
+// Broken down as follows:  BIT0  |  BIT1  |  BIT2  |  BIT3  |  BIT4  |  BIT5  |  BIT6  |  BIT7
+//                          FWD      REF      FWD      REF     CAP POT  IND POT  unused   unused
+//                         (w/o 25ohm res)   (with 25ohm res)
+
 // Main Program function
 int main(void) {
     volatile uint32_t i;
@@ -53,6 +59,9 @@ int main(void) {
     WDTCTL = WDTPW | WDTHOLD;
 
     clock_configure();
+
+    // Initialize task manager
+    initialize_task_manager();
 
     initialize_unused_pins();
 
@@ -82,23 +91,15 @@ int main(void) {
     // to activate previously configured port settings
     PM5CTL0 &= ~LOCKLPM5;
 
-    //PMMCTL0_H = PMMPW_H;  // Unlock the PMM registers
-    //PMMCTL2 |= INTREFEN;   // Enable internal reference
-
     __bis_SR_register(GIE);       // Enable interrupts
-
-    //hd44780_write_string("Intellitune", 2, 1, NO_CR_LF ); // Write text string to first row and first column
 
     while(1)
     {
-        //measure_freq();
-        //while(TB0CTL != MC_0);
-        //measure_ref_coeff();
-        lcd_update();
-        //tune();
-        for(i=500000; i>0; i--);
+        // State machine entry & exit point
+        //===========================================================
+        (*Alpha_State_Ptr)();   // jump to an Alpha state (A0,B0,...)
+        //===========================================================
     }
-
 }
 
 
@@ -209,6 +210,22 @@ void clock_configure(void)
     while(CSCTL7 & (FLLUNLOCK0 | FLLUNLOCK1));   // FLL locked
 
     CSCTL4 = SELMS__DCOCLKDIV | SELA__XT1CLK;   // set XT1 (~32768Hz) as ACLK source, ACLK = 32768Hz
+                                                 // default DCOCLKDIV as MCLK and SMCLK source
+}
+
+void initialize_unused_pins(void)
+{
+    // Configure unused pins as digital outputs.
+    P1DIR |= BIT3 | BIT2;
+}
+                                                 // default DCOCLKDIV as MCLK and SMCLK source
+}
+
+void initialize_unused_pins(void)
+{
+    // Configure unused pins as digital outputs.
+    P1DIR |= BIT3 | BIT2;
+}
                                                  // default DCOCLKDIV as MCLK and SMCLK source
 }
 

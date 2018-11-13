@@ -14,15 +14,6 @@
 #include "hd44780.h"
 
 
-
-// All custom typedefs used for this project
-typedef struct
-{
-    uint32_t fwd;
-    uint32_t ref;
-} SWR;
-
-
 #define PI      3.1415926536
 
 // Globals
@@ -32,11 +23,12 @@ extern uint8_t DATA_BYTE;
 extern const uint32_t DELAY_CYC_NUM;
 extern _iq16 cap_sample, ind_sample;
 extern unsigned int adc_result;
-extern uint8_t display_mode;
+extern uint8_t display_menu;
 extern char cap2_val[8];
 extern char ind2_val[6];
 extern char swr_val[5];
 extern char load_imp[7];
+extern uint8_t task_flag;
 
 // Subsystem function declarations
 
@@ -71,3 +63,26 @@ extern void initialize_relay(void);
 extern void switch_relay(int relay_num, int position);
 extern void switch_net_config(void);
 extern void switch_known_impedance(void);
+
+// State Machine function prototypes
+//------------------------------------
+extern void initialize_task_manager(void);
+// Alpha states
+extern void A0(void);  //state A0
+extern void B0(void);  //state B0
+extern void C0(void);  //state C0
+
+// A branch states
+extern void A1(void);  //state A1
+extern void A2(void);  //state A2
+extern void A3(void);  //state A3
+
+// B branch states
+extern void B1(void);  //state B1
+extern void B2(void);  //state B2
+extern void B3(void);  //state B3
+
+// C branch states
+extern void C1(void);  //state C1
+extern void C2(void);  //state C2
+extern void C3(void);  //state C3
