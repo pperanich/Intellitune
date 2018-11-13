@@ -2,28 +2,32 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-CG_TOOL_ROOT := /Applications/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.3.LTS
+SHELL = cmd.exe
+
+CG_TOOL_ROOT := C:/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.4.LTS
 
 GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./adc_driver.obj" \
 "./freq_counter.obj" \
 "./hd44780.obj" \
 "./intellitune.obj" \
 "./relay.obj" \
 "./standing_wave_sensor.obj" \
+"./state_machine.obj" \
 "./stepper_control.obj" \
 "./user_iface.obj" \
-"/Applications/ti/MSP430Ware_3_80_05_04/iqmathlib/libraries/CCS/MPY32/5xx_6xx/IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib" \
+"../IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib" \
 "../lnk_msp430fr2355.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
 
 -include ../makefile.init
 
-RM := rm -rf
-RMDIR := rm -rf
+RM := DEL /F
+RMDIR := RMDIR /S/Q
 
 # All of the sources participating in the build are defined here
 -include sources.mk
@@ -145,22 +149,22 @@ all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 Intellitune.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: MSP430 Linker'
-	"/Applications/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.3.LTS/bin/cl430" -vmspx --data_model=small -Ooff --use_hw_mpy=F5 --advice:power="all" --advice:hw_config=all --define=__MSP430FR2355__ -g --printf_support=minimal --diag_warning=225 --diag_wrap=off --display_error_number --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU40 -z -m"Intellitune.map" --heap_size=160 --stack_size=160 --cinit_hold_wdt=on -i"/Applications/ti/ccsv8/ccs_base/msp430/include" -i"/Applications/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.3.LTS/lib" -i"/Applications/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.3.LTS/include" -i"/Applications/ti/ccsv8/ccs_base/msp430/lib/FR2xx" --priority --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Intellitune_linkInfo.xml" --use_hw_mpy=F5 --rom_model -o "Intellitune.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.4.LTS/bin/cl430" -vmspx --data_model=small -Ooff --use_hw_mpy=F5 --advice:power="all" --advice:hw_config=all --define=__MSP430FR2355__ -g --printf_support=minimal --diag_warning=225 --diag_wrap=off --display_error_number --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU40 -z -m"Intellitune.map" --heap_size=160 --stack_size=160 --cinit_hold_wdt=on -i"C:/ti/ccsv8/ccs_base/msp430/include" -i"C:/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.4.LTS/lib" -i"C:/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.4.LTS/include" -i"C:/ti/ccsv8/ccs_base/msp430/lib/FR2xx" --priority --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Intellitune_linkInfo.xml" --use_hw_mpy=F5 --rom_model -o "Intellitune.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
 Intellitune.txt: $(EXE_OUTPUTS)
 	@echo 'Building files: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo 'Invoking: MSP430 Hex Utility'
-	"/Applications/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.3.LTS/bin/hex430" --memwidth=8 --romwidth=8 --ti_txt -o "Intellitune.txt" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccsv8/tools/compiler/ti-cgt-msp430_18.1.4.LTS/bin/hex430" --memwidth=8 --romwidth=8 --ti_txt -o "Intellitune.txt" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "freq_counter.obj" "hd44780.obj" "intellitune.obj" "relay.obj" "standing_wave_sensor.obj" "stepper_control.obj" "user_iface.obj" 
-	-$(RM) "freq_counter.d" "hd44780.d" "intellitune.d" "relay.d" "standing_wave_sensor.d" "stepper_control.d" "user_iface.d" 
+	-$(RM) "adc_driver.obj" "freq_counter.obj" "hd44780.obj" "intellitune.obj" "relay.obj" "standing_wave_sensor.obj" "state_machine.obj" "stepper_control.obj" "user_iface.obj" 
+	-$(RM) "adc_driver.d" "freq_counter.d" "hd44780.d" "intellitune.d" "relay.d" "standing_wave_sensor.d" "state_machine.d" "stepper_control.d" "user_iface.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

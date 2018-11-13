@@ -20,6 +20,7 @@ uint8_t button_press = 0;
 //                            TUNE     MODE     ANT     L-UP      C-UP     L-DN       C-DN    unused
 //                         (w/o 25ohm res)   (with 25ohm res)
 uint8_t display_menu= 0;
+uint32_t total_pulses = 0;
 
 // Function Prototypes
 void ui_button_init(void);
@@ -91,7 +92,7 @@ void ui_init(void)
 void lcd_update(void)
 {
 
-    switch(display_mode)
+    switch(display_menu)
     {
     case 0:
         mode_0();
@@ -187,7 +188,6 @@ void mode_2(void) // Target SWR mode
     hd44780_blank_out_remaining_row(1,11);
 
     // Adjust target SWR from 1.5 to 2.0
-    asm("   NOP");
 }
 
 void mode_3(void)  // AutoTune Threshold SWR mode
@@ -315,7 +315,7 @@ __interrupt void Port_2( void )
       
     case P2IV_12: // Pin 2.5: Tune btn
         button_press |= TUNE;
-        display_mode = 1;
+        display_menu = 1;
         break;
   }
 }
@@ -334,12 +334,12 @@ __interrupt void Port_3( void )
             button_press &= ~MODE;
             TB3CCTL6 = CCIE_0; // Compare interrupt disable
             if (PREV_MODE == MODE_SWITCH){
-                if(display_mode == NUM_QUICK_MENUS && !(MODE_SWITCH % 2)) display_mode = 0;
-                else if(display_mode == NUM_SETUP_MENUS && (MODE_SWITCH % 2)) display_mode = 2;
-                else {display_mode++;}
+                if(display_menu == NUM_QUICK_MENUS && !(MODE_SWITCH % 2)) { display_menu = 0; }
+                else if(display_menu == NUM_SETUP_MENUS && (MODE_SWITCH % 2)) { display_menu = 2; }
+                else {display_menu++;}
             }
             else{
-                display_mode = 20;
+                display_menu = 20;
             }
         }
         else {
@@ -348,8 +348,8 @@ __interrupt void Port_3( void )
             TB3CCR6  = TB3R + 65530; // Set CCR2 value for 2 s interrupt
             TB3CCTL6 = CCIE; // Compare interrupt enable
             PREV_MODE = MODE_SWITCH;
-            if(display_mode == NUM_QUICK_MENUS) display_mode = 0;
-            else display_mode++;
+            if(display_menu == NUM_QUICK_MENUS) { display_menu = 0; }
+            else { display_menu++; }
         }
         break;
 

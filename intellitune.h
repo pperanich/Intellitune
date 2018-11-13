@@ -10,7 +10,7 @@
  ******************************************************************************/
 
 #include <string.h>
-#include <IQmathLib.h>
+#include "IQmathLib.h"
 #include "hd44780.h"
 
 

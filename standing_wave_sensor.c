@@ -33,7 +33,6 @@ const uint8_t CMD_BYTE = 0x13;
 // TODO: Implement SWR measurement function
 _iq16 calculate_ref_coeff(uint8_t reflection_to_calc)
 {
-    unsigned int fwd_sample, ref_sample;
     _iq19 numerator, denominator, reflection_coefficient;
     switch(reflection_to_calc)
     {
