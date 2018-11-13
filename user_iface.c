@@ -15,9 +15,11 @@
 // Globals
 uint8_t MODE_SWITCH = 0;
 uint8_t PREV_MODE = 0;
-uint16_t BUTTON_PRESS = 0;
-_iq16 cap_sample, ind_sample;
-uint8_t display_mode = 0;
+uint8_t button_press = 0;
+// Broken down as follows:    BIT0  |  BIT1  |  BIT2  |  BIT3  |  BIT4  |  BIT5  |    BIT6  |  BIT7
+//                            TUNE     MODE     ANT     L-UP      C-UP     L-DN       C-DN    unused
+//                         (w/o 25ohm res)   (with 25ohm res)
+uint8_t display_menu= 0;
 
 // Function Prototypes
 void ui_button_init(void);
@@ -83,6 +85,7 @@ void ui_init(void)
 
     hd44780_clear_screen(); // Clear display content
 }
+
 
 // TODO: LCD update function
 void lcd_update(void)
@@ -221,7 +224,7 @@ void mode_4(void) // LC Limit
 // utoa:  convert n to characters in s
 void utoa(unsigned int n, char s[])
 {
-    int i = 0;
+    uint8_t i = 0;
     do {  // generate digits in reverse order
         s[i++] = n % 10 + '0';  // get next digit
     } while ((n /= 10) > 0);  // delete it
@@ -233,7 +236,7 @@ void utoa(unsigned int n, char s[])
 // reverse string s in place
 void reverse(char s[])
 {
-    int i, j;
+    uint8_t i, j;
     char c;
 
     for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
@@ -264,13 +267,22 @@ __interrupt void Timer3_B1( void )
       TB3CCR3 += 3277; // Add CCR3 value for next interrupt in 50 ms
       task_flag |= C_TASK;
       break; // CCR3 interrupt handling done
+      
+    case TBIV_8: // CCR4 caused the interrupt
+      break;
 
-    case TBIV_12:
+    case TBIV_10: // CCR5 caused the interrupt
+      TB1CTL = MC_0;
+      total_pulses = ((uint32_t)overflowCount << 16) | TB1R;
+      frequency = ((total_pulses << 4)) / 1000;
+      break;
+
+    case TBIV_12: // CCR6 caused the interrupt
         MODE_SWITCH += 1;
-        TB3CCTL2 = CCIE_0; // Compare interrupt disable
+        TB3CCTL6 = CCIE_0; // Compare interrupt disable
         break;
 
-    case TBIV_14:
+    case TBIV_14: // timer overflow caused the interrupt
         if(P1OUT & BIT0) P1OUT &= ~BIT0;
         else P1OUT |= BIT0;
         break;

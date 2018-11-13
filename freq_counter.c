@@ -18,13 +18,13 @@ uint16_t frequency;
 // Function Prototypes
 void measure_freq(void);
 void initialize_freq_counter(void);
-__interrupt void Timer0_B3 (void);
 
 // TODO: Implement frequency measuring
 void measure_freq(void)
 {
     static const uint8_t timing_correction = 2;
 
+    if(TB1CTL != MC_0) { return; } // Frequency is currently being measured
     // Timer1_B3 and Timer0_B3 setup
 
     overflowCount = 0;
@@ -62,7 +62,7 @@ void initialize_freq_counter(void)
 
 
 #pragma vector=TIMER1_B1_VECTOR
-__interrupt void Timer1_B3(void)
+__interrupt void Timer1_B1(void)
 {
     overflowCount++;
     TB1IV = 0;
