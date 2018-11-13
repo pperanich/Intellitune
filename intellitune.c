@@ -122,8 +122,8 @@ void tune(void)
         {
             uint16_t cap_motor_command = 1441;
             uint16_t ind_motor_command = 44642;
-            step_motor(cap_motor_command);
-            step_motor(ind_motor_command);
+            step_cap_motor(cap_motor_command);
+            step_ind_motor(ind_motor_command);
             break;
         }
 
@@ -179,7 +179,6 @@ void tune(void)
                 P3OUT &= ~BIT4; // Capacitors switched to output side.
             } else if(gamma_2 < gamma_1)
             {
-                //switch_cap_side(INPUT);
                 div_res = _IQ16div(iq_one, div_res);
                 Z_load = _IQ16mpy(Z_source, div_res);
                 error += _IQ16toa(load_imp, "%3.2f", Z_load);
@@ -217,6 +216,7 @@ void tune(void)
         case FINE_TUNE:
         {
             tune_task = 0;
+            button_press &= ~TUNE;
             break;
         }
     }

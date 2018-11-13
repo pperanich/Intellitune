@@ -14,11 +14,13 @@
 
 // Function Prototypes
 void initialize_stepper_control(void);
-void step_motor(uint16_t command);
+void step_cap_motor(uint16_t command);
+void step_ind_motor(uint16_t command);
 
 
 // Globals
-uint8_t motor_task = 0;
+uint8_t cap_motor_task = 0;
+uint8_t ind_motor_task = 0;
 
 
 // TODO: Initialize stepper control
@@ -60,11 +62,14 @@ void initialize_stepper_control(void)
     // Initialize direction pins low (Forward)
     P1OUT &= ~BIT4;
     P2OUT &= ~BIT4;
+
+    TB2R = 0;
+    TB2CTL   = (CNTL_0 | TBSSEL_1 | MC__CONTINUOUS); // ACLK as clock source, continuous mode
 }
 
 
-// TODO: Implement stepper motor control function.
-void step_motor(uint16_t command)
+// TODO: Implement capacitor stepper motor control function.
+void step_cap_motor(uint16_t command)
 {
     /*
      * Inputs:
@@ -84,93 +89,122 @@ void step_motor(uint16_t command)
     static uint16_t current_command;
     if(command != 0) { current_command = command; }
 
-    switch(current_command & BIT0)
+    switch(cap_motor_task)
     {
-        case INDUCTOR_MOTOR: // Inductor motor driver
-        {
-            switch(motor_task)
-            {
-            case SET_ENABLE_AND_DIRECTION:
-                P3OUT &= ~BIT2; // Enable FETs on driver
-                if(current_command & BIT1) { P2OUT &= ~BIT4; }
-                else { P2OUT |= BIT4; }
-                step_cycles = (uint32_t)(current_command >> 2) * 10 / 18;
-                TB0CCR2  = TB0R + 8;
-                motor_task = STEP_HIGH;
-                TB0CCTL2 = CCIE;
-                break;
-
-            case STEP_HIGH:
-                if(step_cycles)
-                {
-                    P1OUT |= BIT3;
-                    TB0CCR2  = TB0R + 24;
-                    motor_task = STEP_LOW;
-                }
-                else {
-                    motor_task = DISABLE_DRIVER;
-                }
-                break;
-
-            case STEP_LOW:
-                P1OUT &= ~BIT3;
-                TB0CCR2  = TB0R + 24;
-                step_cycles--;
-                motor_task = STEP_HIGH;
-                break;
-
-            case DISABLE_DRIVER:
-                P3OUT |= BIT2; // Disable FETs on driver
-                motor_task = 0;
-                TB0CCTL2 = CCIE_0;
-                break;
-            }
-            break;
-        }
-
-        case CAPACITOR_MOTOR: // Capacitor motor driver
-        {
-            switch(motor_task)
-            {
-            case SET_ENABLE_AND_DIRECTION:
-                P5OUT &= ~BIT4; // Enable FETs on driver
-                if(current_command & BIT1) { P1OUT &= ~BIT4; }
-                else { P1OUT |= BIT4; }
-                step_cycles = (uint32_t)(current_command >> 2) * 1000 / 67;
-                TB0CCR2  = TB0R + 8;
-                motor_task = STEP_HIGH;
-                TB0CCTL2 = CCIE;
-                break;
-
-            case STEP_HIGH:
-                if(step_cycles)
-                {
-                    P1OUT |= BIT1;
-                    TB0CCR2  = TB0R + 24;
-                    motor_task = STEP_LOW;
-                }
-                else {
-                    motor_task = DISABLE_DRIVER;
-                }
-                break;
-
-            case STEP_LOW:
-                P1OUT &= ~BIT1;
-                TB0CCR2  = TB0R + 24;
-                step_cycles--;
-                motor_task = STEP_HIGH;
-                break;
-
-            case DISABLE_DRIVER:
-                P5OUT |= BIT4; // Disable FETs on driver
-                motor_task = 0;
-                TB0CCTL2 = CCIE_0;
-                break;
-            }
-            break;
-        }
-    default:
-        asm("    NOP");
+    case SET_ENABLE_AND_DIRECTION:
+        P5OUT &= ~BIT4; // Enable FETs on driver
+        if(current_command & BIT1) { P1OUT &= ~BIT4; }
+        else { P1OUT |= BIT4; }
+        step_cycles = (uint32_t)(current_command >> 2) * 1000 / 67;
+        TB2CCR1  = TB0R + 8;
+        cap_motor_task = STEP_HIGH;
+        TB2CCTL1 = CCIE;
         break;
+
+    case STEP_HIGH:
+        if(step_cycles)
+        {
+            P1OUT |= BIT1;
+            TB2CCR1  = TB2R + 24;
+            cap_motor_task = STEP_LOW;
+        }
+        else {
+            cap_motor_task = DISABLE_DRIVER;
+        }
+        break;
+
+    case STEP_LOW:
+        P1OUT &= ~BIT1;
+        TB2CCR1  = TB2R + 24;
+        step_cycles--;
+        cap_motor_task = STEP_HIGH;
+        break;
+
+    case DISABLE_DRIVER:
+        P5OUT |= BIT4; // Disable FETs on driver
+        cap_motor_task = 0;
+        TB2CCTL1 = CCIE_0;
+        break;
+    }
+}
+
+
+// TODO: Implement inductor stepper motor control function.
+void step_ind_motor(uint16_t command)
+{
+    /*
+     * Inputs:
+     *      command: composed of the following parameters
+     *
+     *      motor: <- Bit 0
+     *          0 - inductor motor
+     *          1 - capacitor motor
+     *      direction: <- Bit 1
+     *          1 - Forward
+     *          0 - reverse
+     *      degrees: <- Bits 2-16
+     *          amount of degrees to rotate, shifted left 2 for more precision.
+     */
+
+    static uint32_t step_cycles;
+    static uint16_t current_command;
+    if(command != 0) { current_command = command; }
+
+    switch(ind_motor_task)
+    {
+    case SET_ENABLE_AND_DIRECTION:
+        P3OUT &= ~BIT2; // Enable FETs on driver
+        if(current_command & BIT1) { P2OUT &= ~BIT4; }
+        else { P2OUT |= BIT4; }
+        step_cycles = (uint32_t)(current_command >> 2) * 10 / 18;
+        TB2CCR2  = TB2R + 8;
+        ind_motor_task = STEP_HIGH;
+        TB2CCTL2 = CCIE;
+        break;
+
+    case STEP_HIGH:
+        if(step_cycles)
+        {
+            P1OUT |= BIT3;
+            TB2CCR2  = TB2R + 24;
+            ind_motor_task = STEP_LOW;
+        }
+        else {
+            ind_motor_task = DISABLE_DRIVER;
+        }
+        break;
+
+    case STEP_LOW:
+        P1OUT &= ~BIT3;
+        TB2CCR2  = TB2R + 24;
+        step_cycles--;
+        ind_motor_task = STEP_HIGH;
+        break;
+
+    case DISABLE_DRIVER:
+        P3OUT |= BIT2; // Disable FETs on driver
+        ind_motor_task = 0;
+        TB2CCTL2 = CCIE_0;
+        break;
+    }
+}
+
+
+#pragma vector=TIMER2_B1_VECTOR
+__interrupt void Timer2_B1(void)
+{
+    switch( TB2IV ) // Determine interrupt source
+    {
+        case TBIV_2: // CCR1 caused the interrupt - used for adc_sampling
+        {
+          step_cap_motor(0);
+          break;
+        }
+
+        case TBIV_4: // CCR2 caused the interrupt - used for stepper motor delays
+        {
+          step_ind_motor(0);
+          break;
+        }
     }
 }

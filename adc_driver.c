@@ -157,9 +157,9 @@ __interrupt void Timer0_B1(void)
           break;
         }
 
-        case TBIV_4: // CCR2 caused the interrupt - used for stepper motor delays
+        case TBIV_4:
         {
-          step_motor(0);
+          asm("   NOP");
           break;
         }
     }

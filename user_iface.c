@@ -275,6 +275,7 @@ __interrupt void Timer3_B1( void )
       TB1CTL = MC_0;
       total_pulses = ((uint32_t)overflowCount << 16) | TB1R;
       frequency = ((total_pulses << 4)) / 1000;
+      TB3CCTL5 = CCIE_0; // Compare interrupt disable
       break;
 
     case TBIV_12: // CCR6 caused the interrupt
@@ -297,15 +298,23 @@ __interrupt void Port_2( void )
   switch( P2IV )
   {
     case P2IV_2: // Pin 2.0: C-Up btn
-        BUTTON_PRESS |= BIT0;
+        if(P2IN & BIT0)
+        {
+            P2IES |= BIT0;
+            button_press &= ~Cup;
+        }
+        else {
+            P2IES &= ~BIT0;
+            button_press |= Cup;
+        }
         break;
 
     case P2IV_4: // Pin 2.1: Antenna btn
-        BUTTON_PRESS |= BIT1;
+        button_press |= ANT;
         break;
-
+      
     case P2IV_12: // Pin 2.5: Tune btn
-        BUTTON_PRESS |= BIT5;
+        button_press |= TUNE;
         display_mode = 1;
         break;
   }
@@ -322,7 +331,7 @@ __interrupt void Port_3( void )
         if(P3IN & BIT0)
         {
             P3IES |= BIT0;
-            BUTTON_PRESS &= ~(BIT0 << 8);
+            button_press &= ~MODE;
             TB3CCTL6 = CCIE_0; // Compare interrupt disable
             if (PREV_MODE == MODE_SWITCH){
                 if(display_mode == NUM_QUICK_MENUS && !(MODE_SWITCH % 2)) display_mode = 0;
@@ -335,7 +344,7 @@ __interrupt void Port_3( void )
         }
         else {
             P3IES &= ~BIT0;
-            BUTTON_PRESS |= (BIT0 << 8);
+            button_press |= MODE;
             TB3CCR6  = TB3R + 65530; // Set CCR2 value for 2 s interrupt
             TB3CCTL6 = CCIE; // Compare interrupt enable
             PREV_MODE = MODE_SWITCH;
@@ -345,11 +354,27 @@ __interrupt void Port_3( void )
         break;
 
     case P3IV_4: // Pin 3.1: L-Dn btn
-        BUTTON_PRESS |= (BIT1 << 8);
+        if(P3IN & BIT1)
+        {
+            P3IES |= BIT1;
+            button_press &= ~Ldn;
+        }
+        else {
+            P3IES &= ~BIT1;
+            button_press |= Ldn;
+        }
         break;
 
     case P3IV_12: // Pin 3.5: L-Up btn
-        BUTTON_PRESS |= (BIT5 << 8);
+        if(P3IN & BIT5)
+        {
+            P3IES |= BIT5;
+            button_press &= ~Lup;
+        }
+        else {
+            P3IES &= ~BIT5;
+            button_press |= Lup;
+        }
         break;
   }
 }
@@ -362,7 +387,15 @@ __interrupt void Port_4( void )
   switch( P4IV )
   {
     case P4IV_2: // Pin 4.0: C-Dn btn
-        BUTTON_PRESS |= (BIT0 << 14);
+        if(P4IN & BIT0)
+        {
+            P4IES |= BIT0;
+            button_press &= ~Cdn;
+        }
+        else {
+            P4IES &= ~BIT0;
+            button_press |= Cdn;
+        }
         break;
   }
 }

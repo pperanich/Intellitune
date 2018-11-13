@@ -23,6 +23,7 @@
 void initialize_spi(void);
 void update_digipot(void);
 _iq16 calculate_ref_coeff(uint8_t reflection_to_calc);
+void update_swr(void);
 
 // Globals
 uint8_t DATA_BYTE = 0x80;
@@ -129,4 +130,19 @@ void update_digipot(void)
         UCB1STATW &= ~UCLISTEN;  //Disable loopback mode
         P4OUT |= BIT4; //De-select digi pot on SPI
     }
+}
+
+
+// TODO: Update SWR reading from most recent ADC values
+void update_swr(void)
+{
+    static const _iq16 iq_one = _IQ16(1.0);
+    uint8_t error = 0;
+    _iq16 numerator, denominator, vswr;
+    _iq16 reflection_coefficient = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
+    if(reflection_coefficient == 0) { return; }
+    numerator = iq_one + reflection_coefficient;
+    denominator = iq_one - reflection_coefficient;
+    vswr = _IQ16div(numerator, denominator);
+    error += _IQ16toa(swr_val,"%2.1f", vswr);
 }
