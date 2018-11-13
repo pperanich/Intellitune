@@ -60,6 +60,11 @@ extern void ui_init(void);
 extern void lcd_update(void);
 extern void utoa(unsigned int n, char s[]);
 extern void reverse(char s[]);
+extern void mode_0(void);
+extern void mode_1(void);
+extern void mode_2(void);
+extern void mode_3(void);
+extern void mode_4(void);
 
 // Relay subsystem
 extern void initialize_relay(void);

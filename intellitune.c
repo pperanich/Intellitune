@@ -95,7 +95,7 @@ int main(void) {
         //while(TB0CTL != MC_0);
         //measure_ref_coeff();
         lcd_update();
-        tune();
+        //tune();
         for(i=500000; i>0; i--);
     }
 

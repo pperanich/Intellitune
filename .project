@@ -28,13 +28,13 @@
 		<link>
 			<name>IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib</name>
 			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/ti/msp/MSP430Ware_3_80_05_04/iqmathlib/libraries/CCS/MPY32/5xx_6xx/IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib</locationURI>
+			<location>/Applications/ti/MSP430Ware_3_80_05_04/iqmathlib/libraries/CCS/MPY32/5xx_6xx/IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib</location>
 		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
 			<name>MSP430WARE</name>
-			<value>file:/C:/ti/msp/MSP430Ware_3_80_05_04</value>
+			<value>file:/Applications/ti/MSP430Ware_3_80_05_04</value>
 		</variable>
 	</variableList>
 </projectDescription>

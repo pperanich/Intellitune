@@ -64,6 +64,7 @@ _iq16 measure_ref_coeff(void)
     ADCCTL0 &= ~ADCENC;
     ADCMCTL0 &= ~ADCINCH;
     ADCMCTL0 |= ADCINCH_11; // A11
+    __delay_cycles(16000000);
     ADCCTL0 |= ADCENC | ADCSC; // Sampling and conversion start
     while(ADCCTL1 & ADCBUSY); // Wait if ADC core is active
     ref_sample = adc_result;
