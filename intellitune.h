@@ -65,7 +65,8 @@ extern uint16_t frequency, overflowCount;
 extern uint16_t cap_sample, ind_sample, fwd_sample,
                 ref_sample, fwd_25_sample, ref_25_sample;
 extern uint8_t adc_channel_select, adc_flg, task_flag,
-               display_menu, motor_task, tune_task, button_press;
+               display_menu, cap_motor_task, ind_motor_task,
+               tune_task, button_press;
 extern char cap2_val[8];
 extern char ind2_val[6];
 extern char swr_val[5];
@@ -77,7 +78,8 @@ void tune(void);
 
 // Stepper motor subsystem
 extern void initialize_stepper_control(void);
-void step_motor(uint16_t command);
+extern void step_cap_motor(uint16_t command);
+extern void step_ind_motor(uint16_t command);
 extern void current_setting(void);
 
 // Frequency Counter subsystem
@@ -89,6 +91,7 @@ extern _iq16 calculate_ref_coeff(uint8_t reflection_to_calc);
 extern void initialize_spi(void);
 extern void initialize_adc(void);
 extern void update_digipot(void);
+extern void update_swr(void);
 
 // User Interface subsystem
 extern void ui_init(void);

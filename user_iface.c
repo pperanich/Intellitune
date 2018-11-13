@@ -185,14 +185,13 @@ __interrupt void Timer3_B1( void )
       break; // CCR3 interrupt handling done
 
     case TBIV_8: // CCR4 caused the interrupt
-
-
       break;
 
     case TBIV_10: // CCR5 caused the interrupt
       TB1CTL = MC_0;
       total_pulses = ((uint32_t)overflowCount << 16) | TB1R;
       frequency = ((total_pulses << 4)) / 1000;
+      TB3CCTL5 = CCIE_0; // Compare interrupt disable
       break;
 
     case TBIV_12: // CCR6 caused the interrupt
@@ -215,7 +214,15 @@ __interrupt void Port_2( void )
   switch( P2IV )
   {
     case P2IV_2: // Pin 2.0: C-Up btn
-        button_press |= Cup;
+        if(P2IN & BIT0)
+        {
+            P2IES |= BIT0;
+            button_press &= ~Cup;
+        }
+        else {
+            P2IES &= ~BIT0;
+            button_press |= Cup;
+        }
         break;
 
     case P2IV_4: // Pin 2.1: Antenna btn
@@ -258,11 +265,27 @@ __interrupt void Port_3( void )
         break;
 
     case P3IV_4: // Pin 3.1: L-Dn btn
-        button_press |= Ldn;
+        if(P3IN & BIT1)
+        {
+            P3IES |= BIT1;
+            button_press &= ~Ldn;
+        }
+        else {
+            P3IES &= ~BIT1;
+            button_press |= Ldn;
+        }
         break;
 
     case P3IV_12: // Pin 3.5: L-Up btn
-        button_press |= Lup;
+        if(P3IN & BIT5)
+        {
+            P3IES |= BIT5;
+            button_press &= ~Lup;
+        }
+        else {
+            P3IES &= ~BIT5;
+            button_press |= Lup;
+        }
         break;
   }
 }
@@ -275,7 +298,15 @@ __interrupt void Port_4( void )
   switch( P4IV )
   {
     case P4IV_2: // Pin 4.0: C-Dn btn
-        button_press |= Cdn;
+        if(P4IN & BIT0)
+        {
+            P4IES |= BIT0;
+            button_press &= ~Cdn;
+        }
+        else {
+            P4IES &= ~BIT0;
+            button_press |= Cdn;
+        }
         break;
   }
 }
