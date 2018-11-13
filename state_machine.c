@@ -44,7 +44,6 @@ void (*C_Task_Ptr)(void);       // State pointer C branch
 
 //Globals
 uint8_t task_flag = 0;
-uint8_t adc_ready = 1;
 
 
 // TODO: Create timer interrupt that will execute next task once previous task is completed.
@@ -135,6 +134,7 @@ void A1(void)
 void A2(void)
 //--------------------------------------------------------
 {
+    if(button_press & TUNE) { tune(); }
     //-------------------
     //the next time Timer3 counter 1 reaches Period value go to A1
     A_Task_Ptr = &A1;
@@ -151,7 +151,7 @@ void A2(void)
 void B1(void)
 //----------------------------------------
 {
-
+    update_digipot();
     //-----------------
     //the next time Timer3 counter 2 reaches period value go to B2
     B_Task_Ptr = &B2;
@@ -165,18 +165,6 @@ void B2(void) //  SPARE
 
     //-----------------
     //the next time Timer3 counter 2 reaches period value go to B3
-    B_Task_Ptr = &B3;
-    //-----------------
-}
-
-//----------------------------------------
-void B3(void) //  SPARE
-//----------------------------------------
-{
-
-    //-----------------
-    //the next time Timer3 counter 2 reaches period value go to B1
-    //tune();
     B_Task_Ptr = &B1;
     //-----------------
 }
@@ -207,21 +195,9 @@ void C1(void)
 void C2(void) //  SPARE
 //----------------------------------------
 {
-
+    measure_freq();
     //-----------------
     //the next time Timer3 counter 3 reaches period value go to C3
-    C_Task_Ptr = &C3;
-    //-----------------
-}
-
-
-//-----------------------------------------
-void C3(void) //  SPARE
-//-----------------------------------------
-{
-
-    //-----------------
-    //the next time Timer3 counter 3 reaches period value go to C1
     C_Task_Ptr = &C1;
     //-----------------
 }

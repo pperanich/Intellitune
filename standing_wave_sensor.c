@@ -9,6 +9,11 @@
  *              another function will regulate the digipot on the SWR board to protect
  *              the launchpad from voltage inputs above its rating.
  *
+ *              Important side note: digital potentiometer should be connected as follows:
+ *              A terminal to ground
+ *              B terminal to 1.5V
+ *              Wiper terminal to ADC pin
+ *
  ******************************************************************************/
 
 #include "intellitune.h"
@@ -17,36 +22,49 @@
 // Function Prototypes
 void initialize_spi(void);
 void update_digipot(void);
+_iq16 calculate_ref_coeff(uint8_t reflection_to_calc);
 
 // Globals
-const uint8_t DATA_BYTE = 0x80;
+uint8_t DATA_BYTE = 0x80;
 const uint8_t CMD_BYTE = 0x13;
-uint16_t adc_result;
 
 
 // TODO: Implement SWR measurement function
-_iq16 measure_ref_coeff(void)
+_iq16 calculate_ref_coeff(uint8_t reflection_to_calc)
 {
-    unsigned int fwd_sample, ref_sample;
     _iq19 numerator, denominator, reflection_coefficient;
-    ADCCTL0 &= ~ADCENC;
-    ADCMCTL0 &= ~ADCINCH;
-    ADCMCTL0 |= ADCINCH_10; // A10
-    ADCCTL0 |= ADCENC | ADCSC; // Sampling and conversion start
-    while(ADCCTL1 & ADCBUSY); // Wait if ADC core is active
-    fwd_sample = adc_result;
+    switch(reflection_to_calc)
+    {
+        case KNOWN_SWITCHED_OUT:
+        {
+            if(adc_flg & SWR_KNOWN_SENSE)
+            {
+                adc_flg &= ~SWR_KNOWN_SENSE;
+                numerator = _IQ19(ref_25_sample);
+                denominator = _IQ19(fwd_25_sample);
+                reflection_coefficient = _IQ19div(numerator, denominator);
+                return _IQ19toIQ(reflection_coefficient);
+            } else {
+                return 0;
+            }
+        }
 
-    ADCCTL0 &= ~ADCENC;
-    ADCMCTL0 &= ~ADCINCH;
-    ADCMCTL0 |= ADCINCH_11; // A11
-    ADCCTL0 |= ADCENC | ADCSC; // Sampling and conversion start
-    while(ADCCTL1 & ADCBUSY); // Wait if ADC core is active
-    ref_sample = adc_result;
-
-    numerator = _IQ19(ref_sample);
-    denominator = _IQ19(fwd_sample);
-    reflection_coefficient = _IQ19div(numerator, denominator);
-    return _IQ19toIQ(reflection_coefficient);
+        case KNOWN_SWITCHED_IN:
+        {
+            if(adc_flg & SWR_SENSE)
+            {
+                adc_flg &= ~SWR_SENSE;
+                numerator = _IQ19(ref_sample);
+                denominator = _IQ19(fwd_sample);
+                reflection_coefficient = _IQ19div(numerator, denominator);
+                return _IQ19toIQ(reflection_coefficient);
+            } else {
+                return 0;
+            }
+        }
+        default:
+            return 0;
+    }
 }
 
 
@@ -71,32 +89,43 @@ void initialize_spi(void)
 // TODO: Change digipot for safe ADC voltages
 void update_digipot(void)
 {
-    volatile unsigned char LoopBack_cmd;
-    volatile unsigned char LoopBack_data;
+    uint8_t update_needed = 0;
+    if((fwd_sample > 4090) || (ref_sample > 4090))
+    {
+        DATA_BYTE++; // Increase resistance to lower voltage
+        update_needed = 1;
+    } else if((DATA_BYTE != 0) && ((fwd_sample < 4050) || (ref_sample < 4050)))
+    {
+        DATA_BYTE--; // Decrease resistance to increase voltage
+        update_needed = 1;
+    }
+    if(update_needed)
+    {
+        volatile unsigned char LoopBack_cmd;
+        volatile unsigned char LoopBack_data;
 
-    P4OUT &= ~BIT4; //Pull select line low on P4.4
-    UCB1STATW |= UCLISTEN;  //Enable loopback mode since no MISO line
-    UCB1CTLW0 &= ~UCSWRST; //Start USCI
-
-
-    // First write the Command Byte
-    while (!(UCB1IFG & UCTXIFG)); //Check if it is OK to write
-    UCB1TXBUF = CMD_BYTE; //Load data into transmit buffer
-
-    while (!(UCB1IFG & UCRXIFG)); //Wait until complete RX byte is received
-    LoopBack_cmd = UCB1RXBUF; //Read buffer to clear RX flag
-
-    // Then write the Data Byte
-    while (!(UCB1IFG & UCTXIFG)); //Check if it is OK to write
-    UCB1TXBUF = DATA_BYTE; //Load data into transmit buffer
-
-    while (!(UCB1IFG & UCRXIFG)); //Wait until complete RX byte is received
-    LoopBack_data = UCB1RXBUF; //Read buffer to clear RX flag
+        P4OUT &= ~BIT4; //Pull select line low on P4.4
+        UCB1STATW |= UCLISTEN;  //Enable loopback mode since no MISO line
+        UCB1CTLW0 &= ~UCSWRST; //Start USCI
 
 
-    UCB1CTLW0 |= UCSWRST; //Stop USCI
-    UCB1STATW &= ~UCLISTEN;  //Disable loopback mode
-    P4OUT |= BIT4; //De-select digi pot on SPI
+        // First write the Command Byte
+        while (!(UCB1IFG & UCTXIFG)); //Check if it is OK to write
+        UCB1TXBUF = CMD_BYTE; //Load data into transmit buffer
 
-    asm("    NOP");
+        while (!(UCB1IFG & UCRXIFG)); //Wait until complete RX byte is received
+        LoopBack_cmd = UCB1RXBUF; //Read buffer to clear RX flag
+
+        // Then write the Data Byte
+        while (!(UCB1IFG & UCTXIFG)); //Check if it is OK to write
+        UCB1TXBUF = DATA_BYTE; //Load data into transmit buffer
+
+        while (!(UCB1IFG & UCRXIFG)); //Wait until complete RX byte is received
+        LoopBack_data = UCB1RXBUF; //Read buffer to clear RX flag
+
+
+        UCB1CTLW0 |= UCSWRST; //Stop USCI
+        UCB1STATW &= ~UCLISTEN;  //Disable loopback mode
+        P4OUT |= BIT4; //De-select digi pot on SPI
+    }
 }

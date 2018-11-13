@@ -17,6 +17,10 @@ void initialize_stepper_control(void);
 void step_motor(uint16_t command);
 
 
+// Globals
+uint8_t motor_task = 0;
+
+
 // TODO: Initialize stepper control
 void initialize_stepper_control(void)
 {
@@ -56,9 +60,6 @@ void initialize_stepper_control(void)
     // Initialize direction pins low (Forward)
     P1OUT &= ~BIT4;
     P2OUT &= ~BIT4;
-
-    // Configure ADC pins for reference potentiometers
-    P5DIR &= ~BIT0 & ~BIT1;
 }
 
 
@@ -79,42 +80,95 @@ void step_motor(uint16_t command)
      *          amount of degrees to rotate, shifted left 2 for more precision.
      */
 
-    uint32_t step_cycles;
+    static uint32_t step_cycles;
+    static uint16_t current_command;
+    if(command != 0) { current_command = command; }
 
-    switch(command & BIT0)
+    switch(current_command & BIT0)
     {
-    case INDUCTOR_MOTOR: // Inductor motor driver
-        P3OUT &= ~BIT2; // Enable FETs on driver
-        if(command & BIT1) { P2OUT &= ~BIT4; }
-        else { P2OUT |= BIT4; }
-        step_cycles = (uint32_t)(command >> 2) * 10 / 18;
-        __delay_cycles(4000);
-        while(step_cycles){
-            P1OUT |= BIT3;
-            __delay_cycles(STEP_DUTY_CYCLE);
-            P1OUT &= ~BIT3;
-            __delay_cycles(STEP_DUTY_CYCLE);
-            step_cycles--;
-        }
-        P3OUT |= BIT2; // Disable FETs on driver
-        break;
+        case INDUCTOR_MOTOR: // Inductor motor driver
+        {
+            switch(motor_task)
+            {
+            case SET_ENABLE_AND_DIRECTION:
+                P3OUT &= ~BIT2; // Enable FETs on driver
+                if(current_command & BIT1) { P2OUT &= ~BIT4; }
+                else { P2OUT |= BIT4; }
+                step_cycles = (uint32_t)(current_command >> 2) * 10 / 18;
+                TB0CCR2  = TB0R + 8;
+                motor_task = STEP_HIGH;
+                TB0CCTL2 = CCIE;
+                break;
 
-    case CAPACITOR_MOTOR: // Capacitor motor driver
-        P5OUT &= ~BIT4; // Enable FETs on driver
-        if(command & BIT1) { P1OUT &= ~BIT4; }
-        else { P1OUT |= BIT4; }
-        step_cycles = (uint32_t)(command >> 2) * 1000 / 67;
-        __delay_cycles(4000);
-        while(step_cycles){
-            P1OUT |= BIT1;
-            __delay_cycles(STEP_DUTY_CYCLE);
-            P1OUT &= ~BIT1;
-            __delay_cycles(STEP_DUTY_CYCLE);
-            step_cycles--;
-        }
-        P5OUT |= BIT4; // Disable FETs on driver
-        break;
+            case STEP_HIGH:
+                if(step_cycles)
+                {
+                    P1OUT |= BIT3;
+                    TB0CCR2  = TB0R + 24;
+                    motor_task = STEP_LOW;
+                }
+                else {
+                    motor_task = DISABLE_DRIVER;
+                }
+                break;
 
+            case STEP_LOW:
+                P1OUT &= ~BIT3;
+                TB0CCR2  = TB0R + 24;
+                step_cycles--;
+                motor_task = STEP_HIGH;
+                break;
+
+            case DISABLE_DRIVER:
+                P3OUT |= BIT2; // Disable FETs on driver
+                motor_task = 0;
+                TB0CCTL2 = CCIE_0;
+                break;
+            }
+            break;
+        }
+
+        case CAPACITOR_MOTOR: // Capacitor motor driver
+        {
+            switch(motor_task)
+            {
+            case SET_ENABLE_AND_DIRECTION:
+                P5OUT &= ~BIT4; // Enable FETs on driver
+                if(current_command & BIT1) { P1OUT &= ~BIT4; }
+                else { P1OUT |= BIT4; }
+                step_cycles = (uint32_t)(current_command >> 2) * 1000 / 67;
+                TB0CCR2  = TB0R + 8;
+                motor_task = STEP_HIGH;
+                TB0CCTL2 = CCIE;
+                break;
+
+            case STEP_HIGH:
+                if(step_cycles)
+                {
+                    P1OUT |= BIT1;
+                    TB0CCR2  = TB0R + 24;
+                    motor_task = STEP_LOW;
+                }
+                else {
+                    motor_task = DISABLE_DRIVER;
+                }
+                break;
+
+            case STEP_LOW:
+                P1OUT &= ~BIT1;
+                TB0CCR2  = TB0R + 24;
+                step_cycles--;
+                motor_task = STEP_HIGH;
+                break;
+
+            case DISABLE_DRIVER:
+                P5OUT |= BIT4; // Disable FETs on driver
+                motor_task = 0;
+                TB0CCTL2 = CCIE_0;
+                break;
+            }
+            break;
+        }
     default:
         asm("    NOP");
         break;

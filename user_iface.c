@@ -13,8 +13,10 @@
 
 // Globals
 uint8_t MODE_SWITCH = 0;
-uint16_t BUTTON_PRESS = 0;
-_iq16 cap_sample, ind_sample;
+uint8_t button_press = 0;
+// Broken down as follows:    BIT0  |  BIT1  |  BIT2  |  BIT3  |  BIT4  |  BIT5  |    BIT6  |  BIT7
+//                            TUNE     MODE     ANT     L-UP      C-UP     L-DN       C-DN    unused
+//                         (w/o 25ohm res)   (with 25ohm res)
 uint8_t display_menu= 0;
 
 // Function Prototypes
@@ -138,7 +140,7 @@ void lcd_update(void)
 // utoa:  convert n to characters in s
 void utoa(unsigned int n, char s[])
 {
-    int i = 0;
+    uint8_t i = 0;
     do {  // generate digits in reverse order
         s[i++] = n % 10 + '0';  // get next digit
     } while ((n /= 10) > 0);  // delete it
@@ -150,7 +152,7 @@ void utoa(unsigned int n, char s[])
 // reverse string s in place
 void reverse(char s[])
 {
-    int i, j;
+    uint8_t i, j;
     char c;
 
     for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
@@ -213,15 +215,15 @@ __interrupt void Port_2( void )
   switch( P2IV )
   {
     case P2IV_2: // Pin 2.0: C-Up btn
-        BUTTON_PRESS |= BIT0;
+        button_press |= Cup;
         break;
 
     case P2IV_4: // Pin 2.1: Antenna btn
-        BUTTON_PRESS |= BIT1;
+        button_press |= ANT;
         break;
 
     case P2IV_12: // Pin 2.5: Tune btn
-        BUTTON_PRESS |= BIT5;
+        button_press |= TUNE;
         break;
   }
 }
@@ -238,7 +240,7 @@ __interrupt void Port_3( void )
         if(P3IN & BIT0)
         {
             P3IES |= BIT0;
-            BUTTON_PRESS &= ~(BIT0 << 8);
+            button_press &= ~MODE;
             TB3CCTL6 = CCIE_0; // Compare interrupt disable
             if(previous_mode == MODE_SWITCH) {
                 if(display_menu == NUM_DISPLAY_MENUS) {display_menu = 0;}
@@ -249,18 +251,18 @@ __interrupt void Port_3( void )
         }
         else {
             P3IES &= ~BIT0;
-            BUTTON_PRESS |= (BIT0 << 8);
+            button_press |= MODE;
             TB3CCR6  = TB3R + 65530; // Set CCR2 value for 2 s interrupt
             TB3CCTL6 = CCIE; // Compare interrupt enable
         }
         break;
 
     case P3IV_4: // Pin 3.1: L-Dn btn
-        BUTTON_PRESS |= (BIT1 << 8);
+        button_press |= Ldn;
         break;
 
     case P3IV_12: // Pin 3.5: L-Up btn
-        BUTTON_PRESS |= (BIT5 << 8);
+        button_press |= Lup;
         break;
   }
 }
@@ -273,7 +275,7 @@ __interrupt void Port_4( void )
   switch( P4IV )
   {
     case P4IV_2: // Pin 4.0: C-Dn btn
-        BUTTON_PRESS |= (BIT0 << 14);
+        button_press |= Cdn;
         break;
   }
 }

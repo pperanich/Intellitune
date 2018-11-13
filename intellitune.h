@@ -17,13 +17,16 @@
 // Macro definitions to improve readability of code
 #define PI      3.1415926536
 // Macros for ADC flags
-#define FWD_SENSE   BIT0
-#define REF_SENSE   BIT1
-#define FWD_WITH_25 BIT2
-#define REF_WITH_25 BIT3
-#define CAP_POT     BIT4
-#define IND_POT     BIT5
-#define ADC_STATUS  BIT6
+#define IMP_SWITCH       BIT0
+#define SWR_SENSE       BIT1
+#define SWR_KNOWN_SENSE BIT2
+#define CAP_POT         BIT4
+#define IND_POT         BIT5
+#define ADC_STATUS      BIT6
+#define FWD_PIN         ADCINCH_10
+#define REF_PIN         ADCINCH_11
+#define IND_PIN         ADCINCH_9
+#define CAP_PIN         ADCINCH_8
 // Macros for task flags
 #define A_TASK      BIT0
 #define B_TASK      BIT1
@@ -32,26 +35,45 @@
 #define CAPACITOR_MOTOR 1
 #define INDUCTOR_MOTOR  0
 #define STEP_DUTY_CYCLE 12000
+#define SET_ENABLE_AND_DIRECTION    0
+#define STEP_HIGH                   1
+#define STEP_LOW                    2
+#define DISABLE_DRIVER              3
+// Macros for SWR sense
+#define KNOWN_SWITCHED_OUT  0
+#define KNOWN_SWITCHED_IN   1
+// Macros for tune task algorithm
+#define INITIALIZE_TUNE_COMPONENTS  0
+#define CALCULATE_SWR               1
+#define CALCULATE_SWR_W_KNOWN_IMP   2
+#define ESTIMATE_TUNE_VALUES        3
+#define ADJUST_TO_ESTIMATES         4
+#define FINE_TUNE                   5
+// Macros for the push button flag
+#define TUNE        BIT0
+#define MODE        BIT1
+#define ANT         BIT2
+#define Lup         BIT3
+#define Cup         BIT4
+#define Ldn         BIT5
+#define Cdn         BIT6
 
 
 // Globals
-extern uint16_t frequency;
-extern const uint8_t CMD_BYTE;
-extern const uint8_t DATA_BYTE;
-extern _iq16 cap_sample, ind_sample;
-extern uint16_t adc_result;
-extern uint8_t display_menu;
+extern uint32_t  total_pulses;
+extern uint16_t frequency, overflowCount;
+extern uint16_t cap_sample, ind_sample, fwd_sample,
+                ref_sample, fwd_25_sample, ref_25_sample;
+extern uint8_t adc_channel_select, adc_flg, task_flag,
+               display_menu, motor_task, tune_task, button_press;
 extern char cap2_val[8];
 extern char ind2_val[6];
 extern char swr_val[5];
 extern char load_imp[7];
-extern uint8_t task_flag;
-extern uint8_t adc_ready;
-extern uint16_t overflowCount;
-extern uint32_t  total_pulses;
 
 
 // Subsystem function declarations
+void tune(void);
 
 // Stepper motor subsystem
 extern void initialize_stepper_control(void);
@@ -63,7 +85,7 @@ extern void measure_freq(void);
 extern void initialize_freq_counter(void);
 
 // Standing Wave Ratio subsystem
-extern _iq16 measure_ref_coeff(void);
+extern _iq16 calculate_ref_coeff(uint8_t reflection_to_calc);
 extern void initialize_spi(void);
 extern void initialize_adc(void);
 extern void update_digipot(void);
