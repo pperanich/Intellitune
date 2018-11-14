@@ -9,18 +9,18 @@
 
 #include "intellitune.h"
 
-#define NUM_QUICK_MENUS 1
-#define NUM_SETUP_MENUS 4
+
 
 // Globals
+uint8_t display_menu= 0;
+uint32_t total_pulses = 0;
 uint8_t MODE_SWITCH = 0;
 uint8_t PREV_MODE = 0;
 uint8_t button_press = 0;
-// Broken down as follows:    BIT0  |  BIT1  |  BIT2  |  BIT3  |  BIT4  |  BIT5  |    BIT6  |  BIT7
-//                            TUNE     MODE     ANT     L-UP      C-UP     L-DN       C-DN    unused
-//                         (w/o 25ohm res)   (with 25ohm res)
-uint8_t display_menu= 0;
-uint32_t total_pulses = 0;
+// Broken down as follows:
+// BIT0  |  BIT1  |  BIT2  |  BIT3  |  BIT4  |  BIT5  |    BIT6  |  BIT7
+// TUNE     MODE     ANT     L-UP      C-UP     L-DN       C-DN    MODE_LOCK
+
 
 // Function Prototypes
 void ui_button_init(void);
@@ -94,19 +94,19 @@ void lcd_update(void)
 
     switch(display_menu)
     {
-    case 0:
+    case DEFAULT_DISPLAY:
         mode_0();
         break;
-    case 1:
+    case TUNING_DISPLAY:
         mode_1();
         break;
-    case 2:
+    case TARGET_SWR:
         mode_2();
         break;
-    case 3:
+    case AUTOTUNE_THRESH:
         mode_3();
         break;
-    case 4:
+    case LC_DISPLAY:
         mode_4();
         break;
     }
@@ -298,23 +298,26 @@ __interrupt void Port_2( void )
   switch( P2IV )
   {
     case P2IV_2: // Pin 2.0: C-Up btn
+        if(button_press & MODE_LOCK) { break; }
         if(P2IN & BIT0)
         {
             P2IES |= BIT0;
-            button_press &= ~Cup;
+            button_press &= ~Cup & ~MODE_LOCK;
         }
         else {
             P2IES &= ~BIT0;
-            button_press |= Cup;
+            button_press |= Cup | MODE_LOCK;
         }
         break;
 
     case P2IV_4: // Pin 2.1: Antenna btn
+        if(button_press & MODE_LOCK) { break; }
         button_press |= ANT;
         break;
       
     case P2IV_12: // Pin 2.5: Tune btn
-        button_press |= TUNE;
+        if(button_press & MODE_LOCK) { break; }
+        button_press |= TUNE | MODE_LOCK;
         display_menu = 1;
         break;
   }
@@ -328,10 +331,11 @@ __interrupt void Port_3( void )
   switch( P3IV )
   {
     case P3IV_2: // Pin 3.0: Mode btn
+        if(button_press & MODE_LOCK) { break; }
         if(P3IN & BIT0)
         {
             P3IES |= BIT0;
-            button_press &= ~MODE;
+            button_press &= ~MODE & ~MODE_LOCK;
             TB3CCTL6 = CCIE_0; // Compare interrupt disable
             if (PREV_MODE == MODE_SWITCH){
                 if(display_menu == NUM_QUICK_MENUS && !(MODE_SWITCH % 2)) { display_menu = 0; }
@@ -339,41 +343,41 @@ __interrupt void Port_3( void )
                 else {display_menu++;}
             }
             else{
-                display_menu = 20;
+                display_menu = 2;
             }
         }
         else {
             P3IES &= ~BIT0;
-            button_press |= MODE;
+            button_press |= MODE | MODE_LOCK;
             TB3CCR6  = TB3R + 65530; // Set CCR2 value for 2 s interrupt
             TB3CCTL6 = CCIE; // Compare interrupt enable
             PREV_MODE = MODE_SWITCH;
-            if(display_menu == NUM_QUICK_MENUS) { display_menu = 0; }
-            else { display_menu++; }
         }
         break;
 
     case P3IV_4: // Pin 3.1: L-Dn btn
+        if(button_press & MODE_LOCK) { break; }
         if(P3IN & BIT1)
         {
             P3IES |= BIT1;
-            button_press &= ~Ldn;
+            button_press &= ~Ldn & ~MODE_LOCK;
         }
         else {
             P3IES &= ~BIT1;
-            button_press |= Ldn;
+            button_press |= Ldn | MODE_LOCK;
         }
         break;
 
     case P3IV_12: // Pin 3.5: L-Up btn
+        if(button_press & MODE_LOCK) { break; }
         if(P3IN & BIT5)
         {
             P3IES |= BIT5;
-            button_press &= ~Lup;
+            button_press &= ~Lup & ~MODE_LOCK;
         }
         else {
             P3IES &= ~BIT5;
-            button_press |= Lup;
+            button_press |= Lup | MODE_LOCK;
         }
         break;
   }
@@ -387,14 +391,15 @@ __interrupt void Port_4( void )
   switch( P4IV )
   {
     case P4IV_2: // Pin 4.0: C-Dn btn
+        if(button_press & MODE_LOCK) { break; }
         if(P4IN & BIT0)
         {
             P4IES |= BIT0;
-            button_press &= ~Cdn;
+            button_press &= ~Cdn & ~MODE_LOCK;
         }
         else {
             P4IES &= ~BIT0;
-            button_press |= Cdn;
+            button_press |= Cdn | MODE_LOCK;
         }
         break;
   }

@@ -216,7 +216,7 @@ void tune(void)
         case FINE_TUNE:
         {
             tune_task = 0;
-            button_press &= ~TUNE;
+            button_press &= ~TUNE & ~MODE_LOCK;
             break;
         }
     }

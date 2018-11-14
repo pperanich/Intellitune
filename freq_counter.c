@@ -34,6 +34,9 @@ void measure_freq(void)
 
     // 16-bit, TBxCLK, halt mode, divide by 4, enable Interrupt
     TB1CTL = (CNTL_0 | TBSSEL_0 | MC__CONTINUOUS | ID_2 | TBIE);
+
+    TB3CCR5 = TB3R + 32768 + timing_correction;
+    TB3CCTL5 = CCIE;
 }
 
 

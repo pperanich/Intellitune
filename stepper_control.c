@@ -52,8 +52,8 @@ void initialize_stepper_control(void)
     P3OUT |= BIT2;
     P5OUT |= BIT4;
 
-    // Pull MS1 pin for capacitor microstep low
-    P4OUT &= ~BIT7;
+    // Pull MS1 pin for capacitor microstep high
+    P4OUT |= BIT7;
 
     // Initialize step pins low
     P1OUT &= ~BIT1;
@@ -69,31 +69,35 @@ void initialize_stepper_control(void)
 
 
 // TODO: Implement capacitor stepper motor control function.
-void step_cap_motor(uint16_t command)
+inline void step_cap_motor(uint16_t command)
 {
     /*
-     * Inputs:
-     *      command: composed of the following parameters
+     * Vari-Capacitor has 5373 unique values, calculated by
+     *      180(deg) / 0.067(deg) * 2(MS1 halves step angle)
      *
-     *      motor: <- Bit 0
-     *          0 - inductor motor
-     *          1 - capacitor motor
-     *      direction: <- Bit 1
-     *          1 - Forward
-     *          0 - reverse
-     *      degrees: <- Bits 2-16
-     *          amount of degrees to rotate, shifted left 2 for more precision.
+     * Input: command
+     *      This can be used to select different modes of stepper operation.
+     *      By this, I mean that one command may tell the component to go to its
+     *      minimum setting while another command may specify a certain position.
+     *      Further, a command should be implemented that simply increments component
+     *      until flag is erased.
+     *
      */
 
     static uint32_t step_cycles;
     static uint16_t current_command;
     if(command != 0) { current_command = command; }
 
+    if((cap_sample < C_LOWER_LIMIT) || (cap_sample > C_UPPER_LIMIT))
+    {
+        cap_motor_task = DISABLE_DRIVER;
+    }
+
     switch(cap_motor_task)
     {
     case SET_ENABLE_AND_DIRECTION:
         P5OUT &= ~BIT4; // Enable FETs on driver
-        if(current_command & BIT1) { P1OUT &= ~BIT4; }
+        if(current_command & BIT0) { P1OUT &= ~BIT4; }
         else { P1OUT |= BIT4; }
         step_cycles = (uint32_t)(current_command >> 2) * 1000 / 67;
         TB2CCR1  = TB0R + 8;
@@ -102,14 +106,14 @@ void step_cap_motor(uint16_t command)
         break;
 
     case STEP_HIGH:
-        if(step_cycles)
+        if(step_cycles <= 0)
         {
+            cap_motor_task = DISABLE_DRIVER;
+        }
+        else {
             P1OUT |= BIT1;
             TB2CCR1  = TB2R + 24;
             cap_motor_task = STEP_LOW;
-        }
-        else {
-            cap_motor_task = DISABLE_DRIVER;
         }
         break;
 
@@ -121,6 +125,7 @@ void step_cap_motor(uint16_t command)
         break;
 
     case DISABLE_DRIVER:
+        P1OUT &= ~BIT1; // Make sure step pin is low
         P5OUT |= BIT4; // Disable FETs on driver
         cap_motor_task = 0;
         TB2CCTL1 = CCIE_0;
@@ -130,31 +135,35 @@ void step_cap_motor(uint16_t command)
 
 
 // TODO: Implement inductor stepper motor control function.
-void step_ind_motor(uint16_t command)
+inline void step_ind_motor(uint16_t command)
 {
     /*
-     * Inputs:
-     *      command: composed of the following parameters
+     * Roller Inductor has 6200 unique values, calculated by
+     *      31(rotations) * 360(deg) / 1.8(deg step angle)
      *
-     *      motor: <- Bit 0
-     *          0 - inductor motor
-     *          1 - capacitor motor
-     *      direction: <- Bit 1
-     *          1 - Forward
-     *          0 - reverse
-     *      degrees: <- Bits 2-16
-     *          amount of degrees to rotate, shifted left 2 for more precision.
+     * Input: command
+     *      This can be used to select different modes of stepper operation.
+     *      By this, I mean that one command may tell the component to go to its
+     *      minimum setting while another command may specify a certain position.
+     *      Further, a command should be implemented that simply increments component
+     *      until flag is erased.
+     *
      */
 
     static uint32_t step_cycles;
     static uint16_t current_command;
     if(command != 0) { current_command = command; }
 
+    if((ind_sample < L_LOWER_LIMIT) || (ind_sample > L_UPPER_LIMIT))
+    {
+        ind_motor_task = DISABLE_DRIVER;
+    }
+
     switch(ind_motor_task)
     {
     case SET_ENABLE_AND_DIRECTION:
         P3OUT &= ~BIT2; // Enable FETs on driver
-        if(current_command & BIT1) { P2OUT &= ~BIT4; }
+        if(current_command & BIT0) { P2OUT &= ~BIT4; }
         else { P2OUT |= BIT4; }
         step_cycles = (uint32_t)(current_command >> 2) * 10 / 18;
         TB2CCR2  = TB2R + 8;
@@ -163,14 +172,14 @@ void step_ind_motor(uint16_t command)
         break;
 
     case STEP_HIGH:
-        if(step_cycles)
+        if(step_cycles <= 0)
         {
+            ind_motor_task = DISABLE_DRIVER;
+        }
+        else {
             P1OUT |= BIT3;
             TB2CCR2  = TB2R + 24;
             ind_motor_task = STEP_LOW;
-        }
-        else {
-            ind_motor_task = DISABLE_DRIVER;
         }
         break;
 
@@ -182,6 +191,7 @@ void step_ind_motor(uint16_t command)
         break;
 
     case DISABLE_DRIVER:
+        P1OUT &= ~BIT3; // Make sure step pin is low
         P3OUT |= BIT2; // Disable FETs on driver
         ind_motor_task = 0;
         TB2CCTL2 = CCIE_0;
@@ -195,13 +205,13 @@ __interrupt void Timer2_B1(void)
 {
     switch( TB2IV ) // Determine interrupt source
     {
-        case TBIV_2: // CCR1 caused the interrupt - used for adc_sampling
+        case TBIV_2: // CCR1 caused the interrupt - used for capacitor stepper motor delay
         {
           step_cap_motor(0);
           break;
         }
 
-        case TBIV_4: // CCR2 caused the interrupt - used for stepper motor delays
+        case TBIV_4: // CCR2 caused the interrupt - used for inductor stepper motor delay
         {
           step_ind_motor(0);
           break;

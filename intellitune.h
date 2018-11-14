@@ -15,33 +15,41 @@
 
 
 // Macro definitions to improve readability of code
-#define PI      3.1415926536
+#define PI                          3.1415926536
 // Macros for ADC flags
-#define IMP_SWITCH       BIT0
-#define SWR_SENSE       BIT1
-#define SWR_KNOWN_SENSE BIT2
-#define CAP_POT         BIT4
-#define IND_POT         BIT5
-#define ADC_STATUS      BIT6
-#define FWD_PIN         ADCINCH_10
-#define REF_PIN         ADCINCH_11
-#define IND_PIN         ADCINCH_9
-#define CAP_PIN         ADCINCH_8
+#define IMP_SWITCH                  BIT0
+#define SWR_SENSE                   BIT1
+#define SWR_KNOWN_SENSE             BIT2
+#define CAP_POT                     BIT4
+#define IND_POT                     BIT5
+#define ADC_STATUS                  BIT6
+#define FWD_PIN                     ADCINCH_10
+#define REF_PIN                     ADCINCH_11
+#define IND_PIN                     ADCINCH_9
+#define CAP_PIN                     ADCINCH_8
 // Macros for task flags
-#define A_TASK      BIT0
-#define B_TASK      BIT1
-#define C_TASK      BIT2
+#define A_TASK                      BIT0
+#define B_TASK                      BIT1
+#define C_TASK                      BIT2
 // Macros for Stepper Motors
-#define CAPACITOR_MOTOR 1
-#define INDUCTOR_MOTOR  0
-#define STEP_DUTY_CYCLE 12000
+#define CAPACITOR_MOTOR             1
+#define INDUCTOR_MOTOR              0
+#define INCREASE_IND_DIR            1
+#define DECREASE_IND_DIR            0
+#define INCREASE_CAP_DIR            1
+#define DECREASE_CAP_DIR            0
+#define STEP_DUTY_CYCLE             12000
 #define SET_ENABLE_AND_DIRECTION    0
 #define STEP_HIGH                   1
 #define STEP_LOW                    2
 #define DISABLE_DRIVER              3
+#define L_LOWER_LIMIT               0005
+#define L_UPPER_LIMIT               4090
+#define C_LOWER_LIMIT               0005
+#define C_UPPER_LIMIT               4090
 // Macros for SWR sense
-#define KNOWN_SWITCHED_OUT  0
-#define KNOWN_SWITCHED_IN   1
+#define KNOWN_SWITCHED_OUT          0
+#define KNOWN_SWITCHED_IN           1
 // Macros for tune task algorithm
 #define INITIALIZE_TUNE_COMPONENTS  0
 #define CALCULATE_SWR               1
@@ -50,18 +58,27 @@
 #define ADJUST_TO_ESTIMATES         4
 #define FINE_TUNE                   5
 // Macros for the push button flag
-#define TUNE        BIT0
-#define MODE        BIT1
-#define ANT         BIT2
-#define Lup         BIT3
-#define Cup         BIT4
-#define Ldn         BIT5
-#define Cdn         BIT6
+#define TUNE                        BIT0
+#define MODE                        BIT1
+#define ANT                         BIT2
+#define Lup                         BIT3
+#define Cup                         BIT4
+#define Ldn                         BIT5
+#define Cdn                         BIT6
+#define MODE_LOCK                   BIT7
+// Macros for UI menus
+#define NUM_QUICK_MENUS             1
+#define NUM_SETUP_MENUS             3
+#define DEFAULT_DISPLAY             0
+#define TUNING_DISPLAY              1
+#define TARGET_SWR                  2
+#define AUTOTUNE_THRESH             3
+#define LC_DISPLAY                  4
 
 
 // Globals
 extern uint32_t  total_pulses;
-extern uint16_t frequency, overflowCount;
+extern uint16_t frequency, overflowCount, inductor_position, capacitor_position;
 extern uint16_t cap_sample, ind_sample, fwd_sample,
                 ref_sample, fwd_25_sample, ref_25_sample;
 extern uint8_t adc_channel_select, adc_flg, task_flag,
