@@ -13,14 +13,12 @@
 
 // Globals
 uint8_t display_menu= 0;
-uint32_t total_pulses = 0;
 uint8_t MODE_SWITCH = 0;
 uint8_t PREV_MODE = 0;
 uint8_t button_press = 0;
 // Broken down as follows:
 // BIT0  |  BIT1  |  BIT2  |  BIT3  |  BIT4  |  BIT5  |    BIT6  |  BIT7
 // TUNE     MODE     ANT     L-UP      C-UP     L-DN       C-DN    MODE_LOCK
-
 
 // Function Prototypes
 void ui_button_init(void);
@@ -279,14 +277,14 @@ __interrupt void Timer3_B1( void )
       break;
 
     case TBIV_12: // CCR6 caused the interrupt
-        MODE_SWITCH += 1;
-        TB3CCTL6 = CCIE_0; // Compare interrupt disable
-        break;
+      MODE_SWITCH += 1;
+      TB3CCTL6 = CCIE_0; // Compare interrupt disable
+      break;
 
     case TBIV_14: // timer overflow caused the interrupt
-        if(P1OUT & BIT0) P1OUT &= ~BIT0;
-        else P1OUT |= BIT0;
-        break;
+      if(P1OUT & BIT0) P1OUT &= ~BIT0;
+      else P1OUT |= BIT0;
+      break;
   }
 }
 

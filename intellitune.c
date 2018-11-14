@@ -95,8 +95,6 @@ int main(void) {
 
     __bis_SR_register(GIE);       // Enable interrupts
 
-    //hd44780_write_string("Intellitune", 2, 1, NO_CR_LF ); // Write text string to first row and first column
-
     while(1)
     {
         // State machine entry & exit point
@@ -104,7 +102,6 @@ int main(void) {
         (*Alpha_State_Ptr)();   // jump to an Alpha state (A0,B0,...)
         //===========================================================
     }
-
 }
 
 

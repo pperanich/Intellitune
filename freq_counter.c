@@ -13,6 +13,7 @@
 // Globals
 uint16_t overflowCount;
 uint16_t frequency;
+uint32_t total_pulses;
 
 
 // Function Prototypes
@@ -32,11 +33,11 @@ void measure_freq(void)
     //Reset the timer1 count register to 0.
     TB1R = 0;
 
-    // 16-bit, TBxCLK, halt mode, divide by 4, enable Interrupt
-    TB1CTL = (CNTL_0 | TBSSEL_0 | MC__CONTINUOUS | ID_2 | TBIE);
-
+    // TBCCR0 interrupt enabled and set interval to 1 sec
     TB3CCR5 = TB3R + 32768 + timing_correction;
     TB3CCTL5 = CCIE;
+    // 16-bit, TBxCLK, halt mode, divide by 4, enable Interrupt
+    TB1CTL = (CNTL_0 | TBSSEL_2 | MC__CONTINUOUS | ID_2 | TBIE);
 }
 
 

@@ -1,4 +1,3 @@
-
 /*
  * File: state_machine.c
  *
