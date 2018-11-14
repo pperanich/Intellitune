@@ -162,15 +162,26 @@ void B1(void)
 void B2(void) //  SPARE
 //----------------------------------------
 {
-    if(!(button_press & TUNE))
+    if(!(button_press & TUNE) && !(task_flag & MOTOR_ACTIVE))
     {
         update_swr();
-        uint16_t cap_motor_command = 1441;
-        uint16_t ind_motor_command = 44642;
-        if(button_press & Lup) step_ind_motor(ind_motor_command);
-        else if(button_press & Ldn) step_ind_motor(ind_motor_command);
-        if(button_press & Cup) step_cap_motor(cap_motor_command);
-        else if(button_press & Cdn) step_cap_motor(cap_motor_command);
+        if(button_press & Lup)
+        {
+            step_ind_motor(Lup_CMD);
+            task_flag |= MOTOR_ACTIVE;
+        }
+        else if(button_press & Ldn) {
+            step_ind_motor(Ldn_CMD);
+            task_flag |= MOTOR_ACTIVE;
+        }
+        if(button_press & Cup) {
+            step_cap_motor(Cup_CMD);
+            task_flag |= MOTOR_ACTIVE;
+        }
+        else if(button_press & Cdn) {
+            step_cap_motor(Cdn_CMD);
+            task_flag |= MOTOR_ACTIVE;
+        }
     }
     //-----------------
     //the next time Timer3 counter 2 reaches period value go to B3

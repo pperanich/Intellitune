@@ -112,15 +112,14 @@ void tune(void)
                     angular_frequency, gamma_1, gamma_2, vswr, numerator, denominator, div_res;
     static const _iq16 Z_source = _IQ16(50.0);
     static const _iq16 iq_one = _IQ16(1.0);
+    static uint8_t task_status = 0;
 
     switch(tune_task)
     {
         case INITIALIZE_TUNE_COMPONENTS:
         {
-            uint16_t cap_motor_command = 1441;
-            uint16_t ind_motor_command = 44642;
-            step_cap_motor(cap_motor_command);
-            step_ind_motor(ind_motor_command);
+            step_cap_motor(RETURN_START_MODE);
+            step_ind_motor(RETURN_START_MODE);
             break;
         }
 
@@ -134,11 +133,15 @@ void tune(void)
 
         case CALCULATE_SWR_W_KNOWN_IMP:
         {
-            P3OUT |= BIT6;
-            adc_flg |= IMP_SWITCH;
+            if(task_status == 0){
+                P3OUT |= BIT6;
+                adc_flg |= IMP_SWITCH;
+                adc_channel_select = FWD_PIN;
+                task_status++;
+            }
             gamma_2 = calculate_ref_coeff(KNOWN_SWITCHED_IN);//_IQ16(0.826);
             if(gamma_2 == 0) { return; }
-            else { tune_task++; }
+            else { tune_task++; task_status = 0;}
             break;
         }
 
@@ -206,14 +209,30 @@ void tune(void)
 
         case ADJUST_TO_ESTIMATES:
         {
+
             tune_task++;
             break;
         }
 
         case FINE_TUNE:
         {
-            tune_task = 0;
-            button_press &= ~TUNE & ~MODE_LOCK;
+            if(task_status == 0) {
+                step_cap_motor(FINE_TUNE_MODE);
+                task_status = 3;
+            } else if(task_status == 1) {
+                step_ind_motor(FINE_TUNE_MODE);
+                task_status = 4;
+            } else if(task_status == 3) {
+                if(!(task_flag & MOTOR_ACTIVE)) { task_status = 1; }
+                return;
+            } else if(task_status == 4) {
+                if(!(task_flag & MOTOR_ACTIVE)) { task_status = 2; }
+                return;
+            } else if(task_status == 2) {
+                task_status = 0;
+                tune_task = INITIALIZE_TUNE_COMPONENTS;
+                button_press &= ~TUNE & ~MODE_LOCK;
+            }
             break;
         }
     }

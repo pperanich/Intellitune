@@ -301,6 +301,7 @@ __interrupt void Port_2( void )
         {
             P2IES |= BIT0;
             button_press &= ~Cup & ~MODE_LOCK;
+            task_flag &= ~MOTOR_ACTIVE;
         }
         else {
             P2IES &= ~BIT0;
@@ -359,6 +360,7 @@ __interrupt void Port_3( void )
         {
             P3IES |= BIT1;
             button_press &= ~Ldn & ~MODE_LOCK;
+            task_flag &= ~MOTOR_ACTIVE;
         }
         else {
             P3IES &= ~BIT1;
@@ -372,6 +374,7 @@ __interrupt void Port_3( void )
         {
             P3IES |= BIT5;
             button_press &= ~Lup & ~MODE_LOCK;
+            task_flag &= ~MOTOR_ACTIVE;
         }
         else {
             P3IES &= ~BIT5;
@@ -394,6 +397,7 @@ __interrupt void Port_4( void )
         {
             P4IES |= BIT0;
             button_press &= ~Cdn & ~MODE_LOCK;
+            task_flag &= ~MOTOR_ACTIVE;
         }
         else {
             P4IES &= ~BIT0;

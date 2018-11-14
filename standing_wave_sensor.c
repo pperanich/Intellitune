@@ -36,7 +36,7 @@ _iq16 calculate_ref_coeff(uint8_t reflection_to_calc)
     _iq19 numerator, denominator, reflection_coefficient;
     switch(reflection_to_calc)
     {
-        case KNOWN_SWITCHED_OUT:
+        case KNOWN_SWITCHED_IN:
         {
             if(adc_flg & SWR_KNOWN_SENSE)
             {
@@ -50,7 +50,7 @@ _iq16 calculate_ref_coeff(uint8_t reflection_to_calc)
             }
         }
 
-        case KNOWN_SWITCHED_IN:
+        case KNOWN_SWITCHED_OUT:
         {
             if(adc_flg & SWR_SENSE)
             {

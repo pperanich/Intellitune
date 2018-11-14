@@ -31,6 +31,7 @@
 #define A_TASK                      BIT0
 #define B_TASK                      BIT1
 #define C_TASK                      BIT2
+#define MOTOR_ACTIVE                BIT3
 // Macros for Stepper Motors
 #define CAPACITOR_MOTOR             1
 #define INDUCTOR_MOTOR              0
@@ -47,6 +48,15 @@
 #define L_UPPER_LIMIT               4090
 #define C_LOWER_LIMIT               0005
 #define C_UPPER_LIMIT               4090
+#define BTN_CMD                     1
+#define BTN_CONTROL_MODE            2
+#define RETURN_START_MODE           4
+#define CMD_POS_MODE                8
+#define FINE_TUNE_MODE              10
+#define Lup_CMD                     3
+#define Ldn_CMD                     2
+#define Cup_CMD                     3
+#define Cdn_CMD                     2
 // Macros for SWR sense
 #define KNOWN_SWITCHED_OUT          0
 #define KNOWN_SWITCHED_IN           1
