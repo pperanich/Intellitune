@@ -200,7 +200,6 @@ void mode_3(void)  // AutoTune Threshold SWR mode
     hd44780_blank_out_remaining_row(2, 1);
 
     // Threshold of SWR and tuning will begin when it is surpassed
-    asm("   NOP");
 }
 
 void mode_4(void) // LC Limit
@@ -216,7 +215,6 @@ void mode_4(void) // LC Limit
 
 
     // Turns off limits for L and C -OR- Display max values instead
-    asm("   NOP");
 }
 
 // utoa:  convert n to characters in s

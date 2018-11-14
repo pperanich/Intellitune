@@ -12,7 +12,7 @@
 
 // Function Prototypes
 void initialize_relay(void);
-void switch_cap_relay(int relay_num, int position);
+void switch_cap_relay(uint8_t setting);
 void switch_net_config(void);
 void switch_kwown_impedance(void);
 
@@ -33,10 +33,35 @@ void initialize_relay(void)
 
 
 // TODO: Binary sequenced capacitor relay function.
-void switch_cap_relay(int relay_num, int position)
+void switch_cap_relay(uint8_t setting)
 {
-    // Not Implemented
-    asm("    NOP");
+    switch(setting)
+    {
+    case 0:
+        P1OUT &= ~BIT5 & ~BIT6 & ~BIT7;
+        break;
+    case 1:
+        P1OUT |= BIT5; P1OUT &= ~BIT6 & ~BIT7;
+        break;
+    case 2:
+        P1OUT |= BIT6; P1OUT &= ~BIT5 & ~BIT7;
+        break;
+    case 3:
+        P1OUT |= BIT5 | BIT6; P1OUT &= ~BIT7;
+        break;
+    case 4:
+        P1OUT |= BIT7; P1OUT &= ~BIT5 & ~BIT6;
+        break;
+    case 5:
+        P1OUT |= BIT7 | BIT5; P1OUT &= ~BIT6;
+        break;
+    case 6:
+        P1OUT |= BIT7 | BIT6; P1OUT &= ~BIT5;
+        break;
+    case 7:
+        P1OUT |= BIT5 | BIT6 | BIT7;
+        break;
+    }
 }
 
 

@@ -102,7 +102,7 @@ inline void step_cap_motor(uint16_t command)
             break;
         case CMD_POS_MODE:
             position = (command >> 4);
-            if(position < ind_sample) { direction = INCREASE_CAP_DIR; }
+            if(position < cap_sample) { direction = INCREASE_CAP_DIR; }
             else { direction = DECREASE_CAP_DIR; }
             break;
         case FINE_TUNE_MODE:
@@ -117,9 +117,30 @@ inline void step_cap_motor(uint16_t command)
         }
     }
 
-    if((cap_sample < C_LOWER_LIMIT) || (cap_sample > C_UPPER_LIMIT))
+    if(((cap_sample < C_LOWER_LIMIT) && (direction == DECREASE_CAP_DIR)) ||
+       ((cap_sample > C_UPPER_LIMIT) && (direction == INCREASE_CAP_DIR)))
     {
-        cap_motor_task = DISABLE_DRIVER;
+        if((mode == BTN_CONTROL_MODE) && (button_press & Cup)){
+            if(relay_setting < 7) {
+                switch_cap_relay(++relay_setting);
+                direction = DECREASE_CAP_DIR;
+                mode = CMD_POS_MODE;
+                position = C_LOWER_LIMIT;
+                cap_motor_task = SET_ENABLE_AND_DIRECTION;
+                task_flag |= REVERT_TO_BTN_MODE;
+            } else { cap_motor_task = DISABLE_DRIVER; }
+        } else if((mode == BTN_CONTROL_MODE) && (button_press & Cdn)) {
+            if(relay_setting > 0) {
+                switch_cap_relay(--relay_setting);
+                direction = INCREASE_CAP_DIR;
+                mode = CMD_POS_MODE;
+                position = C_UPPER_LIMIT;
+                cap_motor_task = SET_ENABLE_AND_DIRECTION;
+                task_flag |= REVERT_TO_BTN_MODE;
+            } else { cap_motor_task = DISABLE_DRIVER; }
+        } else {
+            cap_motor_task = DISABLE_DRIVER;
+        }
     }
 
     switch(cap_motor_task)
@@ -130,7 +151,7 @@ inline void step_cap_motor(uint16_t command)
             P5OUT &= ~BIT4; // Enable FETs on driver
             if(direction) { P1OUT &= ~BIT4; }
             else { P1OUT |= BIT4; }
-            TB2CCR1  = TB0R + 8;
+            TB2CCR1  = TB2R + 8;
             cap_motor_task = STEP_HIGH;
             TB2CCTL1 = CCIE;
             break;
@@ -156,7 +177,18 @@ inline void step_cap_motor(uint16_t command)
                 {
                     if((position < cap_sample) && (direction == INCREASE_CAP_DIR)) { step_status = 1; }
                     else if((position > cap_sample) && (direction == DECREASE_CAP_DIR)) { step_status = 1; }
-                    else { step_status = 0; }
+                    else {
+                        if(task_flag & REVERT_TO_BTN_MODE) {
+                            task_flag &= ~ REVERT_TO_BTN_MODE;
+                            mode = BTN_CONTROL_MODE;
+                            if(button_press & Cup) { direction = INCREASE_CAP_DIR; }
+                            else if(button_press & Cdn) { direction = DECREASE_CAP_DIR; }
+                            cap_motor_task = SET_ENABLE_AND_DIRECTION;
+                            TB2CCR2  = TB2R + 2;
+                            return;
+                        }
+                        step_status = 0;
+                    }
                     break;
                 }
                 case FINE_TUNE_MODE:
@@ -169,7 +201,7 @@ inline void step_cap_motor(uint16_t command)
                     } else if(cap_sample >= fine_upper) {
                         mode = CMD_POS_MODE;
                         if(position < cap_sample) {
-                            direction = DECREASE_IND_DIR;
+                            direction = DECREASE_CAP_DIR;
                             cap_motor_task = SET_ENABLE_AND_DIRECTION;
                         }
                         TB2CCR2  = TB2R + 2;
@@ -265,7 +297,8 @@ inline void step_ind_motor(uint16_t command)
         }
     }
 
-    if((ind_sample < L_LOWER_LIMIT) || (ind_sample > L_UPPER_LIMIT))
+    if(((ind_sample < L_LOWER_LIMIT) && (direction == DECREASE_IND_DIR)) ||
+       ((ind_sample > L_UPPER_LIMIT) && (direction == INCREASE_IND_DIR)))
     {
         ind_motor_task = DISABLE_DRIVER;
     }

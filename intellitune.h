@@ -32,6 +32,7 @@
 #define B_TASK                      BIT1
 #define C_TASK                      BIT2
 #define MOTOR_ACTIVE                BIT3
+#define REVERT_TO_BTN_MODE          BIT4
 // Macros for Stepper Motors
 #define CAPACITOR_MOTOR             1
 #define INDUCTOR_MOTOR              0
@@ -84,6 +85,15 @@
 #define TARGET_SWR                  2
 #define AUTOTUNE_THRESH             3
 #define LC_DISPLAY                  4
+// Macros for relays
+#define CAP_SEQUENCE_0()              (P1OUT &= ~BIT5 & ~BIT6 & ~BIT7;)
+#define CAP_SEQUENCE_1              (P1OUT |= BIT5; P1OUT &= ~BIT6 & ~BIT7;)
+#define CAP_SEQUENCE_2              (P1OUT |= BIT6; P1OUT &= ~BIT5 & ~BIT7;)
+#define CAP_SEQUENCE_3              (P1OUT |= BIT5 | BIT6; P1OUT &= ~BIT7;)
+#define CAP_SEQUENCE_4              (P1OUT |= BIT7; P1OUT &= ~BIT5 & ~BIT6;)
+#define CAP_SEQUENCE_5              (P1OUT |= BIT7 | BIT5; P1OUT &= ~BIT6;)
+#define CAP_SEQUENCE_6              (P1OUT |= BIT7 | BIT6; P1OUT &= ~BIT5;)
+#define CAP_SEQUENCE_7              (P1OUT |= BIT5 | BIT6 | BIT7;)
 
 
 // Globals
@@ -93,7 +103,7 @@ extern uint16_t cap_sample, ind_sample, fwd_sample,
                 ref_sample, fwd_25_sample, ref_25_sample;
 extern uint8_t adc_channel_select, adc_flg, task_flag,
                display_menu, cap_motor_task, ind_motor_task,
-               tune_task, button_press;
+               tune_task, button_press, relay_setting;
 extern char cap2_val[8];
 extern char ind2_val[6];
 extern char swr_val[5];
@@ -133,7 +143,7 @@ extern void mode_4(void);
 
 // Relay subsystem
 extern void initialize_relay(void);
-extern void switch_relay(int relay_num, int position);
+extern void switch_cap_relay(uint8_t setting);
 extern void switch_net_config(void);
 extern void switch_known_impedance(void);
 

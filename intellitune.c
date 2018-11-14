@@ -45,6 +45,7 @@ char ind2_val[6] = {'\0'};
 char swr_val[5] = {'\0'};
 char load_imp[7] = {'\0'};
 uint8_t tune_task = 0;
+uint8_t relay_setting = 0;
 
 
 // This global will be used to notify user that a new adc value has been sampled
@@ -203,14 +204,47 @@ void tune(void)
             estimated_inductance = _IQ16div(ind_react, angular_frequency); // in uH
             error += _IQ16toa(ind2_val, "%2.2f", estimated_inductance);
 
+            if((estimated_capacitance < _IQ16(0.0)) || (estimated_inductance < _IQ16(0.0))) {
+                tune_task = CALCULATE_SWR;
+            } else if((vswr < _IQ16(0.0)) || (Z_load < _IQ16(0.0))) {
+                tune_task = CALCULATE_SWR;
+            }
+
             if(error == 0) { tune_task++; }
             break;
         }
 
         case ADJUST_TO_ESTIMATES:
         {
+            if(task_status == 0) {
+                _iq16 varicap_value, temp, iq_position;
+                uint16_t cap_position, ind_position;
+                temp = estimated_capacitance - _IQ16(30.0);
+                temp = _IQ16div(temp, _IQ16(470));
+                relay_setting = (uint8_t)_IQ16int(temp);
+                varicap_value = _IQ16frac(temp);
+                varicap_value = _IQ16mpy(varicap_value, _IQ16(470));
+                varicap_value = varicap_value + _IQ16(30.0);
+                iq_position = _IQ16div((_IQ16(C_UPPER_LIMIT) - _IQ16(C_LOWER_LIMIT)), _IQ16(500));
+                iq_position = _IQ16rmpy(iq_position, varicap_value);
+                cap_position = (uint16_t)_IQ16int(iq_position);
 
-            tune_task++;
+                iq_position = _IQ16div((_IQ16(L_UPPER_LIMIT) - _IQ16(L_LOWER_LIMIT)), _IQ16(24));
+                iq_position = _IQ16rmpy(iq_position, estimated_inductance);
+                ind_position = (uint16_t)_IQ16int(iq_position);
+
+                step_cap_motor((cap_position << 4) | CMD_POS_MODE);
+                step_ind_motor((ind_position << 4) | CMD_POS_MODE);
+
+                switch_cap_relay(relay_setting);
+
+                task_status++;
+            } else if(task_status == 1) {
+                if(!(task_flag & MOTOR_ACTIVE)) {
+                    tune_task++;
+                    task_status = 0;
+                }
+            }
             break;
         }
 
