@@ -206,6 +206,8 @@ void tune(void)
 
             if((estimated_capacitance < _IQ16(0.0)) || (estimated_inductance < _IQ16(0.0))) {
                 tune_task = CALCULATE_SWR;
+            } else if((estimated_capacitance > _IQ16(3790.0)) || (estimated_inductance > _IQ16(24.8))) {
+                            tune_task = CALCULATE_SWR;
             } else if((vswr < _IQ16(0.0)) || (Z_load < _IQ16(0.0))) {
                 tune_task = CALCULATE_SWR;
             }

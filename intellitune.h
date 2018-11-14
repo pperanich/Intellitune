@@ -49,7 +49,6 @@
 #define L_UPPER_LIMIT               4090
 #define C_LOWER_LIMIT               0005
 #define C_UPPER_LIMIT               4090
-#define BTN_CMD                     1
 #define BTN_CONTROL_MODE            2
 #define RETURN_START_MODE           4
 #define CMD_POS_MODE                8
