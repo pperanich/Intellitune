@@ -25,11 +25,12 @@ void ui_button_init(void);
 void lcd_update(void);
 void utoa(unsigned int n, char s[]);
 void reverse(char s[]);
-void mode_0(void);
 void mode_1(void);
 void mode_2(void);
 void mode_3(void);
-void mode_4(void);
+void mode_21(void);
+void mode_22(void);
+void mode_23(void);
 
 
 // Display variables and titles
@@ -43,8 +44,6 @@ static const char ind_unit[4] = {'u', 'H', ' ', '\0'};
 static const char target_mode_name[11] = "Target SWR\0";
 static const char threshold_mode_name[14] = "SWR Threshold\0";
 static const char lclimit_mode_name[9] = "LC Limit\0";
-
-
 
 
 // TODO: User interface button configuration
@@ -93,25 +92,27 @@ void lcd_update(void)
     switch(display_menu)
     {
     case DEFAULT_DISPLAY:
-        mode_0();
-        break;
-    case TUNING_DISPLAY:
         mode_1();
         break;
-    case TARGET_SWR:
+    case TUNING_DISPLAY:
         mode_2();
         break;
-    case AUTOTUNE_THRESH:
+    case COMPONENT_VALUES:
         mode_3();
+    case TARGET_SWR:
+        mode_21();
+        break;
+    case AUTOTUNE_THRESH:
+        mode_22();
         break;
     case LC_DISPLAY:
-        mode_4();
+        mode_23();
         break;
     }
 
 }
 
-void mode_0(void)  // Default display w/ frequ.
+void mode_1(void)  // Default display w/ frequ.
 {
 
     char buf2[4] = {'\0'};
@@ -152,7 +153,7 @@ void mode_0(void)  // Default display w/ frequ.
     hd44780_write_string(row2, 2, 1, NO_CR_LF );
 }
 
-void mode_1(void)  // Tuning display with impedance network
+void mode_2(void)  // Tuning display with impedance network
 {
 
     char row1[17] = {'\0'};
@@ -174,7 +175,46 @@ void mode_1(void)  // Tuning display with impedance network
     hd44780_write_string(row2, 2, 1, NO_CR_LF );
 }
 
-void mode_2(void) // Target SWR mode
+void mode_3(void)  // Tuning display with impedance network
+{
+
+    char row1[17] = {'\0'};
+    char row2[17] = {'\0'};
+    char curr_ind[6] = {'\0'};
+    char curr_cap[8] = {'\0'};
+
+    uint8_t error = 0;
+    uint16_t ind_range = L_UPPER_LIMIT - L_LOWER_LIMIT;
+    uint16_t cap_range = C_UPPER_LIMIT - C_LOWER_LIMIT;
+
+    _iq19 ind_scale = _IQ19div(_IQ19(IND_MAX), _IQ19(ind_range));
+    _iq19 current_inductance = _IQ19mpy(_IQ19(ind_sample), ind_scale);
+    error = _IQ19toa(curr_ind, "%2.2f", current_inductance);
+
+    _iq19 cap_scale = _IQ19div(_IQ19(CAP_MAX), _IQ19(cap_range));
+    _iq19 current_capacitance = _IQ19mpy(_IQ19(cap_sample), cap_scale);
+    error = _IQ19toa(curr_cap, "%4.2f", current_capacitance);
+
+    strcat(row1, cap_disp);
+    strcat(row2, ind_disp);
+
+    strcat(row1, curr_cap);
+    strcat(row2, curr_ind);
+
+    strcat(row1, cap_unit);
+    strcat(row2, ind_unit);
+
+    strcat(row1, swr_val);
+    strcat(row2, "Menu2\0");
+
+    if(error) { asm("    NOP"); }
+
+    hd44780_write_string(row1, 1, 1, NO_CR_LF );
+    hd44780_write_string(row2, 2, 1, NO_CR_LF );
+}
+
+
+void mode_21(void) // Target SWR mode
 {
 
     char row1[17] = {'\0'};
@@ -188,7 +228,7 @@ void mode_2(void) // Target SWR mode
     // Adjust target SWR from 1.5 to 2.0
 }
 
-void mode_3(void)  // AutoTune Threshold SWR mode
+void mode_22(void)  // AutoTune Threshold SWR mode
 {
     char row1[17] = {'\0'};
     // char row2[17] = {'\0'};
@@ -202,7 +242,7 @@ void mode_3(void)  // AutoTune Threshold SWR mode
     // Threshold of SWR and tuning will begin when it is surpassed
 }
 
-void mode_4(void) // LC Limit
+void mode_23(void) // LC Limit
 {
     char row1[17] = {'\0'};
     // char row2[17] = {'\0'};
@@ -335,12 +375,19 @@ __interrupt void Port_3( void )
             button_press &= ~MODE & ~MODE_LOCK;
             TB3CCTL6 = CCIE_0; // Compare interrupt disable
             if (PREV_MODE == MODE_SWITCH){
-                if(display_menu == NUM_QUICK_MENUS && !(MODE_SWITCH % 2)) { display_menu = 0; }
-                else if(display_menu == NUM_SETUP_MENUS && (MODE_SWITCH % 2)) { display_menu = 2; }
-                else {display_menu++;}
+                if(display_menu == NUM_QUICK_MENUS && !(MODE_SWITCH % 2))
+                {
+                    display_menu = DEFAULT_QUICK_MENU;
+                }
+                else if((display_menu - SETTING_MENU_OFFSET) == NUM_SETUP_MENUS && (MODE_SWITCH % 2))
+                {
+                    display_menu = DEFAULT_SETTING_MENU;
+                }
+                else { display_menu++; }
             }
             else{
-                display_menu = 2;
+                if(display_menu <= NUM_QUICK_MENUS) { display_menu = DEFAULT_SETTING_MENU; }
+                else { display_menu = DEFAULT_QUICK_MENU; }
             }
         }
         else {

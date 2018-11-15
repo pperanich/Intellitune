@@ -77,22 +77,20 @@
 #define Cdn                         BIT6
 #define MODE_LOCK                   BIT7
 // Macros for UI menus
-#define NUM_QUICK_MENUS             1
+#define SETTING_MENU_OFFSET         20
+#define NUM_QUICK_MENUS             3
 #define NUM_SETUP_MENUS             3
-#define DEFAULT_DISPLAY             0
-#define TUNING_DISPLAY              1
-#define TARGET_SWR                  2
-#define AUTOTUNE_THRESH             3
-#define LC_DISPLAY                  4
-// Macros for relays
-#define CAP_SEQUENCE_0()              (P1OUT &= ~BIT5 & ~BIT6 & ~BIT7;)
-#define CAP_SEQUENCE_1              (P1OUT |= BIT5; P1OUT &= ~BIT6 & ~BIT7;)
-#define CAP_SEQUENCE_2              (P1OUT |= BIT6; P1OUT &= ~BIT5 & ~BIT7;)
-#define CAP_SEQUENCE_3              (P1OUT |= BIT5 | BIT6; P1OUT &= ~BIT7;)
-#define CAP_SEQUENCE_4              (P1OUT |= BIT7; P1OUT &= ~BIT5 & ~BIT6;)
-#define CAP_SEQUENCE_5              (P1OUT |= BIT7 | BIT5; P1OUT &= ~BIT6;)
-#define CAP_SEQUENCE_6              (P1OUT |= BIT7 | BIT6; P1OUT &= ~BIT5;)
-#define CAP_SEQUENCE_7              (P1OUT |= BIT5 | BIT6 | BIT7;)
+#define DEFAULT_DISPLAY             1
+#define TUNING_DISPLAY              2
+#define COMPONENT_VALUES            3
+#define TARGET_SWR                  21
+#define AUTOTUNE_THRESH             22
+#define LC_DISPLAY                  23
+#define DEFAULT_QUICK_MENU          DEFAULT_DISPLAY
+#define DEFAULT_SETTING_MENU        TARGET_SWR
+// Macros for other
+#define CAP_MAX                     3790.00 // in pF
+#define IND_MAX                     24.6    // in uH
 
 
 // Globals
@@ -134,11 +132,6 @@ extern void ui_init(void);
 extern void lcd_update(void);
 extern void utoa(unsigned int n, char s[]);
 extern void reverse(char s[]);
-extern void mode_0(void);
-extern void mode_1(void);
-extern void mode_2(void);
-extern void mode_3(void);
-extern void mode_4(void);
 
 // Relay subsystem
 extern void initialize_relay(void);
