@@ -12,7 +12,7 @@
 
 
 // Globals
-uint8_t display_menu= 0;
+uint8_t display_menu= 1;
 uint8_t MODE_SWITCH = 0;
 uint8_t PREV_MODE = 0;
 uint8_t button_press = 0;
@@ -88,7 +88,7 @@ void ui_init(void)
 // TODO: LCD update function
 void lcd_update(void)
 {
-
+    hd44780_clear_screen();
     switch(display_menu)
     {
     case DEFAULT_DISPLAY:
@@ -99,6 +99,7 @@ void lcd_update(void)
         break;
     case COMPONENT_VALUES:
         mode_3();
+        break;
     case TARGET_SWR:
         mode_21();
         break;
@@ -148,9 +149,9 @@ void mode_1(void)  // Default display w/ frequ.
     utoa(str_length, buf3);
     if(buf3[0]!='1') buf3[1] = ' ';
     // Write text string to second row and first column
-    hd44780_write_string(buf3, 2, 14, CR_LF );
     strcat(row2, name);
-    hd44780_write_string(row2, 2, 1, NO_CR_LF );
+    hd44780_write_string(row2, 2, 1, CR_LF );
+    hd44780_write_string(buf3, 2, 14, NO_CR_LF );
 }
 
 void mode_2(void)  // Tuning display with impedance network
@@ -171,8 +172,8 @@ void mode_2(void)  // Tuning display with impedance network
     strcat(row1, swr_val);
     strcat(row2, load_imp);
 
-    hd44780_write_string(row1, 1, 1, NO_CR_LF );
-    hd44780_write_string(row2, 2, 1, NO_CR_LF );
+    hd44780_write_string(row1, 1, 1, CR_LF );
+    hd44780_write_string(row2, 2, 1, CR_LF );
 }
 
 void mode_3(void)  // Tuning display with impedance network
@@ -209,8 +210,8 @@ void mode_3(void)  // Tuning display with impedance network
 
     if(error) { asm("    NOP"); }
 
-    hd44780_write_string(row1, 1, 1, NO_CR_LF );
-    hd44780_write_string(row2, 2, 1, NO_CR_LF );
+    hd44780_write_string(row1, 1, 1, CR_LF );
+    hd44780_write_string(row2, 2, 1, CR_LF );
 }
 
 
@@ -305,6 +306,10 @@ __interrupt void Timer3_B1( void )
       break; // CCR3 interrupt handling done
       
     case TBIV_8: // CCR4 caused the interrupt
+      P2IE |= BIT0 | BIT1 | BIT5;
+      P3IE |= BIT0 | BIT1 | BIT5;
+      P4IE |= BIT0;
+      TB3CCTL4 = CCIE_0;
       break;
 
     case TBIV_10: // CCR5 caused the interrupt
@@ -334,7 +339,9 @@ __interrupt void Port_2( void )
   switch( P2IV )
   {
     case P2IV_2: // Pin 2.0: C-Up btn
-        if(button_press & MODE_LOCK) { break; }
+        P2IE &= ~BIT0;
+        TB3CCR4 = TB3R + 4;
+        TB3CCTL4 = CCIE;
         if(P2IN & BIT0)
         {
             P2IES |= BIT0;
@@ -342,17 +349,24 @@ __interrupt void Port_2( void )
             task_flag &= ~MOTOR_ACTIVE;
         }
         else {
+            if(button_press & MODE_LOCK) { break; }
             P2IES &= ~BIT0;
             button_press |= Cup | MODE_LOCK;
         }
         break;
 
     case P2IV_4: // Pin 2.1: Antenna btn
+        P2IE &= ~BIT1;
+        TB3CCR4 = TB3R + 4;
+        TB3CCTL4 = CCIE;
         if(button_press & MODE_LOCK) { break; }
         button_press |= ANT;
         break;
       
     case P2IV_12: // Pin 2.5: Tune btn
+        P2IE &= ~BIT5;
+        TB3CCR4 = TB3R + 4;
+        TB3CCTL4 = CCIE;
         if(button_press & MODE_LOCK) { break; }
         button_press |= TUNE | MODE_LOCK;
         display_menu = 1;
@@ -368,7 +382,9 @@ __interrupt void Port_3( void )
   switch( P3IV )
   {
     case P3IV_2: // Pin 3.0: Mode btn
-        if(button_press & MODE_LOCK) { break; }
+        P3IE &= ~BIT0;
+        TB3CCR4 = TB3R + 2;
+        TB3CCTL4 = CCIE;
         if(P3IN & BIT0)
         {
             P3IES |= BIT0;
@@ -391,6 +407,7 @@ __interrupt void Port_3( void )
             }
         }
         else {
+            if(button_press & MODE_LOCK) { break; }
             P3IES &= ~BIT0;
             button_press |= MODE | MODE_LOCK;
             TB3CCR6  = TB3R + 65530; // Set CCR2 value for 2 s interrupt
@@ -400,7 +417,9 @@ __interrupt void Port_3( void )
         break;
 
     case P3IV_4: // Pin 3.1: L-Dn btn
-        if(button_press & MODE_LOCK) { break; }
+        P3IE &= ~BIT1;
+        TB3CCR4 = TB3R + 4;
+        TB3CCTL4 = CCIE;
         if(P3IN & BIT1)
         {
             P3IES |= BIT1;
@@ -408,13 +427,16 @@ __interrupt void Port_3( void )
             task_flag &= ~MOTOR_ACTIVE;
         }
         else {
+            if(button_press & MODE_LOCK) { break; }
             P3IES &= ~BIT1;
             button_press |= Ldn | MODE_LOCK;
         }
         break;
 
     case P3IV_12: // Pin 3.5: L-Up btn
-        if(button_press & MODE_LOCK) { break; }
+        P3IE &= ~BIT5;
+        TB3CCR4 = TB3R + 4;
+        TB3CCTL4 = CCIE;
         if(P3IN & BIT5)
         {
             P3IES |= BIT5;
@@ -422,6 +444,7 @@ __interrupt void Port_3( void )
             task_flag &= ~MOTOR_ACTIVE;
         }
         else {
+            if(button_press & MODE_LOCK) { break; }
             P3IES &= ~BIT5;
             button_press |= Lup | MODE_LOCK;
         }
@@ -437,7 +460,9 @@ __interrupt void Port_4( void )
   switch( P4IV )
   {
     case P4IV_2: // Pin 4.0: C-Dn btn
-        if(button_press & MODE_LOCK) { break; }
+        P4IE &= ~BIT0;
+        TB3CCR4 = TB3R + 4;
+        TB3CCTL4 = CCIE;
         if(P4IN & BIT0)
         {
             P4IES |= BIT0;
@@ -445,6 +470,7 @@ __interrupt void Port_4( void )
             task_flag &= ~MOTOR_ACTIVE;
         }
         else {
+            if(button_press & MODE_LOCK) { break; }
             P4IES &= ~BIT0;
             button_press |= Cdn | MODE_LOCK;
         }
