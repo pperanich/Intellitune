@@ -20,10 +20,11 @@ uint32_t total_pulses;
 void measure_freq(void);
 void initialize_freq_counter(void);
 
+
 // TODO: Implement frequency measuring
 void measure_freq(void)
 {
-    static const uint8_t timing_correction = 2;
+    static const uint8_t timing_correction = 3;
 
     if(TB1CTL != MC_0) { return; } // Frequency is currently being measured
     // Timer1_B3 and Timer0_B3 setup

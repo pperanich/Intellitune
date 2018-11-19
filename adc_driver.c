@@ -36,7 +36,7 @@ void initialize_adc(void)
 
     // Configure ADC
     ADCCTL0 &= ~ADCENC; // Disable ADC
-    ADCCTL0 |= ADCSHT_14 | ADCON; // 16ADCclks, MSC, ADC ON
+    ADCCTL0 |= ADCSHT_8 | ADCON; // 16ADCclks, MSC, ADC ON
     ADCCTL1 |= ADCSHP; // s/w trig, single ch/conv, MODOSC
     ADCCTL2 &= ~ADCRES; // clear ADCRES in ADCCTL
     ADCCTL2 |= ADCRES_2; // 12-bit conversion results

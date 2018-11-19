@@ -340,7 +340,7 @@ __interrupt void Port_2( void )
   {
     case P2IV_2: // Pin 2.0: C-Up btn
         P2IE &= ~BIT0;
-        TB3CCR4 = TB3R + 4;
+        TB3CCR4 = TB3R + 6554;
         TB3CCTL4 = CCIE;
         if(P2IN & BIT0)
         {
@@ -357,7 +357,7 @@ __interrupt void Port_2( void )
 
     case P2IV_4: // Pin 2.1: Antenna btn
         P2IE &= ~BIT1;
-        TB3CCR4 = TB3R + 4;
+        TB3CCR4 = TB3R + 6554;
         TB3CCTL4 = CCIE;
         if(button_press & MODE_LOCK) { break; }
         button_press |= ANT;
@@ -365,7 +365,7 @@ __interrupt void Port_2( void )
       
     case P2IV_12: // Pin 2.5: Tune btn
         P2IE &= ~BIT5;
-        TB3CCR4 = TB3R + 4;
+        TB3CCR4 = TB3R + 6554;
         TB3CCTL4 = CCIE;
         if(button_press & MODE_LOCK) { break; }
         button_press |= TUNE | MODE_LOCK;
@@ -383,7 +383,7 @@ __interrupt void Port_3( void )
   {
     case P3IV_2: // Pin 3.0: Mode btn
         P3IE &= ~BIT0;
-        TB3CCR4 = TB3R + 2;
+        TB3CCR4 = TB3R + 6554;
         TB3CCTL4 = CCIE;
         if(P3IN & BIT0)
         {
@@ -418,7 +418,7 @@ __interrupt void Port_3( void )
 
     case P3IV_4: // Pin 3.1: L-Dn btn
         P3IE &= ~BIT1;
-        TB3CCR4 = TB3R + 4;
+        TB3CCR4 = TB3R + 6554;
         TB3CCTL4 = CCIE;
         if(P3IN & BIT1)
         {
@@ -435,7 +435,7 @@ __interrupt void Port_3( void )
 
     case P3IV_12: // Pin 3.5: L-Up btn
         P3IE &= ~BIT5;
-        TB3CCR4 = TB3R + 4;
+        TB3CCR4 = TB3R + 6554;
         TB3CCTL4 = CCIE;
         if(P3IN & BIT5)
         {
@@ -461,7 +461,7 @@ __interrupt void Port_4( void )
   {
     case P4IV_2: // Pin 4.0: C-Dn btn
         P4IE &= ~BIT0;
-        TB3CCR4 = TB3R + 4;
+        TB3CCR4 = TB3R + 6554;
         TB3CCTL4 = CCIE;
         if(P4IN & BIT0)
         {
