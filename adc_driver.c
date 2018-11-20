@@ -13,13 +13,14 @@
 
 // Function Prototypes
 void initialize_adc(void);
-void current_setting(void);
+inline void sample_adc_channel(uint8_t adc_channel);
+inline void update_adc_value(uint16_t adc_reading);
 
 
 // Globals
 uint8_t adc_channel_select = FWD_PIN;
-uint16_t cap_sample = 0;
-uint16_t ind_sample = 0;
+uint16_t cap_sample = C_LOWER_LIMIT;
+uint16_t ind_sample = L_LOWER_LIMIT;
 uint16_t fwd_sample = 0;
 uint16_t ref_sample = 0;
 uint16_t fwd_25_sample = 0;
@@ -83,7 +84,7 @@ inline void update_adc_value(uint16_t adc_reading)
         break;
 
     case REF_PIN:
-        adc_channel_select = IND_PIN;
+        adc_channel_select = FWD_PIN;
         if(adc_flg & IMP_SWITCH) // The known impedance is switched in
         {
             ref_25_sample = adc_reading;
@@ -94,18 +95,6 @@ inline void update_adc_value(uint16_t adc_reading)
             ref_sample = adc_reading;
             adc_flg |= SWR_SENSE;
         }
-        break;
-
-    case IND_PIN:
-        adc_channel_select = CAP_PIN;
-        ind_sample = adc_reading;
-        adc_flg |= IND_POT;
-        break;
-
-    case CAP_PIN:
-        adc_channel_select = FWD_PIN;
-        cap_sample = adc_reading;
-        adc_flg |= CAP_POT;
         break;
     }
     adc_flg |= ADC_STATUS;

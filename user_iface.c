@@ -183,18 +183,29 @@ void mode_3(void)  // Tuning display with impedance network
     char row2[17] = {'\0'};
     char curr_ind[6] = {'\0'};
     char curr_cap[8] = {'\0'};
+    uint8_t i = 0;
 
     uint8_t error = 0;
     uint16_t ind_range = L_UPPER_LIMIT - L_LOWER_LIMIT;
     uint16_t cap_range = C_UPPER_LIMIT - C_LOWER_LIMIT;
 
-    _iq19 ind_scale = _IQ19div(_IQ19(IND_MAX), _IQ19(ind_range));
-    _iq19 current_inductance = _IQ19mpy(_IQ19(ind_sample), ind_scale);
-    error = _IQ19toa(curr_ind, "%2.2f", current_inductance);
+    _iq18 ind_scale = _IQ18div(_IQ18(IND_MAX), _IQ18(ind_range));
+    _iq18 current_inductance = _IQ18mpy(_IQ18(ind_sample), ind_scale);
+    error = _IQ18toa(curr_ind, "%2.2f", current_inductance);
+    curr_ind[5] = '\0';
+    for(;i < 5; i++) {
+        if(curr_ind[i] == '\0') { curr_ind[i] = '0'; }
+    } i = 0;
 
-    _iq19 cap_scale = _IQ19div(_IQ19(CAP_MAX), _IQ19(cap_range));
-    _iq19 current_capacitance = _IQ19mpy(_IQ19(cap_sample), cap_scale);
-    error = _IQ19toa(curr_cap, "%4.2f", current_capacitance);
+    _iq18 cap_scale = _IQ18div(_IQ18(CAP_MAX), _IQ18(cap_range));
+    _iq18 current_capacitance = _IQ18mpy(_IQ18(cap_sample), cap_scale);
+    _iq18 relay_capacitance = _IQ18mpy(_IQ18(relay_setting), _IQ18(470.0));
+    current_capacitance += relay_capacitance;
+    error = _IQ18toa(curr_cap, "%4.2f", current_capacitance);
+    curr_cap[7] = '\0';
+    for(;i < 7; i++) {
+        if(curr_cap[i] == '\0') { curr_cap[i] = '0'; }
+    }
 
     strcat(row1, cap_disp);
     strcat(row2, ind_disp);
@@ -206,8 +217,8 @@ void mode_3(void)  // Tuning display with impedance network
     strcat(row2, ind_unit);
 
     strcat(row1, swr_val);
-    strcat(row2, "Menu2\0");
-
+    if(button_press & MODE_LOCK) { strcat(row2, "ML\0"); }
+    if(button_press & TUNE) { strcat(row2, " T\0"); }
     if(error) { asm("    NOP"); }
 
     hd44780_write_string(row1, 1, 1, CR_LF );
@@ -365,11 +376,15 @@ __interrupt void Port_2( void )
       
     case P2IV_12: // Pin 2.5: Tune btn
         P2IE &= ~BIT5;
-        TB3CCR4 = TB3R + 6554;
+        TB3CCR4 = TB3R + 45878;
         TB3CCTL4 = CCIE;
-        if(button_press & MODE_LOCK) { break; }
-        button_press |= TUNE | MODE_LOCK;
-        display_menu = 1;
+        if(button_press & TUNE) {
+            button_press &= ~TUNE & ~MODE_LOCK;
+        } else{
+            if(button_press & MODE_LOCK) { break; }
+            button_press |= TUNE | MODE_LOCK;
+            display_menu = TUNING_DISPLAY;
+        }
         break;
   }
 }

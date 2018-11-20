@@ -33,6 +33,9 @@
 #define C_TASK                      BIT2
 #define MOTOR_ACTIVE                BIT3
 #define REVERT_TO_BTN_MODE          BIT4
+#define CAP_ACTIVE                  BIT5
+#define IND_ACTIVE                  BIT6
+#define TUNE_BUSY                   BIT7
 // Macros for Stepper Motors
 #define CAPACITOR_MOTOR             1
 #define INDUCTOR_MOTOR              0
@@ -45,10 +48,10 @@
 #define STEP_HIGH                   1
 #define STEP_LOW                    2
 #define DISABLE_DRIVER              3
-#define L_LOWER_LIMIT               0005
-#define L_UPPER_LIMIT               4090
-#define C_LOWER_LIMIT               0005
-#define C_UPPER_LIMIT               4090
+#define L_LOWER_LIMIT               2004
+#define L_UPPER_LIMIT               4186
+#define C_LOWER_LIMIT               0002
+#define C_UPPER_LIMIT               5374
 #define BTN_CONTROL_MODE            2
 #define RETURN_START_MODE           4
 #define CMD_POS_MODE                8
@@ -89,7 +92,7 @@
 #define DEFAULT_QUICK_MENU          DEFAULT_DISPLAY
 #define DEFAULT_SETTING_MENU        TARGET_SWR
 // Macros for other
-#define CAP_MAX                     3790.00 // in pF
+#define CAP_MAX                     500.00 // in pF
 #define IND_MAX                     24.6    // in uH
 
 
@@ -112,8 +115,8 @@ extern void tune(void);
 
 // Stepper motor subsystem
 extern void initialize_stepper_control(void);
-extern void step_cap_motor(uint16_t command);
-extern void step_ind_motor(uint16_t command);
+extern void step_cap_motor(uint32_t command);
+extern void step_ind_motor(uint32_t command);
 extern void current_setting(void);
 
 // Frequency Counter subsystem

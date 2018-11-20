@@ -134,7 +134,17 @@ void A1(void)
 void A2(void)
 //--------------------------------------------------------
 {
-    if(button_press & TUNE) { tune(); }
+    if((button_press & TUNE) && !(task_flag & TUNE_BUSY)) { tune(); }
+    //-------------------
+    //the next time Timer3 counter 1 reaches Period value go to A1
+    A_Task_Ptr = &A3;
+    //-------------------
+}
+
+//--------------------------------------------------------
+void A3(void)
+//--------------------------------------------------------
+{
     //-------------------
     //the next time Timer3 counter 1 reaches Period value go to A1
     A_Task_Ptr = &A1;

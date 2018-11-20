@@ -91,7 +91,7 @@ void initialize_spi(void)
 void update_digipot(void)
 {
     uint8_t update_needed = 0;
-    if((fwd_sample > 4090) || (ref_sample > 4090))
+    if((DATA_BYTE != 255) && ((fwd_sample > 4080) || (ref_sample > 4080)))
     {
         DATA_BYTE++; // Increase resistance to lower voltage
         update_needed = 1;
@@ -143,5 +143,5 @@ void update_swr(void)
     numerator = iq_one + reflection_coefficient;
     denominator = iq_one - reflection_coefficient;
     vswr = _IQ16div(numerator, denominator);
-    error += _IQ16toa(swr_val,"%2.1f", vswr);
+    if(vswr > _IQ16(0.0)) { error += _IQ16toa(swr_val,"%2.1f", vswr); }
 }

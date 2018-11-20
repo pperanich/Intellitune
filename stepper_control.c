@@ -14,8 +14,8 @@
 
 // Function Prototypes
 void initialize_stepper_control(void);
-void step_cap_motor(uint16_t command);
-void step_ind_motor(uint16_t command);
+void step_cap_motor(uint32_t command);
+void step_ind_motor(uint32_t command);
 
 
 // Globals
@@ -69,7 +69,7 @@ void initialize_stepper_control(void)
 
 
 // TODO: Implement capacitor stepper motor control function.
-inline void step_cap_motor(uint16_t command)
+inline void step_cap_motor(uint32_t command)
 {
     /*
      * Vari-Capacitor has 5373 unique values, calculated by
@@ -91,7 +91,7 @@ inline void step_cap_motor(uint16_t command)
     _iq16 current_swr;
     if(command != 0)
     {
-        mode = command & 0x0E;
+        mode = command & 0x000E;
         switch(mode)
         {
         case BTN_CONTROL_MODE:
@@ -106,8 +106,8 @@ inline void step_cap_motor(uint16_t command)
             else { direction = DECREASE_CAP_DIR; }
             break;
         case FINE_TUNE_MODE:
-            fine_lower = cap_sample - 128;
-            fine_upper = cap_sample + 128;
+            fine_lower = cap_sample - 256;
+            fine_upper = cap_sample + 256;
             if(fine_lower < C_LOWER_LIMIT) { fine_lower = C_LOWER_LIMIT; }
             if(fine_upper > C_UPPER_LIMIT) { fine_upper = C_UPPER_LIMIT; }
             direction = DECREASE_CAP_DIR;
@@ -147,7 +147,7 @@ inline void step_cap_motor(uint16_t command)
     {
         case SET_ENABLE_AND_DIRECTION:
         {
-            task_flag |= MOTOR_ACTIVE;
+            task_flag |= MOTOR_ACTIVE | CAP_ACTIVE;
             P5OUT &= ~BIT4; // Enable FETs on driver
             if(direction) { P1OUT &= ~BIT4; }
             else { P1OUT |= BIT4; }
@@ -175,8 +175,8 @@ inline void step_cap_motor(uint16_t command)
                 }
                 case CMD_POS_MODE:
                 {
-                    if((position < cap_sample) && (direction == INCREASE_CAP_DIR)) { step_status = 1; }
-                    else if((position > cap_sample) && (direction == DECREASE_CAP_DIR)) { step_status = 1; }
+                    if((position > cap_sample) && (direction == INCREASE_CAP_DIR)) { step_status = 1; }
+                    else if((position < cap_sample) && (direction == DECREASE_CAP_DIR)) { step_status = 1; }
                     else {
                         if(task_flag & REVERT_TO_BTN_MODE) {
                             task_flag &= ~ REVERT_TO_BTN_MODE;
@@ -221,6 +221,8 @@ inline void step_cap_motor(uint16_t command)
             if(step_status == 0) { cap_motor_task = DISABLE_DRIVER; }
             else if(step_status == 1)
             {
+                if(direction == INCREASE_CAP_DIR) { cap_sample++; }
+                else if(direction == DECREASE_CAP_DIR) { cap_sample--; }
                 P1OUT |= BIT1;
                 TB2CCR1  = TB2R + 24;
                 cap_motor_task = STEP_LOW;
@@ -240,7 +242,7 @@ inline void step_cap_motor(uint16_t command)
             P5OUT |= BIT4; // Disable FETs on driver
             cap_motor_task = SET_ENABLE_AND_DIRECTION;
             TB2CCTL1 = CCIE_0;
-            task_flag &= ~MOTOR_ACTIVE;
+            task_flag &= ~MOTOR_ACTIVE & ~CAP_ACTIVE;
             break;
         }
     }
@@ -248,7 +250,7 @@ inline void step_cap_motor(uint16_t command)
 
 
 // TODO: Implement inductor stepper motor control function.
-inline void step_ind_motor(uint16_t command)
+inline void step_ind_motor(uint32_t command)
 {
     /*
      * Roller Inductor has 6200 unique values, calculated by
@@ -286,8 +288,8 @@ inline void step_ind_motor(uint16_t command)
             break;
         case FINE_TUNE_MODE:
             minimum_swr = _IQ16(100.00);
-            fine_lower = ind_sample - 128;
-            fine_upper = ind_sample + 128;
+            fine_lower = ind_sample - 256;
+            fine_upper = ind_sample + 256;
             if(fine_lower < L_LOWER_LIMIT) { fine_lower = L_LOWER_LIMIT; }
             if(fine_upper > L_UPPER_LIMIT) { fine_upper = L_UPPER_LIMIT; }
             direction = DECREASE_IND_DIR;
@@ -307,7 +309,7 @@ inline void step_ind_motor(uint16_t command)
     {
         case SET_ENABLE_AND_DIRECTION:
         {
-            task_flag |= MOTOR_ACTIVE;
+            task_flag |= MOTOR_ACTIVE | IND_ACTIVE;
             P3OUT &= ~BIT2; // Enable FETs on driver
             if(direction) { P2OUT &= ~BIT4; }
             else { P2OUT |= BIT4; }
@@ -370,6 +372,8 @@ inline void step_ind_motor(uint16_t command)
             if(step_status == 0) { ind_motor_task = DISABLE_DRIVER; }
             else if(step_status == 1)
             {
+                if(direction == INCREASE_IND_DIR) { ind_sample++; }
+                else if(direction == DECREASE_IND_DIR) { ind_sample--; }
                 P1OUT |= BIT3;
                 TB2CCR2  = TB2R + 24;
                 ind_motor_task = STEP_LOW;
@@ -389,7 +393,7 @@ inline void step_ind_motor(uint16_t command)
             P3OUT |= BIT2; // Disable FETs on driver
             ind_motor_task = SET_ENABLE_AND_DIRECTION;
             TB2CCTL2 = CCIE_0;
-            task_flag &= ~MOTOR_ACTIVE;
+            task_flag &= ~MOTOR_ACTIVE & ~IND_ACTIVE;
             break;
         }
     }

@@ -114,35 +114,44 @@ void tune(void)
     static const _iq16 Z_source = _IQ16(50.0);
     static const _iq16 iq_one = _IQ16(1.0);
     static uint8_t task_status = 0;
-
+    task_flag |= TUNE_BUSY;
     switch(tune_task)
     {
         case INITIALIZE_TUNE_COMPONENTS:
         {
-            step_cap_motor(RETURN_START_MODE);
-            step_ind_motor(RETURN_START_MODE);
+            if(task_status == 0) {
+                relay_setting = 0;
+                switch_cap_relay(relay_setting);
+                step_cap_motor(RETURN_START_MODE);
+                step_ind_motor(RETURN_START_MODE);
+                task_status++;
+            } else if(task_status == 1) {
+                if(!(task_flag & IND_ACTIVE) && !(task_flag & CAP_ACTIVE)) {
+                    tune_task++;
+                    task_status = 0;
+                }
+            }
             break;
         }
 
         case CALCULATE_SWR:
         {
             gamma_1 = calculate_ref_coeff(KNOWN_SWITCHED_OUT);//_IQ16(0.818182);
-            if(gamma_1 == 0) { return; }
-            else { tune_task++; }
+            if(gamma_1 != 0) { tune_task++; }
             break;
         }
 
         case CALCULATE_SWR_W_KNOWN_IMP:
         {
             if(task_status == 0){
+                adc_flg &= ~SWR_KNOWN_SENSE;
                 P3OUT |= BIT6;
                 adc_flg |= IMP_SWITCH;
                 adc_channel_select = FWD_PIN;
                 task_status++;
             }
             gamma_2 = calculate_ref_coeff(KNOWN_SWITCHED_IN);//_IQ16(0.826);
-            if(gamma_2 == 0) { return; }
-            else { tune_task++; task_status = 0;}
+            if(gamma_2 != 0) { tune_task++; task_status = 0; }
             break;
         }
 
@@ -163,46 +172,33 @@ void tune(void)
             numerator = iq_one + gamma_1;
             denominator = iq_one - gamma_1;
             vswr = _IQ16div(numerator, denominator);
-            error += _IQ16toa(swr_val,"%2.1f", vswr);
             div_res = vswr;
             if(gamma_2 > gamma_1)
             {
                 Z_load = _IQ16mpy(Z_source, div_res);
-                error += _IQ16toa(load_imp, "%4.4f", Z_load);
                 temp = _IQ16div(Z_load, Z_source);
                 temp = temp - iq_one;
                 Q_factor = _IQ16sqrt(temp);
-                error += _IQ16toa(q_val, "%2.2f", Q_factor);
                 ind_react = _IQ16mpy(Q_factor, Z_source);
-                error += _IQ16toa(ind_val, "%4.2f", ind_react);
                 cap_react = _IQ16div(Z_load, Q_factor);
-                error += _IQ16toa(cap_val, "%4.2f", cap_react);
                 P3OUT &= ~BIT4; // Capacitors switched to output side.
             } else if(gamma_2 < gamma_1)
             {
                 div_res = _IQ16div(iq_one, div_res);
                 Z_load = _IQ16mpy(Z_source, div_res);
-                error += _IQ16toa(load_imp, "%3.2f", Z_load);
                 temp = _IQ16div(Z_source, Z_load);
                 temp = temp - iq_one;
                 Q_factor = _IQ16sqrt(temp);
-                error += _IQ16toa(q_val, "%2.2f", Q_factor);
                 ind_react = _IQ16mpy(Q_factor, Z_load);
-                error += _IQ16toa(ind_val, "%4.2f", ind_react);
                 cap_react = _IQ16div(Z_source, Q_factor);
-                error += _IQ16toa(cap_val, "%4.2f", cap_react);
                 P3OUT |= BIT4; // Capacitors switched to input side.
-            } else { return; }
+            } else { asm("   NOP"); }
 
 
             estimated_capacitance = _IQ16div(iq_one, cap_react);
             estimated_capacitance = _IQ16mpy(estimated_capacitance, _IQ16(10000));
             estimated_capacitance = _IQ16div(estimated_capacitance, angular_frequency);
             estimated_capacitance = _IQ16mpy(estimated_capacitance, _IQ16(100)); // in pF
-            error += _IQ16toa(cap2_val, "%4.2f", estimated_capacitance);
-
-            estimated_inductance = _IQ16div(ind_react, angular_frequency); // in uH
-            error += _IQ16toa(ind2_val, "%2.2f", estimated_inductance);
 
             if((estimated_capacitance < _IQ16(0.0)) || (estimated_inductance < _IQ16(0.0))) {
                 tune_task = CALCULATE_SWR;
@@ -210,6 +206,14 @@ void tune(void)
                             tune_task = CALCULATE_SWR;
             } else if((vswr < _IQ16(0.0)) || (Z_load < _IQ16(0.0))) {
                 tune_task = CALCULATE_SWR;
+            } else {
+                error += _IQ16toa(swr_val,"%2.1f", vswr);
+                error += _IQ16toa(q_val, "%2.2f", Q_factor);
+                error += _IQ16toa(load_imp, "%3.2f", Z_load);
+                error += _IQ16toa(cap_val, "%4.2f", cap_react);
+                error += _IQ16toa(ind_val, "%4.2f", ind_react);
+                error += _IQ16toa(cap2_val, "%4.2f", estimated_capacitance);
+                error += _IQ16toa(ind2_val, "%2.2f", estimated_inductance);
             }
 
             if(error == 0) { tune_task++; }
@@ -235,8 +239,8 @@ void tune(void)
                 iq_position = _IQ16rmpy(iq_position, estimated_inductance);
                 ind_position = (uint16_t)_IQ16int(iq_position);
 
-                step_cap_motor((cap_position << 4) | CMD_POS_MODE);
-                step_ind_motor((ind_position << 4) | CMD_POS_MODE);
+                step_cap_motor((uint32_t)((cap_position << 4) | CMD_POS_MODE));
+                step_ind_motor((uint32_t)((ind_position << 4) | CMD_POS_MODE));
 
                 switch_cap_relay(relay_setting);
 
@@ -272,6 +276,7 @@ void tune(void)
             break;
         }
     }
+    task_flag &= ~TUNE_BUSY;
 }
 
 
