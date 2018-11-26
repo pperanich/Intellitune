@@ -64,7 +64,7 @@ inline void sample_adc_channel(uint8_t adc_channel)
     ADCMCTL0 &= ~ADCINCH;
     ADCMCTL0 |= adc_channel;
     adc_flg &= ~ADC_STATUS;
-    TB0CCR1  = TB0R + 2; // Time delay to let adc channel RC circuit charge
+    TB0CCR1  = TB0R + 20; // Time delay to let adc channel RC circuit charge
 }
 
 
@@ -98,7 +98,7 @@ inline void update_adc_value(uint16_t adc_reading)
         break;
     }
     adc_flg |= ADC_STATUS;
-    TB0CCR1  = TB0R + 4; // Time delay to next adc sample interval
+    TB0CCR1  = TB0R + 400; // Time delay to next adc sample interval
 }
 
 

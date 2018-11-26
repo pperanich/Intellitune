@@ -57,6 +57,7 @@ _iq16 calculate_ref_coeff(uint8_t reflection_to_calc)
                 adc_flg &= ~SWR_SENSE;
                 numerator = _IQ19(ref_sample);
                 denominator = _IQ19(fwd_sample);
+                if(fwd_sample < 100) { return 0; }
                 reflection_coefficient = _IQ19div(numerator, denominator);
                 return _IQ19toIQ(reflection_coefficient);
             } else {

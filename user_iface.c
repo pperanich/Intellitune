@@ -376,6 +376,7 @@ __interrupt void Port_2( void )
       
     case P2IV_12: // Pin 2.5: Tune btn
         P2IE &= ~BIT5;
+        P2IV &= ~P2IV_12;
         TB3CCR4 = TB3R + 45878;
         TB3CCTL4 = CCIE;
         if(button_press & TUNE) {

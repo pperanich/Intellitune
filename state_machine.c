@@ -145,6 +145,7 @@ void A2(void)
 void A3(void)
 //--------------------------------------------------------
 {
+    update_digipot();
     //-------------------
     //the next time Timer3 counter 1 reaches Period value go to A1
     A_Task_Ptr = &A1;
@@ -161,7 +162,6 @@ void A3(void)
 void B1(void)
 //----------------------------------------
 {
-    update_digipot();
     //-----------------
     //the next time Timer3 counter 2 reaches period value go to B2
     B_Task_Ptr = &B2;
@@ -174,6 +174,8 @@ void B2(void) //  SPARE
 {
     if(!(button_press & TUNE) && !(task_flag & MOTOR_ACTIVE))
     {
+        P3OUT &= ~BIT6;
+        P3OUT &= ~BIT4;
         update_swr();
         if(button_press & Lup)
         {

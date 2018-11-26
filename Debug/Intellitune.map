@@ -1,10 +1,10 @@
 ******************************************************************************
                   MSP430 Linker PC v18.1.4                     
 ******************************************************************************
->> Linked Tue Nov 20 11:32:29 2018
+>> Linked Tue Nov 20 17:35:01 2018
 
 OUTPUT FILE NAME:   <Intellitune.out>
-ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 0000b086
+ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 0000b0d6
 
 
 MEMORY CONFIGURATION
@@ -17,7 +17,7 @@ MEMORY CONFIGURATION
   TLVMEM                00001a00   00000200  00000000  00000200  RWIX
   BOOTCODE              00001c00   00000400  00000000  00000400  RWIX
   RAM                   00002000   00001000  00000169  00000e97  RWIX
-  FRAM                  00008000   00007f80  000030b4  00004ecc  RWIX
+  FRAM                  00008000   00007f80  00003104  00004e7c  RWIX
   JTAGSIGNATURE         0000ff80   00000004  00000004  00000000  RWIX  ffff 
   BSLSIGNATURE          0000ff84   00000004  00000004  00000000  RWIX  ffff 
   BSLCONFIGURATIONSIGNA 0000ff88   00000002  00000002  00000000  RWIX  ffff 
@@ -130,91 +130,91 @@ section   page    origin      length       input sections
                   000081b9    00000001     --HOLE-- [fill = 0]
                   000081ba    00000002     user_iface.obj (.const:.string:period)
 
-.text      0    000081bc    00002b20     
-                  000081bc    0000060c     intellitune.obj (.text:tune)
-                  000087c8    00000356     stepper_control.obj (.text:step_cap_motor)
-                  00008b1e    000002a0     stepper_control.obj (.text:step_ind_motor)
-                  00008dbe    00000238     user_iface.obj (.text:mode_3)
-                  00008ff6    0000021e     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNtoa.o (.text:_IQ18toa)
-                  00009214    00000210                                                                : _IQNtoa.o (.text:_IQ16toa)
-                  00009424    000001d2                                                                : _IQNdiv.o (.text:_IQ16div)
-                  000095f6    000001d2                                                                : _IQNdiv.o (.text:_IQ18div)
-                  000097c8    000001d2                                                                : _IQNdiv.o (.text:_IQ19div)
-                  0000999a    00000174     hd44780.obj (.text:hd44780_timer_isr)
-                  00009b0e    00000152     user_iface.obj (.text:mode_1)
-                  00009c60    0000013a     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNsqrt.o (.text:_IQ16sqrt)
-                  00009d9a    000000ee     rts430x_lc_sd_eabi.lib : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
-                  00009e88    000000c8     standing_wave_sensor.obj (.text:calculate_ref_coeff)
-                  00009f50    000000ac     hd44780.obj (.text:hd44780_write_string)
-                  00009ffc    000000a4     standing_wave_sensor.obj (.text:update_digipot)
-                  0000a0a0    000000a2     user_iface.obj (.text:mode_2)
-                  0000a142    0000009e     relay.obj (.text:switch_cap_relay)
-                  0000a1e0    00000086     standing_wave_sensor.obj (.text:update_swr)
-                  0000a266    00000078     user_iface.obj (.text:ui_init)
-                  0000a2de    00000070     state_machine.obj (.text:B2)
-                  0000a34e    0000006c     adc_driver.obj (.text:update_adc_value)
-                  0000a3ba    0000006a     rts430x_lc_sd_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit_hold_wdt:__TI_auto_init_nobinit_nopinit_hold_wdt)
-                  0000a424    00000068     adc_driver.obj (.text:initialize_adc)
-                  0000a48c    00000066     intellitune.obj (.text:init_gpio)
-                  0000a4f2    00000060     user_iface.obj (.text:utoa)
-                  0000a552    00000058     hd44780.obj (.text:hd44780_blank_out_remaining_row)
-                  0000a5aa    00000058     state_machine.obj (.text:initialize_task_manager)
-                  0000a602    00000058     rts430x_lc_sd_eabi.lib : div32u.asm.obj (.text)
-                  0000a65a    00000054     user_iface.obj (.text:reverse)
-                  0000a6ae    0000004c     intellitune.obj (.text:clock_configure)
-                  0000a6fa    0000004c     stepper_control.obj (.text:initialize_stepper_control)
-                  0000a746    0000004c     user_iface.obj (.text:lcd_update)
-                  0000a792    00000048     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : __IQNmpy.o (.text:_IQ18mpy)
-                  0000a7da    00000044     intellitune.obj (.text:main)
-                  0000a81e    00000040     rts430x_lc_sd_eabi.lib : cpy_util.asm.obj (.text:__memcpy_far)
-                  0000a85e    0000003e     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : __IQNrmpy.o (.text:_IQ16rmpy)
-                  0000a89c    0000003e     rts430x_lc_sd_eabi.lib : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset:__TI_zero_init_nomemset)
-                  0000a8da    0000003e                            : asr32.asm.obj (.text:l_asr_const)
-                  0000a918    0000003e                            : lsl32.asm.obj (.text:l_lsl_const)
-                  0000a956    0000003e                            : lsr32.asm.obj (.text:l_lsr_const)
-                  0000a994    0000003e     user_iface.obj (.text:mode_22)
-                  0000a9d2    0000003e     user_iface.obj (.text:mode_23)
-                  0000aa10    0000003c     rts430x_lc_sd_eabi.lib : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
-                  0000aa4c    0000003a                            : lsr64.c.obj (.text:__mspabi_srlll)
-                  0000aa86    00000038     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : __IQNmpy.o (.text:_IQ16mpy)
-                  0000aabe    00000036     user_iface.obj (.text:mode_21)
-                  0000aaf4    0000002a     adc_driver.obj (.text:sample_adc_channel)
-                  0000ab1e    00000028     freq_counter.obj (.text:measure_freq)
-                  0000ab46    00000026     hd44780.obj (.text:hd44780_clear_screen)
-                  0000ab6c    0000001e     standing_wave_sensor.obj (.text:initialize_spi)
-                  0000ab8a    0000001c     relay.obj (.text:initialize_relay)
-                  0000aba6    0000001a     state_machine.obj (.text:A2)
-                  0000abc0    0000001a     rts430x_lc_sd_eabi.lib : strcat.c.obj (.text:strcat)
-                  0000abda    00000018     state_machine.obj (.text:A0)
-                  0000abf2    00000018     state_machine.obj (.text:B0)
-                  0000ac0a    00000018     state_machine.obj (.text:C0)
-                  0000ac22    00000016     rts430x_lc_sd_eabi.lib : div16u.asm.obj (.text)
-                  0000ac38    00000014     freq_counter.obj (.text:initialize_freq_counter)
-                  0000ac4c    00000014     rts430x_lc_sd_eabi.lib : memset.c.obj (.text:memset)
-                  0000ac60    00000012                            : memcpy.c.obj (.text:memcpy)
-                  0000ac72    0000000e     state_machine.obj (.text:A1)
-                  0000ac80    0000000e     state_machine.obj (.text:B1)
-                  0000ac8e    0000000e     state_machine.obj (.text:C1)
-                  0000ac9c    0000000e     state_machine.obj (.text:C2)
-                  0000acaa    0000000e     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNfrac.o (.text:_IQ16frac)
-                  0000acb8    0000000e     rts430x_lc_sd_eabi.lib : strlen.c.obj (.text:strlen)
-                  0000acc6    0000000a     state_machine.obj (.text:A3)
-                  0000acd0    00000006     rts430x_lc_sd_eabi.lib : exit.c.obj (.text:abort)
-                  0000acd6    00000004                            : pre_init.c.obj (.text:_system_pre_init)
-                  0000acda    00000002                            : startup.c.obj (.text:_system_post_cinit)
+.text      0    000081bc    00002b6a     
+                  000081bc    0000062c     intellitune.obj (.text:tune)
+                  000087e8    00000356     stepper_control.obj (.text:step_cap_motor)
+                  00008b3e    000002a0     stepper_control.obj (.text:step_ind_motor)
+                  00008dde    00000238     user_iface.obj (.text:mode_3)
+                  00009016    0000021e     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNtoa.o (.text:_IQ18toa)
+                  00009234    00000210                                                                : _IQNtoa.o (.text:_IQ16toa)
+                  00009444    000001d2                                                                : _IQNdiv.o (.text:_IQ16div)
+                  00009616    000001d2                                                                : _IQNdiv.o (.text:_IQ18div)
+                  000097e8    000001d2                                                                : _IQNdiv.o (.text:_IQ19div)
+                  000099ba    00000174     hd44780.obj (.text:hd44780_timer_isr)
+                  00009b2e    00000152     user_iface.obj (.text:mode_1)
+                  00009c80    0000013a     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNsqrt.o (.text:_IQ16sqrt)
+                  00009dba    000000ee     rts430x_lc_sd_eabi.lib : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
+                  00009ea8    000000e2     standing_wave_sensor.obj (.text:calculate_ref_coeff)
+                  00009f8a    000000ac     hd44780.obj (.text:hd44780_write_string)
+                  0000a036    000000a4     standing_wave_sensor.obj (.text:update_digipot)
+                  0000a0da    000000a2     user_iface.obj (.text:mode_2)
+                  0000a17c    0000009e     relay.obj (.text:switch_cap_relay)
+                  0000a21a    00000086     standing_wave_sensor.obj (.text:update_swr)
+                  0000a2a0    0000007c     state_machine.obj (.text:B2)
+                  0000a31c    00000078     user_iface.obj (.text:ui_init)
+                  0000a394    0000006e     adc_driver.obj (.text:update_adc_value)
+                  0000a402    0000006a     rts430x_lc_sd_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit_hold_wdt:__TI_auto_init_nobinit_nopinit_hold_wdt)
+                  0000a46c    00000068     adc_driver.obj (.text:initialize_adc)
+                  0000a4d4    00000066     intellitune.obj (.text:init_gpio)
+                  0000a53a    00000060     user_iface.obj (.text:utoa)
+                  0000a59a    00000058     hd44780.obj (.text:hd44780_blank_out_remaining_row)
+                  0000a5f2    00000058     state_machine.obj (.text:initialize_task_manager)
+                  0000a64a    00000058     rts430x_lc_sd_eabi.lib : div32u.asm.obj (.text)
+                  0000a6a2    00000054     user_iface.obj (.text:reverse)
+                  0000a6f6    0000004c     intellitune.obj (.text:clock_configure)
+                  0000a742    0000004c     stepper_control.obj (.text:initialize_stepper_control)
+                  0000a78e    0000004c     user_iface.obj (.text:lcd_update)
+                  0000a7da    00000048     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : __IQNmpy.o (.text:_IQ18mpy)
+                  0000a822    00000044     intellitune.obj (.text:main)
+                  0000a866    00000040     rts430x_lc_sd_eabi.lib : cpy_util.asm.obj (.text:__memcpy_far)
+                  0000a8a6    0000003e     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : __IQNrmpy.o (.text:_IQ16rmpy)
+                  0000a8e4    0000003e     rts430x_lc_sd_eabi.lib : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset:__TI_zero_init_nomemset)
+                  0000a922    0000003e                            : asr32.asm.obj (.text:l_asr_const)
+                  0000a960    0000003e                            : lsl32.asm.obj (.text:l_lsl_const)
+                  0000a99e    0000003e                            : lsr32.asm.obj (.text:l_lsr_const)
+                  0000a9dc    0000003e     user_iface.obj (.text:mode_22)
+                  0000aa1a    0000003e     user_iface.obj (.text:mode_23)
+                  0000aa58    0000003c     rts430x_lc_sd_eabi.lib : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
+                  0000aa94    0000003a                            : lsr64.c.obj (.text:__mspabi_srlll)
+                  0000aace    00000038     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : __IQNmpy.o (.text:_IQ16mpy)
+                  0000ab06    00000036     user_iface.obj (.text:mode_21)
+                  0000ab3c    0000002c     adc_driver.obj (.text:sample_adc_channel)
+                  0000ab68    00000028     freq_counter.obj (.text:measure_freq)
+                  0000ab90    00000026     hd44780.obj (.text:hd44780_clear_screen)
+                  0000abb6    0000001e     standing_wave_sensor.obj (.text:initialize_spi)
+                  0000abd4    0000001c     relay.obj (.text:initialize_relay)
+                  0000abf0    0000001a     state_machine.obj (.text:A2)
+                  0000ac0a    0000001a     rts430x_lc_sd_eabi.lib : strcat.c.obj (.text:strcat)
+                  0000ac24    00000018     state_machine.obj (.text:A0)
+                  0000ac3c    00000018     state_machine.obj (.text:B0)
+                  0000ac54    00000018     state_machine.obj (.text:C0)
+                  0000ac6c    00000016     rts430x_lc_sd_eabi.lib : div16u.asm.obj (.text)
+                  0000ac82    00000014     freq_counter.obj (.text:initialize_freq_counter)
+                  0000ac96    00000014     rts430x_lc_sd_eabi.lib : memset.c.obj (.text:memset)
+                  0000acaa    00000012                            : memcpy.c.obj (.text:memcpy)
+                  0000acbc    0000000e     state_machine.obj (.text:A1)
+                  0000acca    0000000e     state_machine.obj (.text:A3)
+                  0000acd8    0000000e     state_machine.obj (.text:C1)
+                  0000ace6    0000000e     state_machine.obj (.text:C2)
+                  0000acf4    0000000e     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNfrac.o (.text:_IQ16frac)
+                  0000ad02    0000000e     rts430x_lc_sd_eabi.lib : strlen.c.obj (.text:strlen)
+                  0000ad10    0000000a     state_machine.obj (.text:B1)
+                  0000ad1a    00000006     rts430x_lc_sd_eabi.lib : exit.c.obj (.text:abort)
+                  0000ad20    00000004                            : pre_init.c.obj (.text:_system_pre_init)
+                  0000ad24    00000002                            : startup.c.obj (.text:_system_post_cinit)
 
 .text:_isr 
-*          0    0000acdc    000003d8     
-                  0000acdc    0000015c     user_iface.obj (.text:_isr:Port_3)
-                  0000ae38    000000b4     user_iface.obj (.text:_isr:Timer3_B1)
-                  0000aeec    000000b2     user_iface.obj (.text:_isr:Port_2)
-                  0000af9e    00000050     user_iface.obj (.text:_isr:Port_4)
-                  0000afee    0000003a     adc_driver.obj (.text:_isr:Timer0_B1)
-                  0000b028    00000034     adc_driver.obj (.text:_isr:ADC_ISR)
-                  0000b05c    0000002a     stepper_control.obj (.text:_isr:Timer2_B1)
-                  0000b086    0000001c     rts430x_lc_sd_eabi.lib : boot.c.obj (.text:_isr:_c_int00_noargs)
-                  0000b0a2    0000000a     freq_counter.obj (.text:_isr:Timer1_B1)
-                  0000b0ac    00000008     rts430x_lc_sd_eabi.lib : isr_trap.asm.obj (.text:_isr:__TI_ISR_TRAP)
+*          0    0000ad26    000003de     
+                  0000ad26    0000015c     user_iface.obj (.text:_isr:Port_3)
+                  0000ae82    000000b8     user_iface.obj (.text:_isr:Port_2)
+                  0000af3a    000000b4     user_iface.obj (.text:_isr:Timer3_B1)
+                  0000afee    00000050     user_iface.obj (.text:_isr:Port_4)
+                  0000b03e    0000003a     adc_driver.obj (.text:_isr:Timer0_B1)
+                  0000b078    00000034     adc_driver.obj (.text:_isr:ADC_ISR)
+                  0000b0ac    0000002a     stepper_control.obj (.text:_isr:Timer2_B1)
+                  0000b0d6    0000001c     rts430x_lc_sd_eabi.lib : boot.c.obj (.text:_isr:_c_int00_noargs)
+                  0000b0f2    0000000a     freq_counter.obj (.text:_isr:Timer1_B1)
+                  0000b0fc    00000008     rts430x_lc_sd_eabi.lib : isr_trap.asm.obj (.text:_isr:__TI_ISR_TRAP)
 
 .bss       0    00002000    00000091     UNINITIALIZED
                   00002000    00000040     intellitune.obj (.bss)
@@ -363,17 +363,17 @@ MODULE SUMMARY
        Module                       code    ro data   rw data
        ------                       ----    -------   -------
     .\
-       user_iface.obj               2408    95        4      
-       intellitune.obj              1794    24        94     
+       user_iface.obj               2414    95        4      
+       intellitune.obj              1826    24        94     
        stepper_control.obj          1644    2         26     
        hd44780.obj                  670     7         37     
-       standing_wave_sensor.obj     528     6         1      
-       adc_driver.obj               364     4         14     
-       state_machine.obj            364     0         17     
+       standing_wave_sensor.obj     554     6         1      
+       state_machine.obj            376     0         17     
+       adc_driver.obj               368     4         14     
        relay.obj                    186     0         0      
        freq_counter.obj             70      2         8      
     +--+----------------------------+-------+---------+---------+
-       Total:                       8028    140       201    
+       Total:                       8108    140       201    
                                                              
     ../IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib
        _IQNdiv.o                    1398    0         0      
@@ -429,7 +429,7 @@ MODULE SUMMARY
        Stack:                       0       0         160    
        Linker Generated:            0       56        0      
     +--+----------------------------+-------+---------+---------+
-       Grand Total:                 12024   487       361    
+       Grand Total:                 12104   487       361    
 
 
 LINKER GENERATED COPY TABLES
@@ -451,10 +451,10 @@ GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name
 
 address   name                                   
 -------   ----                                   
-0000abda  A0                                     
-0000ac72  A1                                     
-0000aba6  A2                                     
-0000acc6  A3                                     
+0000ac24  A0                                     
+0000acbc  A1                                     
+0000abf0  A2                                     
+0000acca  A3                                     
 00000700  ADCCTL0                                
 00000701  ADCCTL0_H                              
 00000700  ADCCTL0_L                              
@@ -485,12 +485,12 @@ address   name
 00000712  ADCMEM0                                
 00000713  ADCMEM0_H                              
 00000712  ADCMEM0_L                              
-0000b028  ADC_ISR                                
+0000b078  ADC_ISR                                
 00002068  A_Task_Ptr                             
 0000206c  Alpha_State_Ptr                        
-0000abf2  B0                                     
-0000ac80  B1                                     
-0000a2de  B2                                     
+0000ac3c  B0                                     
+0000ad10  B1                                     
+0000a2a0  B2                                     
 00000660  BAKMEM0                                
 00000661  BAKMEM0_H                              
 00000660  BAKMEM0_L                              
@@ -540,10 +540,10 @@ address   name
 00000673  BAKMEM9_H                              
 00000672  BAKMEM9_L                              
 00002070  B_Task_Ptr                             
-0000acd0  C$$EXIT                                
-0000ac0a  C0                                     
-0000ac8e  C1                                     
-0000ac9c  C2                                     
+0000ad1a  C$$EXIT                                
+0000ac54  C0                                     
+0000acd8  C1                                     
+0000ace6  C2                                     
 000002ee  CAPTIOCTL                              
 000002ef  CAPTIOCTL_H                            
 000002ee  CAPTIOCTL_L                            
@@ -1002,9 +1002,9 @@ address   name
 0000012b  PMMIFG_H                               
 0000012a  PMMIFG_L                               
 000020c6  PREV_MODE                              
-0000aeec  Port_2                                 
-0000acdc  Port_3                                 
-0000af9e  Port_4                                 
+0000ae82  Port_2                                 
+0000ad26  Port_3                                 
+0000afee  Port_4                                 
 000004e4  RES0                                   
 000004e5  RES0_H                                 
 000004e4  RES0_L                                 
@@ -1302,10 +1302,10 @@ address   name
 00000450  TB3R                                   
 00000451  TB3R_H                                 
 00000450  TB3R_L                                 
-0000afee  Timer0_B1                              
-0000b0a2  Timer1_B1                              
-0000b05c  Timer2_B1                              
-0000ae38  Timer3_B1                              
+0000b03e  Timer0_B1                              
+0000b0f2  Timer1_B1                              
+0000b0ac  Timer2_B1                              
+0000af3a  Timer3_B1                              
 00000510  UCA0ABCTL                              
 00000511  UCA0ABCTL_H                            
 00000510  UCA0ABCTL_L                            
@@ -1484,16 +1484,16 @@ address   name
 000001cd  WDTCTL_H                               
 000001cc  WDTCTL_L                               
 00008038  _IQ14sqrt_lookup                       
-00009424  _IQ16div                               
-0000acaa  _IQ16frac                              
-0000aa86  _IQ16mpy                               
-0000a85e  _IQ16rmpy                              
-00009c60  _IQ16sqrt                              
-00009214  _IQ16toa                               
-000095f6  _IQ18div                               
-0000a792  _IQ18mpy                               
-00008ff6  _IQ18toa                               
-000097c8  _IQ19div                               
+00009444  _IQ16div                               
+0000acf4  _IQ16frac                              
+0000aace  _IQ16mpy                               
+0000a8a6  _IQ16rmpy                              
+00009c80  _IQ16sqrt                              
+00009234  _IQ16toa                               
+00009616  _IQ18div                               
+0000a7da  _IQ18mpy                               
+00009016  _IQ18toa                               
+000097e8  _IQ19div                               
 000080f8  _IQ6div_lookup                         
 00003000  __STACK_END                            
 000000a0  __STACK_SIZE                           
@@ -1501,10 +1501,10 @@ address   name
 00008038  __TI_CINIT_Limit                       
 00008016  __TI_Handler_Table_Base                
 00008022  __TI_Handler_Table_Limit               
-0000b0ac  __TI_ISR_TRAP                          
-0000a3ba  __TI_auto_init_nobinit_nopinit_hold_wdt
-00009d9a  __TI_decompress_lzss                   
-0000aa10  __TI_decompress_none                   
+0000b0fc  __TI_ISR_TRAP                          
+0000a402  __TI_auto_init_nobinit_nopinit_hold_wdt
+00009dba  __TI_decompress_lzss                   
+0000aa58  __TI_decompress_none                   
 0000ffce  __TI_int22                             
 0000ffd0  __TI_int23                             
 0000ffd2  __TI_int24                             
@@ -1532,73 +1532,73 @@ address   name
 ffffffff  __TI_pprof_out_hndl                    
 ffffffff  __TI_prof_data_size                    
 ffffffff  __TI_prof_data_start                   
-0000a89c  __TI_zero_init_nomemset                
+0000a8e4  __TI_zero_init_nomemset                
 ffffffff  __c_args__                             
-0000a81e  __memcpy_far                           
-0000ac22  __mspabi_divu                          
-0000a602  __mspabi_divul                         
-0000ac22  __mspabi_remu                          
-0000a602  __mspabi_remul                         
-0000a950  __mspabi_slll_1                        
-0000a92c  __mspabi_slll_10                       
-0000a928  __mspabi_slll_11                       
-0000a924  __mspabi_slll_12                       
-0000a920  __mspabi_slll_13                       
-0000a91c  __mspabi_slll_14                       
-0000a918  __mspabi_slll_15                       
-0000a94c  __mspabi_slll_2                        
-0000a948  __mspabi_slll_3                        
-0000a944  __mspabi_slll_4                        
-0000a940  __mspabi_slll_5                        
-0000a93c  __mspabi_slll_6                        
-0000a938  __mspabi_slll_7                        
-0000a934  __mspabi_slll_8                        
-0000a930  __mspabi_slll_9                        
-0000a912  __mspabi_sral_1                        
-0000a8ee  __mspabi_sral_10                       
-0000a8ea  __mspabi_sral_11                       
-0000a8e6  __mspabi_sral_12                       
-0000a8e2  __mspabi_sral_13                       
-0000a8de  __mspabi_sral_14                       
-0000a8da  __mspabi_sral_15                       
-0000a90e  __mspabi_sral_2                        
-0000a90a  __mspabi_sral_3                        
-0000a906  __mspabi_sral_4                        
-0000a902  __mspabi_sral_5                        
-0000a8fe  __mspabi_sral_6                        
-0000a8fa  __mspabi_sral_7                        
-0000a8f6  __mspabi_sral_8                        
-0000a8f2  __mspabi_sral_9                        
-0000a98e  __mspabi_srll_1                        
-0000a96a  __mspabi_srll_10                       
-0000a966  __mspabi_srll_11                       
-0000a962  __mspabi_srll_12                       
-0000a95e  __mspabi_srll_13                       
-0000a95a  __mspabi_srll_14                       
-0000a956  __mspabi_srll_15                       
-0000a98a  __mspabi_srll_2                        
-0000a986  __mspabi_srll_3                        
-0000a982  __mspabi_srll_4                        
-0000a97e  __mspabi_srll_5                        
-0000a97a  __mspabi_srll_6                        
-0000a976  __mspabi_srll_7                        
-0000a972  __mspabi_srll_8                        
-0000a96e  __mspabi_srll_9                        
-0000aa4c  __mspabi_srlll                         
-0000b086  _c_int00_noargs                        
+0000a866  __memcpy_far                           
+0000ac6c  __mspabi_divu                          
+0000a64a  __mspabi_divul                         
+0000ac6c  __mspabi_remu                          
+0000a64a  __mspabi_remul                         
+0000a998  __mspabi_slll_1                        
+0000a974  __mspabi_slll_10                       
+0000a970  __mspabi_slll_11                       
+0000a96c  __mspabi_slll_12                       
+0000a968  __mspabi_slll_13                       
+0000a964  __mspabi_slll_14                       
+0000a960  __mspabi_slll_15                       
+0000a994  __mspabi_slll_2                        
+0000a990  __mspabi_slll_3                        
+0000a98c  __mspabi_slll_4                        
+0000a988  __mspabi_slll_5                        
+0000a984  __mspabi_slll_6                        
+0000a980  __mspabi_slll_7                        
+0000a97c  __mspabi_slll_8                        
+0000a978  __mspabi_slll_9                        
+0000a95a  __mspabi_sral_1                        
+0000a936  __mspabi_sral_10                       
+0000a932  __mspabi_sral_11                       
+0000a92e  __mspabi_sral_12                       
+0000a92a  __mspabi_sral_13                       
+0000a926  __mspabi_sral_14                       
+0000a922  __mspabi_sral_15                       
+0000a956  __mspabi_sral_2                        
+0000a952  __mspabi_sral_3                        
+0000a94e  __mspabi_sral_4                        
+0000a94a  __mspabi_sral_5                        
+0000a946  __mspabi_sral_6                        
+0000a942  __mspabi_sral_7                        
+0000a93e  __mspabi_sral_8                        
+0000a93a  __mspabi_sral_9                        
+0000a9d6  __mspabi_srll_1                        
+0000a9b2  __mspabi_srll_10                       
+0000a9ae  __mspabi_srll_11                       
+0000a9aa  __mspabi_srll_12                       
+0000a9a6  __mspabi_srll_13                       
+0000a9a2  __mspabi_srll_14                       
+0000a99e  __mspabi_srll_15                       
+0000a9d2  __mspabi_srll_2                        
+0000a9ce  __mspabi_srll_3                        
+0000a9ca  __mspabi_srll_4                        
+0000a9c6  __mspabi_srll_5                        
+0000a9c2  __mspabi_srll_6                        
+0000a9be  __mspabi_srll_7                        
+0000a9ba  __mspabi_srll_8                        
+0000a9b6  __mspabi_srll_9                        
+0000aa94  __mspabi_srlll                         
+0000b0d6  _c_int00_noargs                        
 0000fffe  _reset_vector                          
 00002f60  _stack                                 
-0000acda  _system_post_cinit                     
-0000acd6  _system_pre_init                       
-0000acd0  abort                                  
+0000ad24  _system_post_cinit                     
+0000ad20  _system_pre_init                       
+0000ad1a  abort                                  
 00002092  adc_channel_select                     
 000020c2  adc_flg                                
 000020c7  button_press                           
-00009e88  calculate_ref_coeff                    
+00009ea8  calculate_ref_coeff                    
 000020a0  cap2_val                               
 000020c8  cap_motor_task                         
 00002094  cap_sample                             
-0000a6ae  clock_configure                        
+0000a6f6  clock_configure                        
 0000208c  direction$step_cap_motor_1             
 0000208d  direction$step_ind_motor_1             
 000020c4  display_menu                           
@@ -1611,59 +1611,59 @@ ffffffff  __c_args__
 00002088  frequency                              
 0000209c  fwd_25_sample                          
 00002098  fwd_sample                             
-0000a552  hd44780_blank_out_remaining_row        
-0000ab46  hd44780_clear_screen                   
-0000999a  hd44780_timer_isr                      
-00009f50  hd44780_write_string                   
+0000a59a  hd44780_blank_out_remaining_row        
+0000ab90  hd44780_clear_screen                   
+000099ba  hd44780_timer_isr                      
+00009f8a  hd44780_write_string                   
 000020b0  ind2_val                               
 000020c9  ind_motor_task                         
 00002096  ind_sample                             
-0000a48c  init_gpio                              
-0000a424  initialize_adc                         
-0000ac38  initialize_freq_counter                
-0000ab8a  initialize_relay                       
-0000ab6c  initialize_spi                         
-0000a6fa  initialize_stepper_control             
-0000a5aa  initialize_task_manager                
-0000a746  lcd_update                             
+0000a4d4  init_gpio                              
+0000a46c  initialize_adc                         
+0000ac82  initialize_freq_counter                
+0000abd4  initialize_relay                       
+0000abb6  initialize_spi                         
+0000a742  initialize_stepper_control             
+0000a5f2  initialize_task_manager                
+0000a78e  lcd_update                             
 000020a8  load_imp                               
-0000a7da  main                                   
-0000ab1e  measure_freq                           
-0000ac60  memcpy                                 
-0000ac4c  memset                                 
+0000a822  main                                   
+0000ab68  measure_freq                           
+0000acaa  memcpy                                 
+0000ac96  memset                                 
 00002060  minimum_swr$step_cap_motor_1           
 00002064  minimum_swr$step_ind_motor_1           
 0000208f  mode$step_cap_motor_1                  
 00002090  mode$step_ind_motor_1                  
-00009b0e  mode_1                                 
-0000a0a0  mode_2                                 
-0000aabe  mode_21                                
-0000a994  mode_22                                
-0000a9d2  mode_23                                
-00008dbe  mode_3                                 
+00009b2e  mode_1                                 
+0000a0da  mode_2                                 
+0000ab06  mode_21                                
+0000a9dc  mode_22                                
+0000aa1a  mode_23                                
+00008dde  mode_3                                 
 0000208a  overflowCount                          
 00002084  position$step_cap_motor_1              
 00002086  position$step_ind_motor_1              
 0000209e  ref_25_sample                          
 0000209a  ref_sample                             
 000020c1  relay_setting                          
-0000a65a  reverse                                
-0000aaf4  sample_adc_channel                     
-000087c8  step_cap_motor                         
-00008b1e  step_ind_motor                         
-0000abc0  strcat                                 
-0000acb8  strlen                                 
-0000a142  switch_cap_relay                       
+0000a6a2  reverse                                
+0000ab3c  sample_adc_channel                     
+000087e8  step_cap_motor                         
+00008b3e  step_ind_motor                         
+0000ac0a  strcat                                 
+0000ad02  strlen                                 
+0000a17c  switch_cap_relay                       
 000020b6  swr_val                                
 000020bb  task_flag                              
 00002078  total_pulses                           
 000081bc  tune                                   
 000020c0  tune_task                              
-0000a266  ui_init                                
-0000a34e  update_adc_value                       
-00009ffc  update_digipot                         
-0000a1e0  update_swr                             
-0000a4f2  utoa                                   
+0000a31c  ui_init                                
+0000a394  update_adc_value                       
+0000a036  update_digipot                         
+0000a21a  update_swr                             
+0000a53a  utoa                                   
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -2729,131 +2729,131 @@ address   name
 00008038  __TI_CINIT_Limit                       
 000080f8  _IQ6div_lookup                         
 000081bc  tune                                   
-000087c8  step_cap_motor                         
-00008b1e  step_ind_motor                         
-00008dbe  mode_3                                 
-00008ff6  _IQ18toa                               
-00009214  _IQ16toa                               
-00009424  _IQ16div                               
-000095f6  _IQ18div                               
-000097c8  _IQ19div                               
-0000999a  hd44780_timer_isr                      
-00009b0e  mode_1                                 
-00009c60  _IQ16sqrt                              
-00009d9a  __TI_decompress_lzss                   
-00009e88  calculate_ref_coeff                    
-00009f50  hd44780_write_string                   
-00009ffc  update_digipot                         
-0000a0a0  mode_2                                 
-0000a142  switch_cap_relay                       
-0000a1e0  update_swr                             
-0000a266  ui_init                                
-0000a2de  B2                                     
-0000a34e  update_adc_value                       
-0000a3ba  __TI_auto_init_nobinit_nopinit_hold_wdt
-0000a424  initialize_adc                         
-0000a48c  init_gpio                              
-0000a4f2  utoa                                   
-0000a552  hd44780_blank_out_remaining_row        
-0000a5aa  initialize_task_manager                
-0000a602  __mspabi_divul                         
-0000a602  __mspabi_remul                         
-0000a65a  reverse                                
-0000a6ae  clock_configure                        
-0000a6fa  initialize_stepper_control             
-0000a746  lcd_update                             
-0000a792  _IQ18mpy                               
-0000a7da  main                                   
-0000a81e  __memcpy_far                           
-0000a85e  _IQ16rmpy                              
-0000a89c  __TI_zero_init_nomemset                
-0000a8da  __mspabi_sral_15                       
-0000a8de  __mspabi_sral_14                       
-0000a8e2  __mspabi_sral_13                       
-0000a8e6  __mspabi_sral_12                       
-0000a8ea  __mspabi_sral_11                       
-0000a8ee  __mspabi_sral_10                       
-0000a8f2  __mspabi_sral_9                        
-0000a8f6  __mspabi_sral_8                        
-0000a8fa  __mspabi_sral_7                        
-0000a8fe  __mspabi_sral_6                        
-0000a902  __mspabi_sral_5                        
-0000a906  __mspabi_sral_4                        
-0000a90a  __mspabi_sral_3                        
-0000a90e  __mspabi_sral_2                        
-0000a912  __mspabi_sral_1                        
-0000a918  __mspabi_slll_15                       
-0000a91c  __mspabi_slll_14                       
-0000a920  __mspabi_slll_13                       
-0000a924  __mspabi_slll_12                       
-0000a928  __mspabi_slll_11                       
-0000a92c  __mspabi_slll_10                       
-0000a930  __mspabi_slll_9                        
-0000a934  __mspabi_slll_8                        
-0000a938  __mspabi_slll_7                        
-0000a93c  __mspabi_slll_6                        
-0000a940  __mspabi_slll_5                        
-0000a944  __mspabi_slll_4                        
-0000a948  __mspabi_slll_3                        
-0000a94c  __mspabi_slll_2                        
-0000a950  __mspabi_slll_1                        
-0000a956  __mspabi_srll_15                       
-0000a95a  __mspabi_srll_14                       
-0000a95e  __mspabi_srll_13                       
-0000a962  __mspabi_srll_12                       
-0000a966  __mspabi_srll_11                       
-0000a96a  __mspabi_srll_10                       
-0000a96e  __mspabi_srll_9                        
-0000a972  __mspabi_srll_8                        
-0000a976  __mspabi_srll_7                        
-0000a97a  __mspabi_srll_6                        
-0000a97e  __mspabi_srll_5                        
-0000a982  __mspabi_srll_4                        
-0000a986  __mspabi_srll_3                        
-0000a98a  __mspabi_srll_2                        
-0000a98e  __mspabi_srll_1                        
-0000a994  mode_22                                
-0000a9d2  mode_23                                
-0000aa10  __TI_decompress_none                   
-0000aa4c  __mspabi_srlll                         
-0000aa86  _IQ16mpy                               
-0000aabe  mode_21                                
-0000aaf4  sample_adc_channel                     
-0000ab1e  measure_freq                           
-0000ab46  hd44780_clear_screen                   
-0000ab6c  initialize_spi                         
-0000ab8a  initialize_relay                       
-0000aba6  A2                                     
-0000abc0  strcat                                 
-0000abda  A0                                     
-0000abf2  B0                                     
-0000ac0a  C0                                     
-0000ac22  __mspabi_divu                          
-0000ac22  __mspabi_remu                          
-0000ac38  initialize_freq_counter                
-0000ac4c  memset                                 
-0000ac60  memcpy                                 
-0000ac72  A1                                     
-0000ac80  B1                                     
-0000ac8e  C1                                     
-0000ac9c  C2                                     
-0000acaa  _IQ16frac                              
-0000acb8  strlen                                 
-0000acc6  A3                                     
-0000acd0  C$$EXIT                                
-0000acd0  abort                                  
-0000acd6  _system_pre_init                       
-0000acda  _system_post_cinit                     
-0000acdc  Port_3                                 
-0000ae38  Timer3_B1                              
-0000aeec  Port_2                                 
-0000af9e  Port_4                                 
-0000afee  Timer0_B1                              
-0000b028  ADC_ISR                                
-0000b05c  Timer2_B1                              
-0000b086  _c_int00_noargs                        
-0000b0a2  Timer1_B1                              
-0000b0ac  __TI_ISR_TRAP                          
+000087e8  step_cap_motor                         
+00008b3e  step_ind_motor                         
+00008dde  mode_3                                 
+00009016  _IQ18toa                               
+00009234  _IQ16toa                               
+00009444  _IQ16div                               
+00009616  _IQ18div                               
+000097e8  _IQ19div                               
+000099ba  hd44780_timer_isr                      
+00009b2e  mode_1                                 
+00009c80  _IQ16sqrt                              
+00009dba  __TI_decompress_lzss                   
+00009ea8  calculate_ref_coeff                    
+00009f8a  hd44780_write_string                   
+0000a036  update_digipot                         
+0000a0da  mode_2                                 
+0000a17c  switch_cap_relay                       
+0000a21a  update_swr                             
+0000a2a0  B2                                     
+0000a31c  ui_init                                
+0000a394  update_adc_value                       
+0000a402  __TI_auto_init_nobinit_nopinit_hold_wdt
+0000a46c  initialize_adc                         
+0000a4d4  init_gpio                              
+0000a53a  utoa                                   
+0000a59a  hd44780_blank_out_remaining_row        
+0000a5f2  initialize_task_manager                
+0000a64a  __mspabi_divul                         
+0000a64a  __mspabi_remul                         
+0000a6a2  reverse                                
+0000a6f6  clock_configure                        
+0000a742  initialize_stepper_control             
+0000a78e  lcd_update                             
+0000a7da  _IQ18mpy                               
+0000a822  main                                   
+0000a866  __memcpy_far                           
+0000a8a6  _IQ16rmpy                              
+0000a8e4  __TI_zero_init_nomemset                
+0000a922  __mspabi_sral_15                       
+0000a926  __mspabi_sral_14                       
+0000a92a  __mspabi_sral_13                       
+0000a92e  __mspabi_sral_12                       
+0000a932  __mspabi_sral_11                       
+0000a936  __mspabi_sral_10                       
+0000a93a  __mspabi_sral_9                        
+0000a93e  __mspabi_sral_8                        
+0000a942  __mspabi_sral_7                        
+0000a946  __mspabi_sral_6                        
+0000a94a  __mspabi_sral_5                        
+0000a94e  __mspabi_sral_4                        
+0000a952  __mspabi_sral_3                        
+0000a956  __mspabi_sral_2                        
+0000a95a  __mspabi_sral_1                        
+0000a960  __mspabi_slll_15                       
+0000a964  __mspabi_slll_14                       
+0000a968  __mspabi_slll_13                       
+0000a96c  __mspabi_slll_12                       
+0000a970  __mspabi_slll_11                       
+0000a974  __mspabi_slll_10                       
+0000a978  __mspabi_slll_9                        
+0000a97c  __mspabi_slll_8                        
+0000a980  __mspabi_slll_7                        
+0000a984  __mspabi_slll_6                        
+0000a988  __mspabi_slll_5                        
+0000a98c  __mspabi_slll_4                        
+0000a990  __mspabi_slll_3                        
+0000a994  __mspabi_slll_2                        
+0000a998  __mspabi_slll_1                        
+0000a99e  __mspabi_srll_15                       
+0000a9a2  __mspabi_srll_14                       
+0000a9a6  __mspabi_srll_13                       
+0000a9aa  __mspabi_srll_12                       
+0000a9ae  __mspabi_srll_11                       
+0000a9b2  __mspabi_srll_10                       
+0000a9b6  __mspabi_srll_9                        
+0000a9ba  __mspabi_srll_8                        
+0000a9be  __mspabi_srll_7                        
+0000a9c2  __mspabi_srll_6                        
+0000a9c6  __mspabi_srll_5                        
+0000a9ca  __mspabi_srll_4                        
+0000a9ce  __mspabi_srll_3                        
+0000a9d2  __mspabi_srll_2                        
+0000a9d6  __mspabi_srll_1                        
+0000a9dc  mode_22                                
+0000aa1a  mode_23                                
+0000aa58  __TI_decompress_none                   
+0000aa94  __mspabi_srlll                         
+0000aace  _IQ16mpy                               
+0000ab06  mode_21                                
+0000ab3c  sample_adc_channel                     
+0000ab68  measure_freq                           
+0000ab90  hd44780_clear_screen                   
+0000abb6  initialize_spi                         
+0000abd4  initialize_relay                       
+0000abf0  A2                                     
+0000ac0a  strcat                                 
+0000ac24  A0                                     
+0000ac3c  B0                                     
+0000ac54  C0                                     
+0000ac6c  __mspabi_divu                          
+0000ac6c  __mspabi_remu                          
+0000ac82  initialize_freq_counter                
+0000ac96  memset                                 
+0000acaa  memcpy                                 
+0000acbc  A1                                     
+0000acca  A3                                     
+0000acd8  C1                                     
+0000ace6  C2                                     
+0000acf4  _IQ16frac                              
+0000ad02  strlen                                 
+0000ad10  B1                                     
+0000ad1a  C$$EXIT                                
+0000ad1a  abort                                  
+0000ad20  _system_pre_init                       
+0000ad24  _system_post_cinit                     
+0000ad26  Port_3                                 
+0000ae82  Port_2                                 
+0000af3a  Timer3_B1                              
+0000afee  Port_4                                 
+0000b03e  Timer0_B1                              
+0000b078  ADC_ISR                                
+0000b0ac  Timer2_B1                              
+0000b0d6  _c_int00_noargs                        
+0000b0f2  Timer1_B1                              
+0000b0fc  __TI_ISR_TRAP                          
 0000ffce  __TI_int22                             
 0000ffd0  __TI_int23                             
 0000ffd2  __TI_int24                             

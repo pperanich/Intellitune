@@ -120,6 +120,9 @@ void tune(void)
         case INITIALIZE_TUNE_COMPONENTS:
         {
             if(task_status == 0) {
+                while(TB1CTL != MC_0) { asm("   NOP"); }
+                measure_freq();
+                while(TB1CTL != MC_0) { asm("   NOP"); }
                 relay_setting = 0;
                 switch_cap_relay(relay_setting);
                 step_cap_motor(RETURN_START_MODE);
