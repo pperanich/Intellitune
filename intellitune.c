@@ -203,6 +203,8 @@ void tune(void)
             estimated_capacitance = _IQ16div(estimated_capacitance, angular_frequency);
             estimated_capacitance = _IQ16mpy(estimated_capacitance, _IQ16(100)); // in pF
 
+            estimated_inductance = _IQ16div(ind_react, angular_frequency); // in uH
+
             if((estimated_capacitance < _IQ16(0.0)) || (estimated_inductance < _IQ16(0.0))) {
                 tune_task = CALCULATE_SWR;
             } else if((estimated_capacitance > _IQ16(CAP_MAX)) || (estimated_inductance > _IQ16(IND_MAX))) {
