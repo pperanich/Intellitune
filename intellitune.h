@@ -99,11 +99,18 @@
 // Globals
 extern uint32_t  total_pulses;
 extern uint16_t frequency, overflowCount, inductor_position, capacitor_position;
-extern uint16_t cap_sample, ind_sample, fwd_sample,
-                ref_sample, fwd_25_sample, ref_25_sample;
+extern uint16_t cap_sample, ind_sample;
 extern uint8_t adc_channel_select, adc_flg, task_flag,
                display_menu, cap_motor_task, ind_motor_task,
-               tune_task, button_press, relay_setting;
+               tune_task, button_press, relay_setting, target_btn;
+extern uint16_t fwd_25_sample[24];
+extern uint16_t ref_25_sample[24];
+extern uint16_t fwd_sample[24];
+extern uint16_t ref_sample[24];
+extern uint16_t median_fwd_sample;
+extern uint16_t median_ref_sample;
+extern uint16_t median_ref_sample_25;
+extern uint16_t median_fwd_sample_25;
 extern char cap2_val[8];
 extern char ind2_val[6];
 extern char swr_val[5];

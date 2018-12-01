@@ -162,6 +162,12 @@ void A3(void)
 void B1(void)
 //----------------------------------------
 {
+    if(button_press & ANT) {
+        if(relay_setting < 7) { relay_setting++; }
+        else { relay_setting = 0; }
+        switch_cap_relay(relay_setting);
+        button_press &= ~ANT & ~MODE_LOCK;
+    }
     //-----------------
     //the next time Timer3 counter 2 reaches period value go to B2
     B_Task_Ptr = &B2;
@@ -212,8 +218,6 @@ void B2(void) //  SPARE
 void C1(void)
 //----------------------------------------
 {
-
-
     lcd_update();
     //-----------------
     //the next time Timer3 counter 3 reaches period value go to C2

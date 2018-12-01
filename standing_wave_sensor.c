@@ -41,8 +41,8 @@ _iq16 calculate_ref_coeff(uint8_t reflection_to_calc)
             if(adc_flg & SWR_KNOWN_SENSE)
             {
                 adc_flg &= ~SWR_KNOWN_SENSE;
-                numerator = _IQ19(ref_25_sample);
-                denominator = _IQ19(fwd_25_sample);
+                numerator = _IQ19(median_ref_sample_25);
+                denominator = _IQ19(median_fwd_sample_25);
                 reflection_coefficient = _IQ19div(numerator, denominator);
                 return _IQ19toIQ(reflection_coefficient);
             } else {
@@ -55,9 +55,10 @@ _iq16 calculate_ref_coeff(uint8_t reflection_to_calc)
             if(adc_flg & SWR_SENSE)
             {
                 adc_flg &= ~SWR_SENSE;
-                numerator = _IQ19(ref_sample);
-                denominator = _IQ19(fwd_sample);
-                if(fwd_sample < 100) { return 0; }
+                numerator = _IQ19(median_ref_sample);
+                denominator = _IQ19(median_fwd_sample);
+                if(numerator > denominator) { return 0; }
+                if(median_fwd_sample < 100) { return 0; }
                 reflection_coefficient = _IQ19div(numerator, denominator);
                 return _IQ19toIQ(reflection_coefficient);
             } else {
@@ -92,11 +93,11 @@ void initialize_spi(void)
 void update_digipot(void)
 {
     uint8_t update_needed = 0;
-    if((DATA_BYTE != 255) && ((fwd_sample > 4080) || (ref_sample > 4080)))
+    if((DATA_BYTE != 255) && ((median_fwd_sample > 4080) || (median_ref_sample > 4080)))
     {
         DATA_BYTE++; // Increase resistance to lower voltage
         update_needed = 1;
-    } else if((DATA_BYTE != 0) && ((fwd_sample < 4050) || (ref_sample < 4050)))
+    } else if((DATA_BYTE != 0) && ((median_fwd_sample < 4050) || (median_ref_sample < 4050)))
     {
         DATA_BYTE--; // Decrease resistance to increase voltage
         update_needed = 1;
@@ -133,16 +134,30 @@ void update_digipot(void)
 }
 
 
+// TODO: Update the internal reference if adc input threshold exceeded
+void update_internal_reference(void)
+{
+
+}
+
+
 // TODO: Update SWR reading from most recent ADC values
 void update_swr(void)
 {
     static const _iq16 iq_one = _IQ16(1.0);
+    char buf1[6] = {'\0'};
+    char buf2[6] = {'\0'};
     uint8_t error = 0;
     _iq16 numerator, denominator, vswr;
     _iq16 reflection_coefficient = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
     if(reflection_coefficient == 0) { return; }
     numerator = iq_one + reflection_coefficient;
     denominator = iq_one - reflection_coefficient;
+    error += _IQ16toa(buf1,"%1.3f", numerator);
+    error += _IQ16toa(buf2,"%1.3f", denominator);
     vswr = _IQ16div(numerator, denominator);
+    //error += _IQ16toa(swr_val,"%2.1f", vswr);
     if(vswr > _IQ16(0.0)) { error += _IQ16toa(swr_val,"%2.1f", vswr); }
+    else if( vswr < _IQ16(1.0))
+        { asm("   NOP"); }
 }

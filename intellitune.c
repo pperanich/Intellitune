@@ -221,7 +221,12 @@ void tune(void)
                 error += _IQ16toa(ind2_val, "%2.2f", estimated_inductance);
             }
 
-            if(error == 0) { tune_task++; }
+            if(error == 0) {
+                //tune_task++;
+                task_status = 0;
+                tune_task = INITIALIZE_TUNE_COMPONENTS;
+                button_press &= ~TUNE & ~MODE_LOCK;
+            }
             break;
         }
 
