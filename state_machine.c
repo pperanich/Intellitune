@@ -181,7 +181,7 @@ void B2(void) //  SPARE
     if(!(button_press & TUNE) && !(task_flag & MOTOR_ACTIVE))
     {
         P3OUT &= ~BIT6;
-        P3OUT &= ~BIT4;
+        //P3OUT &= ~BIT4;
         update_swr();
         if(button_press & Lup)
         {
@@ -230,7 +230,8 @@ void C1(void)
 void C2(void) //  SPARE
 //----------------------------------------
 {
-    measure_freq();
+    //measure_freq();
+
     //-----------------
     //the next time Timer3 counter 3 reaches period value go to C3
     C_Task_Ptr = &C1;

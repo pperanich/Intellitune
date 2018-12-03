@@ -167,8 +167,8 @@ void mode_2(void)  // Tuning display with impedance network
     strcat(row1, cap_disp);
     strcat(row2, ind_disp);
 
-    strcat(row1, cap2_val);
-    strcat(row2, ind2_val);
+    strcat(row1, cap_val);
+    strcat(row2, ind_val);
 
     strcat(row1, cap_unit);
     strcat(row2, ind_unit);
@@ -401,11 +401,11 @@ __interrupt void Port_2( void )
       
     case P2IV_12: // Pin 2.5: Tune btn
         P2IE &= ~BIT5;
-        P2IV &= ~P2IV_12;
-        TB3CCR4 = TB3R + 45878;
+        TB3CCR4 = TB3R + 6554;
         TB3CCTL4 = CCIE;
         if(button_press & TUNE) {
-            button_press &= ~TUNE & ~MODE_LOCK;
+            //button_press &= ~TUNE & ~MODE_LOCK;
+            asm("   NOP");
         } else{
             if(button_press & MODE_LOCK) { break; }
             target_btn |= TUNE | MODE_LOCK;

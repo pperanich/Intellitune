@@ -93,11 +93,11 @@ void initialize_spi(void)
 void update_digipot(void)
 {
     uint8_t update_needed = 0;
-    if((DATA_BYTE != 255) && ((median_fwd_sample > 4080) || (median_ref_sample > 4080)))
+    if((DATA_BYTE != 255) && (median_fwd_sample > 4050))
     {
         DATA_BYTE++; // Increase resistance to lower voltage
         update_needed = 1;
-    } else if((DATA_BYTE != 0) && ((median_fwd_sample < 4050) || (median_ref_sample < 4050)))
+    } else if((DATA_BYTE != 0) && (median_fwd_sample < 1024))
     {
         DATA_BYTE--; // Decrease resistance to increase voltage
         update_needed = 1;
@@ -137,7 +137,7 @@ void update_digipot(void)
 // TODO: Update the internal reference if adc input threshold exceeded
 void update_internal_reference(void)
 {
-
+    asm("   NOP");
 }
 
 

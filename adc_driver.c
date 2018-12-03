@@ -20,9 +20,9 @@ uint16_t median(uint16_t samples[]);
 
 // Globals
 uint8_t adc_channel_select = FWD_PIN;
-uint16_t cap_sample = C_LOWER_LIMIT;
-uint16_t ind_sample = L_LOWER_LIMIT;
-uint16_t fwd_sample[24] = {69};
+uint16_t cap_sample = 0;
+uint16_t ind_sample = 0;
+uint16_t fwd_sample[24] = {0};
 uint16_t ref_sample[24] = {0};
 uint16_t fwd_25_sample[24] = {0};
 uint16_t ref_25_sample[24] = {0};
@@ -35,13 +35,13 @@ uint16_t median_fwd_sample_25 = 0;
 void initialize_adc(void)
 {
     // Configure pins 5.0->5.3 ADC inputs
-    P5DIR &= ~0x0f;
-    P5SEL0 |= 0x0f;
-    P5SEL1 |= 0x0f;
+    P5DIR &= ~0x0C;
+    P5SEL0 |= 0x0C;
+    P5SEL1 |= 0x0C;
 
     // Configure ADC
     ADCCTL0 &= ~ADCENC; // Disable ADC
-    ADCCTL0 |= ADCSHT_1 | ADCON; // 16ADCclks, MSC, ADC ON
+    ADCCTL0 |= ADCSHT_4 | ADCON; // 16ADCclks, MSC, ADC ON
     ADCCTL1 |= ADCSHP; // s/w trig, single ch/conv, MODOSC
     ADCCTL2 &= ~ADCRES; // clear ADCRES in ADCCTL
     ADCCTL2 |= ADCRES_2; // 12-bit conversion results
@@ -68,7 +68,7 @@ inline void sample_adc_channel(uint8_t adc_channel)
     ADCMCTL0 &= ~ADCINCH;
     ADCMCTL0 |= adc_channel;
     adc_flg &= ~ADC_STATUS;
-    TB0CCR1  = TB0R + 20; // Time delay to let adc channel RC circuit charge
+    TB0CCR1  = TB0R + 40; // Time delay to let adc channel RC circuit charge
 }
 
 

@@ -111,8 +111,8 @@ extern uint16_t median_fwd_sample;
 extern uint16_t median_ref_sample;
 extern uint16_t median_ref_sample_25;
 extern uint16_t median_fwd_sample_25;
-extern char cap2_val[8];
-extern char ind2_val[6];
+extern char cap_val[8];
+extern char ind_val[6];
 extern char swr_val[5];
 extern char load_imp[7];
 
