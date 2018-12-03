@@ -117,7 +117,7 @@ void tune(void)
     static uint16_t ind_position_1, ind_position_2, cap_position_1, cap_position_2, ind_step;
     static _iq16 minimum_vswr, vswr_search;
     static uint16_t optimal_inductance, optimal_capacitance;
-    static uint8_t cap_relay_1, cap_relay_2, fine_tune_setting, optimal_relay;
+    static uint8_t cap_relay_1, cap_relay_2, fine_tune, optimal_relay, optimal_cap_position;
     static SearchParams fine_tune_limits;
     static const _iq16 Z_source = _IQ16(50.0);
     static const _iq16 iq_one = _IQ16(1.0);
@@ -363,7 +363,9 @@ void tune(void)
                     step_cap_motor(RETURN_START_MODE);
                     step_ind_motor(RETURN_START_MODE);
                     task_status++;
-                    fine_tune_setting = 1;
+                    // Neither estimate good, search all applicable values
+                    fine_tune_limits = search_parameters(BIT0);
+                    fine_tune = 1;
                 } else if(vswr_high_load < vswr_low_load) {
                     // perform search algorithm around estimate 1.
                     P3OUT &= ~BIT4; // Capacitors switched to output side.
@@ -375,7 +377,8 @@ void tune(void)
                     relay_setting = cap_relay_1;
                     switch_cap_relay(relay_setting);
                     task_status++;
-                    fine_tune_setting = 2;
+                    // Estimate 1 produced the lowest SWR, optimize around those component values
+                    fine_tune_limits = search_parameters(BIT0 | BIT1);
                 } else {
                     // perform search algorithm around estimate 2.
                     P3OUT |= BIT4; // Capacitors switched to input side.
@@ -387,14 +390,15 @@ void tune(void)
                     relay_setting = cap_relay_2;
                     switch_cap_relay(relay_setting);
                     task_status++;
-                    fine_tune_setting = 3;
+                    // Estimate 2 produced the lowest SWR, optimize around those component values
+                    fine_tune_limits = search_parameters(BIT1);
                 }
             } else if(task_status == 1) {
                 if(!(task_flag & MOTOR_ACTIVE)) {
                     tune_task++;
                     task_status = 0;
                     update_swr();
-                    minimum_swr = _IQ16(100.0);
+                    minimum_vswr = _IQ16(100.0);
                 }
             }
             break;
@@ -403,37 +407,11 @@ void tune(void)
         case FINE_TUNE:
         {
             if(task_status == 0) {
-                switch(fine_tune_setting) {
-                    case 1: // Neither estimate good, search all applicable values
-                    {
-                        fine_tune_limits = search_parameters(BIT0);
-                        search_parameters(0);
-                        break;
-                    }
-                    case 2: // Estimate 1 produced the lowest SWR, optimize around those component values
-                    {
-                        fine_tune_limits = search_parameters(BIT0 | BIT1);
-                        break;
-                    }
-                    case 3: // Estimate 2 produced the lowest SWR, optimize around those component values
-                    {
-                        fine_tune_limits = search_parameters(BIT1);
-                        break;
-                    }
-                    default:
-                        return;
-                }
-                ind_step = ((fine_tune_limits.upper_inductance - fine_tune_limits.lower_inductance) / 8) + 1;
-                step_ind_motor((uint32_t)((fine_tune_limits.lower_inductance << 4) | CMD_POS_MODE));
-                if(fine_tune_limits.capacitor_location == 1) { P3OUT &= ~BIT4; } // Capacitors switched to output side.
-                else if(fine_tune_limits.capacitor_location == 2) { P3OUT |= BIT4; } // Capacitors switched to input side.
-                task_status++;
-            } else if(task_status == 1) {
                 relay_setting = fine_tune_limits.lower_relay;
                 switch_cap_relay(relay_setting);
                 step_cap_motor((uint32_t)((fine_tune_limits.lower_capacitance << 4) | CMD_POS_MODE));
                 task_status++;
-            } else if(task_status == 2) {
+            } else if(task_status == 1) {
                 if(!(task_flag & MOTOR_ACTIVE)) {
                     if(relay_setting == fine_tune_limits.upper_relay) {
                         if(cap_sample <= fine_tune_limits.lower_capacitance)
@@ -462,22 +440,46 @@ void tune(void)
                             optimal_inductance = ind_sample;
                             optimal_capacitance = cap_sample;
                             optimal_relay = relay_setting;
+                            optimal_cap_position = fine_tune_limits.capacitor_location;
                             minimum_vswr = vswr_search;
                         }
                     }
                 }
-            } else if(task_status == 3) {
-                if(ind_sample >= fine_tune_limits.upper_inductance) {
+            } else if(task_status == 2) {
+                if(ind_sample == fine_tune_limits.upper_inductance) {
                     task_status++;
                 } else if(!(task_flag & IND_ACTIVE)) {
                     uint16_t ind_pos = ind_sample + ind_step;
                     if(ind_pos > fine_tune_limits.upper_inductance) { ind_pos = fine_tune_limits.upper_inductance; }
-                    step_ind_motor((uint32_t)((fine_tune_limits.lower_inductance << 4) | CMD_POS_MODE));
+                    step_ind_motor((uint32_t)((ind_pos << 4) | CMD_POS_MODE));
                 } else if(!(task_flag & MOTOR_ACTIVE)) {
+                    task_status = 0;
+                }
+            } else if(task_status == 3) {
+                // Either iterate process again or change values to the minimums found
+                if(fine_tune == 1) {
+                    // Try optimization for capacitor on input side
+                    fine_tune_limits = search_parameters(BIT0);
+                    P3OUT |= BIT4; // Capacitors switched to input side.
+                    step_cap_motor(RETURN_START_MODE);
+                    step_ind_motor(RETURN_START_MODE);
+                    fine_tune = 0;
                     task_status = 1;
+                } else {
+                    step_cap_motor((uint32_t)((optimal_capacitance << 4) | CMD_POS_MODE));
+                    step_ind_motor((uint32_t)((optimal_inductance << 4) | CMD_POS_MODE));
+                    relay_setting = optimal_relay;
+                    switch_cap_relay(relay_setting);
+                    if(optimal_cap_position == 1) { P3OUT &= ~BIT4; } // Capacitors switched to output side.
+                    else if(optimal_cap_position == 2) { P3OUT |= BIT4; } // Capacitors switched to input side.
+                    task_status++;
                 }
             } else if(task_status == 4) {
-                // Either iterate process again or change values to the minimums found
+                if(!(task_flag & MOTOR_ACTIVE)) {
+                    button_press &= ~TUNE & ~MODE_LOCK;
+                    task_status = 0;
+                    tune_task = INITIALIZE_TUNE_COMPONENTS;
+                }
             }
             break;
         }

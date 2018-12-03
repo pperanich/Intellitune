@@ -84,11 +84,9 @@ inline void step_cap_motor(uint32_t command)
      *
      */
 
-    static uint16_t position
-    static _iq16 minimum_swr;
+    static uint16_t position;
     static uint8_t direction, mode;
     uint8_t step_status;
-    _iq16 current_swr;
     if(command != 0)
     {
         mode = command & 0x000E;
@@ -235,11 +233,9 @@ inline void step_ind_motor(uint32_t command)
      *
      */
 
-    static uint16_t position, fine_lower, fine_upper;
-    static _iq16 minimum_swr;
+    static uint16_t position;
     static uint8_t direction, mode;
     uint8_t step_status;
-    _iq16 current_swr;
     if(command != 0)
     {
         mode = command & 0x0E;
