@@ -145,19 +145,12 @@ void update_internal_reference(void)
 void update_swr(void)
 {
     static const _iq16 iq_one = _IQ16(1.0);
-    char buf1[6] = {'\0'};
-    char buf2[6] = {'\0'};
     uint8_t error = 0;
     _iq16 numerator, denominator, vswr;
     _iq16 reflection_coefficient = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
     if(reflection_coefficient == 0) { return; }
     numerator = iq_one + reflection_coefficient;
     denominator = iq_one - reflection_coefficient;
-    error += _IQ16toa(buf1,"%1.3f", numerator);
-    error += _IQ16toa(buf2,"%1.3f", denominator);
     vswr = _IQ16div(numerator, denominator);
-    //error += _IQ16toa(swr_val,"%2.1f", vswr);
-    if(vswr > _IQ16(0.0)) { error += _IQ16toa(swr_val,"%2.1f", vswr); }
-    else if( vswr < _IQ16(1.0))
-        { asm("   NOP"); }
+    if(vswr >= _IQ16(1.0)) { error += _IQ16toa(swr_val,"%2.1f", vswr); }
 }

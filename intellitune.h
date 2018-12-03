@@ -68,8 +68,10 @@
 #define CALCULATE_SWR               1
 #define CALCULATE_SWR_W_KNOWN_IMP   2
 #define ESTIMATE_TUNE_VALUES        3
-#define ADJUST_TO_ESTIMATES         4
-#define FINE_TUNE                   5
+#define ADJUST_TO_ESTIMATE_1        4
+#define ADJUST_TO_ESTIMATE_2        5
+#define SELECT_NETWORK_CONFIG       6
+#define FINE_TUNE                   7
 // Macros for the push button flag
 #define TUNE                        BIT0
 #define MODE                        BIT1
@@ -93,7 +95,20 @@
 #define DEFAULT_SETTING_MENU        TARGET_SWR
 // Macros for other
 #define CAP_MAX                     500.00 // in pF
+#define ADDITIONAL_CAP              3290.0 // in pF
 #define IND_MAX                     24.6    // in uH
+
+
+typedef struct {
+    uint16_t lower_inductance;
+    uint16_t upper_inductance;
+    uint16_t lower_capacitance;
+    uint16_t upper_capacitance;
+    uint8_t lower_relay;
+    uint8_t upper_relay;
+    uint8_t capacitor_location;
+    uint8_t num_itr;
+} SearchParams;
 
 
 // Globals
@@ -146,8 +161,6 @@ extern void reverse(char s[]);
 // Relay subsystem
 extern void initialize_relay(void);
 extern void switch_cap_relay(uint8_t setting);
-extern void switch_net_config(void);
-extern void switch_known_impedance(void);
 
 // State Machine function prototypes
 //------------------------------------

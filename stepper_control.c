@@ -84,7 +84,7 @@ inline void step_cap_motor(uint32_t command)
      *
      */
 
-    static uint16_t position, fine_lower, fine_upper;
+    static uint16_t position
     static _iq16 minimum_swr;
     static uint8_t direction, mode;
     uint8_t step_status;
@@ -104,13 +104,6 @@ inline void step_cap_motor(uint32_t command)
             position = (command >> 4);
             if(position < cap_sample) { direction = INCREASE_CAP_DIR; }
             else { direction = DECREASE_CAP_DIR; }
-            break;
-        case FINE_TUNE_MODE:
-            fine_lower = cap_sample - 256;
-            fine_upper = cap_sample + 256;
-            if(fine_lower < C_LOWER_LIMIT) { fine_lower = C_LOWER_LIMIT; }
-            if(fine_upper > C_UPPER_LIMIT) { fine_upper = C_UPPER_LIMIT; }
-            direction = DECREASE_CAP_DIR;
             break;
         default:
             return;
@@ -191,30 +184,6 @@ inline void step_cap_motor(uint32_t command)
                     }
                     break;
                 }
-                case FINE_TUNE_MODE:
-                {
-                    if((cap_sample <= fine_lower) && (direction != INCREASE_CAP_DIR)) {
-                        direction = INCREASE_CAP_DIR;
-                        cap_motor_task = SET_ENABLE_AND_DIRECTION;
-                        TB2CCR2  = TB2R + 2;
-                        return;
-                    } else if(cap_sample >= fine_upper) {
-                        mode = CMD_POS_MODE;
-                        if(position < cap_sample) {
-                            direction = DECREASE_CAP_DIR;
-                            cap_motor_task = SET_ENABLE_AND_DIRECTION;
-                        }
-                        TB2CCR2  = TB2R + 2;
-                        return;
-                    } else {
-                        step_status = 1;
-                        current_swr = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
-                        if((current_swr < minimum_swr) && (current_swr != 0)) {
-                            minimum_swr = current_swr;
-                            position = cap_sample;
-                        }
-                    }
-                }
                 default:
                     return;
             }
@@ -242,7 +211,8 @@ inline void step_cap_motor(uint32_t command)
             P5OUT |= BIT4; // Disable FETs on driver
             cap_motor_task = SET_ENABLE_AND_DIRECTION;
             TB2CCTL1 = CCIE_0;
-            task_flag &= ~MOTOR_ACTIVE & ~CAP_ACTIVE;
+            if(task_flag & IND_ACTIVE) { task_flag &= ~CAP_ACTIVE; }
+            else { task_flag &= ~MOTOR_ACTIVE & ~CAP_ACTIVE; }
             break;
         }
     }
@@ -285,14 +255,6 @@ inline void step_ind_motor(uint32_t command)
             position = (command >> 4);
             if(position < ind_sample) { direction = INCREASE_IND_DIR; }
             else { direction = DECREASE_IND_DIR; }
-            break;
-        case FINE_TUNE_MODE:
-            minimum_swr = _IQ16(100.00);
-            fine_lower = ind_sample - 256;
-            fine_upper = ind_sample + 256;
-            if(fine_lower < L_LOWER_LIMIT) { fine_lower = L_LOWER_LIMIT; }
-            if(fine_upper > L_UPPER_LIMIT) { fine_upper = L_UPPER_LIMIT; }
-            direction = DECREASE_IND_DIR;
             break;
         default:
             return;
@@ -342,30 +304,6 @@ inline void step_ind_motor(uint32_t command)
                     else { step_status = 0; }
                     break;
                 }
-                case FINE_TUNE_MODE:
-                {
-                    if((ind_sample <= fine_lower) && (direction != INCREASE_IND_DIR)) {
-                        direction = INCREASE_IND_DIR;
-                        ind_motor_task = SET_ENABLE_AND_DIRECTION;
-                        TB2CCR2  = TB2R + 2;
-                        return;
-                    } else if(ind_sample >= fine_upper) {
-                        mode = CMD_POS_MODE;
-                        if(position < ind_sample) {
-                            direction = DECREASE_IND_DIR;
-                            ind_motor_task = SET_ENABLE_AND_DIRECTION;
-                        }
-                        TB2CCR2  = TB2R + 2;
-                        return;
-                    } else {
-                        step_status = 1;
-                        current_swr = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
-                        if((current_swr < minimum_swr) && (current_swr != 0)) {
-                            minimum_swr = current_swr;
-                            position = ind_sample;
-                        }
-                    }
-                }
                 default:
                     return;
             }
@@ -385,6 +323,7 @@ inline void step_ind_motor(uint32_t command)
             P1OUT &= ~BIT3;
             TB2CCR2  = TB2R + 24;
             ind_motor_task = STEP_HIGH;
+            update_swr();
             break;
         }
         case DISABLE_DRIVER:
@@ -393,7 +332,8 @@ inline void step_ind_motor(uint32_t command)
             P3OUT |= BIT2; // Disable FETs on driver
             ind_motor_task = SET_ENABLE_AND_DIRECTION;
             TB2CCTL2 = CCIE_0;
-            task_flag &= ~MOTOR_ACTIVE & ~IND_ACTIVE;
+            if(task_flag & CAP_ACTIVE) { task_flag &= ~IND_ACTIVE; }
+            else { task_flag &= ~MOTOR_ACTIVE & ~IND_ACTIVE; }
             break;
         }
     }

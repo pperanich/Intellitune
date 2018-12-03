@@ -45,6 +45,8 @@ static const char ind_unit[4] = {'u', 'H', ' ', '\0'};
 static const char target_mode_name[11] = "Target SWR\0";
 static const char threshold_mode_name[14] = "SWR Threshold\0";
 static const char lclimit_mode_name[9] = "LC Limit\0";
+static const char tune_disp[10] = "Tuning...\0";
+static const char swr_label[6] = "SWR: \0";
 
 
 // TODO: User interface button configuration
@@ -164,18 +166,23 @@ void mode_2(void)  // Tuning display with impedance network
     char row1[17] = {'\0'};
     char row2[17] = {'\0'};
 
-    strcat(row1, cap_disp);
-    strcat(row2, ind_disp);
+    if((cap_val[0] != '\0') && (ind_val[0] != '\0')) {
+        strcat(row1, cap_disp);
+        strcat(row2, ind_disp);
 
-    strcat(row1, cap_val);
-    strcat(row2, ind_val);
+        strcat(row1, cap_val);
+        strcat(row2, ind_val);
 
-    strcat(row1, cap_unit);
-    strcat(row2, ind_unit);
+        strcat(row1, cap_unit);
+        strcat(row2, ind_unit);
 
-    strcat(row1, swr_val);
-    strcat(row2, load_imp);
-
+        strcat(row1, swr_val);
+        strcat(row2, load_imp);
+    } else {
+        strcat(row1, tune_disp);
+        strcat(row2, swr_label);
+        strcat(row2, swr_val);
+    }
     hd44780_write_string(row1, 1, 1, CR_LF );
     hd44780_write_string(row2, 2, 1, CR_LF );
 }

@@ -37,9 +37,11 @@
 
 // Function Prototypes
 void tune(void);
+SearchParams search_parameters(uint8_t settings);
 void clock_configure(void);
 void init_gpio(void);
 
+// Globals
 char cap_val[8] = {'\0'};
 char ind_val[6] = {'\0'};
 char swr_val[5] = {'\0'};
@@ -109,18 +111,28 @@ int main(void) {
 // TODO: Implement tuning algorithm
 void tune(void)
 {
-    static _iq16 temp, angular_frequency, gamma_1, gamma_2, vswr, numerator, denominator, div_res;
+    static _iq16 temp, angular_frequency, gamma_1, gamma_2, vswr, numerator, denominator, div_res, vswr_high_load, vswr_low_load;
     static _iq16 Q_factor_1, Z_load_1, ind_react_1, cap_react_1, estimated_inductance_1, estimated_capacitance_1;
     static _iq16 Q_factor_2, Z_load_2, ind_react_2, cap_react_2, estimated_inductance_2, estimated_capacitance_2;
+    static uint16_t ind_position_1, ind_position_2, cap_position_1, cap_position_2, ind_step;
+    static _iq16 minimum_vswr, vswr_search;
+    static uint16_t optimal_inductance, optimal_capacitance;
+    static uint8_t cap_relay_1, cap_relay_2, fine_tune_setting, optimal_relay;
+    static SearchParams fine_tune_limits;
     static const _iq16 Z_source = _IQ16(50.0);
     static const _iq16 iq_one = _IQ16(1.0);
     static uint8_t task_status = 0;
+
     task_flag |= TUNE_BUSY;
     switch(tune_task)
     {
         case INITIALIZE_TUNE_COMPONENTS:
         {
             if(task_status == 0) {
+                memset(&cap_val[0], 0, sizeof(cap_val));
+                memset(&ind_val[0], 0, sizeof(ind_val));
+                memset(&swr_val[0], 0, sizeof(swr_val));
+                memset(&load_imp[0], 0, sizeof(load_imp));
                 while(TB1CTL != MC_0) { asm("   NOP"); }
                 measure_freq();
                 while(TB1CTL != MC_0) { asm("   NOP"); }
@@ -130,7 +142,7 @@ void tune(void)
                 step_ind_motor(RETURN_START_MODE);
                 task_status++;
             } else if(task_status == 1) {
-                if(!(task_flag & IND_ACTIVE) && !(task_flag & CAP_ACTIVE)) {
+                if(!(task_flag & MOTOR_ACTIVE)) {
                     tune_task++;
                     task_status = 0;
                 }
@@ -140,7 +152,7 @@ void tune(void)
 
         case CALCULATE_SWR:
         {
-            gamma_1 = calculate_ref_coeff(KNOWN_SWITCHED_OUT);//_IQ16(0.818182);
+            gamma_1 = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
             if(gamma_1 != 0) { tune_task++; }
             break;
         }
@@ -155,7 +167,7 @@ void tune(void)
                 TB0CCR1  = TB0R + 400;
                 task_status++;
             }
-            gamma_2 = calculate_ref_coeff(KNOWN_SWITCHED_IN);//_IQ16(0.826);
+            gamma_2 = calculate_ref_coeff(KNOWN_SWITCHED_IN);
             if(gamma_2 != 0) { tune_task++; task_status = 0; }
             break;
         }
@@ -178,10 +190,6 @@ void tune(void)
 
             char ref_coeff[7] = {'\0'};
             char ref_w_25[7] = {'\0'};
-            memset(&cap_val[0], 0, sizeof(cap_val));
-            memset(&ind_val[0], 0, sizeof(ind_val));
-            memset(&swr_val[0], 0, sizeof(swr_val));
-            memset(&load_imp[0], 0, sizeof(load_imp));
             uint8_t error = 0;
 
             _iq16 iq_freq = _IQ16div(_IQ16(frequency), _IQ16(1000));
@@ -198,7 +206,6 @@ void tune(void)
             Q_factor_1 = _IQ16sqrt(temp);
             ind_react_1 = _IQ16mpy(Q_factor_1, Z_source);
             cap_react_1 = _IQ16div(Z_load_1, Q_factor_1);
-            //P3OUT &= ~BIT4; // Capacitors switched to output side.
             estimated_capacitance_1 = _IQ16div(iq_one, cap_react_1);
             estimated_capacitance_1 = _IQ16mpy(estimated_capacitance_1, _IQ16(10000));
             estimated_capacitance_1 = _IQ16div(estimated_capacitance_1, angular_frequency);
@@ -207,8 +214,8 @@ void tune(void)
 
             if((estimated_capacitance_1 < _IQ16(0.0)) || (estimated_inductance_1 < _IQ16(0.0))) {
                 tune_task = CALCULATE_SWR;
-            } else if((estimated_capacitance_1 > _IQ16(CAP_MAX)) || (estimated_inductance_1 > _IQ16(IND_MAX))) {
-                            tune_task = CALCULATE_SWR;
+            } else if((estimated_capacitance_1 > _IQ16(CAP_MAX + ADDITIONAL_CAP)) || (estimated_inductance_1 > _IQ16(IND_MAX))) {
+                tune_task = CALCULATE_SWR;
             } else if(Z_load_1 < _IQ16(0.0)) {
                 tune_task = CALCULATE_SWR;
             } else {
@@ -219,12 +226,6 @@ void tune(void)
                 error += _IQ16toa(cap_val_1, "%4.2f", estimated_capacitance_1);
                 error += _IQ16toa(ind_val_1, "%2.2f", estimated_inductance_1);
             }
-            error += _IQ16toa(q_val_1, "%2.2f", Q_factor_1);
-            error += _IQ16toa(load_imp_1, "%3.2f", Z_load_1);
-            error += _IQ16toa(str_cap_react_1, "%4.2f", cap_react_1);
-            error += _IQ16toa(str_ind_react_1, "%4.2f", ind_react_1);
-            error += _IQ16toa(cap_val_1, "%4.2f", estimated_capacitance_1);
-            error += _IQ16toa(ind_val_1, "%2.2f", estimated_inductance_1);
 
             div_res = _IQ16div(iq_one, div_res);
             Z_load_2 = _IQ16mpy(Z_source, div_res);
@@ -233,7 +234,6 @@ void tune(void)
             Q_factor_2 = _IQ16sqrt(temp);
             ind_react_2 = _IQ16mpy(Q_factor_2, Z_load_2);
             cap_react_2 = _IQ16div(Z_source, Q_factor_2);
-            //P3OUT |= BIT4; // Capacitors switched to input side.
             estimated_capacitance_2 = _IQ16div(iq_one, cap_react_2);
             estimated_capacitance_2 = _IQ16mpy(estimated_capacitance_2, _IQ16(10000));
             estimated_capacitance_2 = _IQ16div(estimated_capacitance_2, angular_frequency);
@@ -242,8 +242,8 @@ void tune(void)
 
             if((estimated_capacitance_2 < _IQ16(0.0)) || (estimated_inductance_2 < _IQ16(0.0))) {
                 tune_task = CALCULATE_SWR;
-            } else if((estimated_capacitance_2 > _IQ16(CAP_MAX)) || (estimated_inductance_2 > _IQ16(IND_MAX))) {
-                            tune_task = CALCULATE_SWR;
+            } else if((estimated_capacitance_2 > _IQ16(CAP_MAX + ADDITIONAL_CAP)) || (estimated_inductance_2 > _IQ16(IND_MAX))) {
+                tune_task = CALCULATE_SWR;
             } else if(Z_load_2 < _IQ16(0.0)) {
                 tune_task = CALCULATE_SWR;
             } else {
@@ -254,55 +254,13 @@ void tune(void)
                 error += _IQ16toa(cap_val_2, "%4.2f", estimated_capacitance_2);
                 error += _IQ16toa(ind_val_2, "%2.2f", estimated_inductance_2);
             }
-            error += _IQ16toa(q_val_2, "%2.2f", Q_factor_2);
-            error += _IQ16toa(load_imp_2, "%3.2f", Z_load_2);
-            error += _IQ16toa(str_cap_react_2, "%4.2f", cap_react_2);
-            error += _IQ16toa(str_ind_react_2, "%4.2f", ind_react_2);
-            error += _IQ16toa(cap_val_2, "%4.2f", estimated_capacitance_2);
-            error += _IQ16toa(ind_val_2, "%2.2f", estimated_inductance_2);
 
             error += _IQ16toa(ref_coeff,"%1.4f", gamma_1);
             error += _IQ16toa(ref_w_25,"%1.4f", gamma_2);
 
             if(error == 0) {
-                //tune_task++;
+                tune_task++;
                 task_status = 0;
-                tune_task = INITIALIZE_TUNE_COMPONENTS;
-                button_press &= ~TUNE & ~MODE_LOCK;
-            }
-            break;
-        }
-/*
-        case ADJUST_TO_ESTIMATE_1:
-        {
-            if(task_status == 0) {
-                _iq16 varicap_value, temp, iq_position;
-                uint16_t cap_position, ind_position;
-                temp = estimated_capacitance - _IQ16(30.0);
-                temp = _IQ16div(temp, _IQ16(470));
-                relay_setting = (uint8_t)_IQ16int(temp);
-                varicap_value = _IQ16frac(temp);
-                varicap_value = _IQ16mpy(varicap_value, _IQ16(470));
-                varicap_value = varicap_value + _IQ16(30.0);
-                iq_position = _IQ16div((_IQ16(C_UPPER_LIMIT) - _IQ16(C_LOWER_LIMIT)), _IQ16(500));
-                iq_position = _IQ16rmpy(iq_position, varicap_value);
-                cap_position = (uint16_t)_IQ16int(iq_position);
-
-                iq_position = _IQ16div((_IQ16(L_UPPER_LIMIT) - _IQ16(L_LOWER_LIMIT)), _IQ16(24));
-                iq_position = _IQ16rmpy(iq_position, estimated_inductance);
-                ind_position = (uint16_t)_IQ16int(iq_position);
-
-                step_cap_motor((uint32_t)((cap_position << 4) | CMD_POS_MODE));
-                step_ind_motor((uint32_t)((ind_position << 4) | CMD_POS_MODE));
-
-                switch_cap_relay(relay_setting);
-
-                task_status++;
-            } else if(task_status == 1) {
-                if(!(task_flag & MOTOR_ACTIVE)) {
-                    tune_task++;
-                    task_status = 0;
-                }
             }
             break;
         }
@@ -311,59 +269,312 @@ void tune(void)
         {
             if(task_status == 0) {
                 _iq16 varicap_value, temp, iq_position;
-                uint16_t cap_position, ind_position;
-                temp = estimated_capacitance - _IQ16(30.0);
+
+                P3OUT &= ~BIT4; // Capacitors switched to output side.
+                temp = estimated_capacitance_1 - _IQ16(30.0);
                 temp = _IQ16div(temp, _IQ16(470));
                 relay_setting = (uint8_t)_IQ16int(temp);
+                cap_relay_1 = relay_setting;
                 varicap_value = _IQ16frac(temp);
                 varicap_value = _IQ16mpy(varicap_value, _IQ16(470));
                 varicap_value = varicap_value + _IQ16(30.0);
-                iq_position = _IQ16div((_IQ16(C_UPPER_LIMIT) - _IQ16(C_LOWER_LIMIT)), _IQ16(500));
+                iq_position = _IQ16div((_IQ16(C_UPPER_LIMIT) - _IQ16(C_LOWER_LIMIT)), _IQ16(CAP_MAX));
                 iq_position = _IQ16rmpy(iq_position, varicap_value);
-                cap_position = (uint16_t)_IQ16int(iq_position);
+                cap_position_1 = (uint16_t)_IQ16int(iq_position);
 
-                iq_position = _IQ16div((_IQ16(L_UPPER_LIMIT) - _IQ16(L_LOWER_LIMIT)), _IQ16(24));
-                iq_position = _IQ16rmpy(iq_position, estimated_inductance);
-                ind_position = (uint16_t)_IQ16int(iq_position);
+                iq_position = _IQ16div((_IQ16(L_UPPER_LIMIT) - _IQ16(L_LOWER_LIMIT)), _IQ16(IND_MAX));
+                iq_position = _IQ16rmpy(iq_position, estimated_inductance_1);
+                ind_position_1 = (uint16_t)_IQ16int(iq_position);
 
-                step_cap_motor((uint32_t)((cap_position << 4) | CMD_POS_MODE));
-                step_ind_motor((uint32_t)((ind_position << 4) | CMD_POS_MODE));
+                step_cap_motor((uint32_t)((cap_position_1 << 4) | CMD_POS_MODE));
+                step_ind_motor((uint32_t)((ind_position_1 << 4) | CMD_POS_MODE));
 
                 switch_cap_relay(relay_setting);
 
                 task_status++;
             } else if(task_status == 1) {
                 if(!(task_flag & MOTOR_ACTIVE)) {
+                    task_status++;
+                }
+            } else if(task_status == 2) {
+                _iq16 ref_coeff = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
+                if(ref_coeff != 0) {
+                    numerator = iq_one + ref_coeff;
+                    denominator = iq_one - ref_coeff;
+                    vswr_high_load = _IQ16div(numerator, denominator);
                     tune_task++;
                     task_status = 0;
                 }
             }
             break;
         }
-*/
+
+        case ADJUST_TO_ESTIMATE_2:
+        {
+            if(task_status == 0) {
+                _iq16 varicap_value, temp, iq_position;
+
+                P3OUT |= BIT4; // Capacitors switched to input side.
+                temp = estimated_capacitance_2 - _IQ16(30.0);
+                temp = _IQ16div(temp, _IQ16(470));
+                relay_setting = (uint8_t)_IQ16int(temp);
+                cap_relay_2 = relay_setting;
+                varicap_value = _IQ16frac(temp);
+                varicap_value = _IQ16mpy(varicap_value, _IQ16(470));
+                varicap_value = varicap_value + _IQ16(30.0);
+                iq_position = _IQ16div((_IQ16(C_UPPER_LIMIT) - _IQ16(C_LOWER_LIMIT)), _IQ16(CAP_MAX));
+                iq_position = _IQ16rmpy(iq_position, varicap_value);
+                cap_position_2 = (uint16_t)_IQ16int(iq_position);
+
+                iq_position = _IQ16div((_IQ16(L_UPPER_LIMIT) - _IQ16(L_LOWER_LIMIT)), _IQ16(IND_MAX));
+                iq_position = _IQ16rmpy(iq_position, estimated_inductance_2);
+                ind_position_2 = (uint16_t)_IQ16int(iq_position);
+
+                step_cap_motor((uint32_t)((cap_position_2 << 4) | CMD_POS_MODE));
+                step_ind_motor((uint32_t)((ind_position_2 << 4) | CMD_POS_MODE));
+
+                switch_cap_relay(relay_setting);
+
+                task_status++;
+            } else if(task_status == 1) {
+                if(!(task_flag & MOTOR_ACTIVE)) {
+                    task_status++;
+                }
+            } else if(task_status == 2) {
+                _iq16 ref_coeff = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
+                if(ref_coeff != 0) {
+                    numerator = iq_one + ref_coeff;
+                    denominator = iq_one - ref_coeff;
+                    vswr_low_load = _IQ16div(numerator, denominator);
+                    tune_task++;
+                    task_status = 0;
+                }
+            }
+            break;
+        }
+
+        case SELECT_NETWORK_CONFIG:
+        {
+            uint8_t error = 0;
+            if(task_status == 0) {
+                if((vswr_low_load > _IQ16(8.0)) && (vswr_high_load > _IQ16(8.0))) {
+                    // Neither estimate was close to network value. Perform search over all values
+                    P3OUT &= ~BIT4; // Capacitors switched to output side.
+                    step_cap_motor(RETURN_START_MODE);
+                    step_ind_motor(RETURN_START_MODE);
+                    task_status++;
+                    fine_tune_setting = 1;
+                } else if(vswr_high_load < vswr_low_load) {
+                    // perform search algorithm around estimate 1.
+                    P3OUT &= ~BIT4; // Capacitors switched to output side.
+                    error += _IQ16toa(load_imp, "%3.2f", Z_load_1);
+                    error += _IQ16toa(cap_val, "%4.2f", estimated_capacitance_1);
+                    error += _IQ16toa(ind_val, "%2.2f", estimated_inductance_1);
+                    step_cap_motor((uint32_t)((cap_position_1 << 4) | CMD_POS_MODE));
+                    step_ind_motor((uint32_t)((ind_position_1 << 4) | CMD_POS_MODE));
+                    relay_setting = cap_relay_1;
+                    switch_cap_relay(relay_setting);
+                    task_status++;
+                    fine_tune_setting = 2;
+                } else {
+                    // perform search algorithm around estimate 2.
+                    P3OUT |= BIT4; // Capacitors switched to input side.
+                    error += _IQ16toa(load_imp, "%3.2f", Z_load_2);
+                    error += _IQ16toa(cap_val, "%4.2f", estimated_capacitance_2);
+                    error += _IQ16toa(ind_val, "%2.2f", estimated_inductance_2);
+                    step_cap_motor((uint32_t)((cap_position_2 << 4) | CMD_POS_MODE));
+                    step_ind_motor((uint32_t)((ind_position_2 << 4) | CMD_POS_MODE));
+                    relay_setting = cap_relay_2;
+                    switch_cap_relay(relay_setting);
+                    task_status++;
+                    fine_tune_setting = 3;
+                }
+            } else if(task_status == 1) {
+                if(!(task_flag & MOTOR_ACTIVE)) {
+                    tune_task++;
+                    task_status = 0;
+                    update_swr();
+                    minimum_swr = _IQ16(100.0);
+                }
+            }
+            break;
+        }
+
         case FINE_TUNE:
         {
             if(task_status == 0) {
-                step_cap_motor(FINE_TUNE_MODE);
-                task_status = 3;
+                switch(fine_tune_setting) {
+                    case 1: // Neither estimate good, search all applicable values
+                    {
+                        fine_tune_limits = search_parameters(BIT0);
+                        search_parameters(0);
+                        break;
+                    }
+                    case 2: // Estimate 1 produced the lowest SWR, optimize around those component values
+                    {
+                        fine_tune_limits = search_parameters(BIT0 | BIT1);
+                        break;
+                    }
+                    case 3: // Estimate 2 produced the lowest SWR, optimize around those component values
+                    {
+                        fine_tune_limits = search_parameters(BIT1);
+                        break;
+                    }
+                    default:
+                        return;
+                }
+                ind_step = ((fine_tune_limits.upper_inductance - fine_tune_limits.lower_inductance) / 8) + 1;
+                step_ind_motor((uint32_t)((fine_tune_limits.lower_inductance << 4) | CMD_POS_MODE));
+                if(fine_tune_limits.capacitor_location == 1) { P3OUT &= ~BIT4; } // Capacitors switched to output side.
+                else if(fine_tune_limits.capacitor_location == 2) { P3OUT |= BIT4; } // Capacitors switched to input side.
+                task_status++;
             } else if(task_status == 1) {
-                step_ind_motor(FINE_TUNE_MODE);
-                task_status = 4;
-            } else if(task_status == 3) {
-                if(!(task_flag & MOTOR_ACTIVE)) { task_status = 1; }
-                return;
-            } else if(task_status == 4) {
-                if(!(task_flag & MOTOR_ACTIVE)) { task_status = 2; }
-                return;
+                relay_setting = fine_tune_limits.lower_relay;
+                switch_cap_relay(relay_setting);
+                step_cap_motor((uint32_t)((fine_tune_limits.lower_capacitance << 4) | CMD_POS_MODE));
+                task_status++;
             } else if(task_status == 2) {
-                task_status = 0;
-                tune_task = INITIALIZE_TUNE_COMPONENTS;
-                button_press &= ~TUNE & ~MODE_LOCK;
+                if(!(task_flag & MOTOR_ACTIVE)) {
+                    if(relay_setting == fine_tune_limits.upper_relay) {
+                        if(cap_sample <= fine_tune_limits.lower_capacitance)
+                        { step_cap_motor((uint32_t)((fine_tune_limits.upper_capacitance << 4) | CMD_POS_MODE)); }
+                        if(cap_sample == fine_tune_limits.upper_capacitance) {
+                            relay_setting = fine_tune_limits.lower_relay;
+                            switch_cap_relay(relay_setting);
+                            step_cap_motor(RETURN_START_MODE);
+                            task_status++;
+                        }
+                    } else if(relay_setting < fine_tune_limits.upper_relay) {
+                        if(cap_sample >= C_UPPER_LIMIT) {
+                            switch_cap_relay(relay_setting++);
+                            step_cap_motor(RETURN_START_MODE);
+                        } else {
+                            step_cap_motor((uint32_t)((C_UPPER_LIMIT << 4) | CMD_POS_MODE));
+                        }
+                    }
+                } else {
+                    _iq16 ref_coeff = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
+                    if(ref_coeff != 0) {
+                        numerator = iq_one + ref_coeff;
+                        denominator = iq_one - ref_coeff;
+                        vswr_search = _IQ16div(numerator, denominator);
+                        if(vswr_search < minimum_vswr) {
+                            optimal_inductance = ind_sample;
+                            optimal_capacitance = cap_sample;
+                            optimal_relay = relay_setting;
+                            minimum_vswr = vswr_search;
+                        }
+                    }
+                }
+            } else if(task_status == 3) {
+                if(ind_sample >= fine_tune_limits.upper_inductance) {
+                    task_status++;
+                } else if(!(task_flag & IND_ACTIVE)) {
+                    uint16_t ind_pos = ind_sample + ind_step;
+                    if(ind_pos > fine_tune_limits.upper_inductance) { ind_pos = fine_tune_limits.upper_inductance; }
+                    step_ind_motor((uint32_t)((fine_tune_limits.lower_inductance << 4) | CMD_POS_MODE));
+                } else if(!(task_flag & MOTOR_ACTIVE)) {
+                    task_status = 1;
+                }
+            } else if(task_status == 4) {
+                // Either iterate process again or change values to the minimums found
             }
             break;
         }
     }
     task_flag &= ~TUNE_BUSY;
+}
+
+
+// TODO: Search algorithm for load greater than 50 ohms
+SearchParams search_parameters(uint8_t settings) {
+    uint16_t max_ind_pos, max_cap_pos, lower_ind_search, upper_ind_search, lower_cap_search, upper_cap_search;
+    uint8_t max_relay_setting, lower_relay_setting, upper_relay_setting, cap_location;
+    _iq16 varicap_value, temp, iq_position;
+    _iq16 iq_freq = _IQ16(frequency);
+    uint8_t iterations;
+
+    if(settings & BIT0) {   // Estimates for load > characteristic impedance
+        cap_location = 1; // Cap bank on the output side of the inductor
+        _iq16 max_ind = _IQ16div(_IQ16(4430.68263), iq_freq);
+        max_ind = _IQ16mpy(max_ind, _IQ16(10.0));
+        if(_IQ16(IND_MAX) < max_ind) { max_ind = _IQ16(IND_MAX); }
+        iq_position = _IQ16div((_IQ16(L_UPPER_LIMIT) - _IQ16(L_LOWER_LIMIT)), _IQ16(IND_MAX));
+        iq_position = _IQ16rmpy(iq_position, max_ind);
+        max_ind_pos = (uint16_t)_IQ16int(iq_position);
+
+        _iq16 max_cap = _IQ16div(_IQ16(17722.7305), iq_freq);
+        max_cap = _IQ16mpy(max_cap, _IQ16(1000.0));
+        if(_IQ16(CAP_MAX + ADDITIONAL_CAP) < max_cap) { max_cap = _IQ16(CAP_MAX + ADDITIONAL_CAP); }
+        temp = max_cap - _IQ16(30.0);
+        temp = _IQ16div(temp, _IQ16(470));
+        max_relay_setting = (uint8_t)_IQ16int(temp);
+        varicap_value = _IQ16frac(temp);
+        varicap_value = _IQ16mpy(varicap_value, _IQ16(470));
+        varicap_value = varicap_value + _IQ16(30.0);
+        iq_position = _IQ16div((_IQ16(C_UPPER_LIMIT) - _IQ16(C_LOWER_LIMIT)), _IQ16(CAP_MAX));
+        iq_position = _IQ16rmpy(iq_position, varicap_value);
+        max_cap_pos = (uint16_t)_IQ16int(iq_position);
+    } else {                // Estimates for load < characteristic impedance
+        cap_location = 2; // Cap bank on the input side of the inductor
+        _iq16 max_ind = _IQ16div(_IQ16(3398.594655), iq_freq);
+        if(_IQ16(IND_MAX) < max_ind) { max_ind = _IQ16(IND_MAX); }
+        iq_position = _IQ16div((_IQ16(L_UPPER_LIMIT) - _IQ16(L_LOWER_LIMIT)), _IQ16(IND_MAX));
+        iq_position = _IQ16rmpy(iq_position, max_ind);
+        max_ind_pos = (uint16_t)_IQ16int(iq_position);
+
+        _iq16 max_cap = _IQ16div(_IQ16(5664.3244), iq_freq);
+        max_cap = _IQ16mpy(max_cap, _IQ16(1000.0));
+        if(_IQ16(CAP_MAX + ADDITIONAL_CAP) < max_cap) { max_cap = _IQ16(CAP_MAX + ADDITIONAL_CAP); }
+        temp = max_cap - _IQ16(30.0);
+        temp = _IQ16div(temp, _IQ16(470));
+        max_relay_setting = (uint8_t)_IQ16int(temp);
+        varicap_value = _IQ16frac(temp);
+        varicap_value = _IQ16mpy(varicap_value, _IQ16(470));
+        varicap_value = varicap_value + _IQ16(30.0);
+        iq_position = _IQ16div((_IQ16(C_UPPER_LIMIT) - _IQ16(C_LOWER_LIMIT)), _IQ16(CAP_MAX));
+        iq_position = _IQ16rmpy(iq_position, varicap_value);
+    }
+
+    if(settings & BIT1) {
+        iterations = 1;
+        lower_ind_search = ind_sample - 512;
+        if(lower_ind_search < L_LOWER_LIMIT) { lower_ind_search = L_LOWER_LIMIT; }
+        upper_ind_search = ind_sample + 512;
+        if(upper_ind_search > max_ind_pos) { upper_ind_search = max_ind_pos; }
+        lower_cap_search = cap_sample - 512;
+        if((lower_cap_search < C_LOWER_LIMIT) || (lower_cap_search > cap_sample)) {
+            lower_cap_search = C_UPPER_LIMIT + cap_sample - 1024;
+            lower_relay_setting = relay_setting - 1;
+        }
+        upper_cap_search = cap_sample + 512;
+        if((upper_cap_search > max_cap_pos) && (relay_setting >= max_relay_setting)) {
+            upper_cap_search = max_cap_pos;
+        } else if(relay_setting <= max_relay_setting) {
+            upper_cap_search = C_LOWER_LIMIT - cap_sample + max_cap_pos;
+            upper_relay_setting = relay_setting + 1;
+        }
+    } else {
+        iterations = 3;
+        lower_ind_search = L_LOWER_LIMIT;
+        upper_ind_search = max_ind_pos;
+        lower_cap_search = C_LOWER_LIMIT;
+        lower_relay_setting = 0;
+        upper_cap_search = max_cap_pos;
+        upper_relay_setting = max_relay_setting;
+    }
+    // Now, all upper and lower values for the search have been established. Proceed to run
+    // optimization function to find optimal configuration in range.
+    SearchParams search_settings;
+    search_settings.lower_inductance = lower_ind_search;
+    search_settings.upper_inductance = upper_ind_search;
+    search_settings.lower_capacitance = lower_cap_search;
+    search_settings.upper_capacitance = upper_cap_search;
+    search_settings.lower_relay = lower_relay_setting;
+    search_settings.upper_relay = upper_relay_setting;
+    search_settings.capacitor_location = cap_location;
+    search_settings.num_itr = iterations;
+    return search_settings;
 }
 
 
@@ -392,8 +603,10 @@ void clock_configure(void)
 
         CSCTL4 = SELMS__DCOCLKDIV | SELA__XT1CLK;   // set XT1 (~32768Hz) as ACLK source, ACLK = 32768Hz
                                                      // default DCOCLKDIV as MCLK and SMCLK source
-        }
+}
 
+
+// TODO: Initialize GPIO outputs to reduce power consumption
 void init_gpio(void)
 {
     // Initialize all pins to digital outputs to improve power consumption

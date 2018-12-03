@@ -13,8 +13,6 @@
 // Function Prototypes
 void initialize_relay(void);
 void switch_cap_relay(uint8_t setting);
-void switch_net_config(void);
-void switch_kwown_impedance(void);
 
 
 // TODO: Initialize relay outputs
@@ -62,20 +60,4 @@ void switch_cap_relay(uint8_t setting)
         P1OUT |= BIT5 | BIT6 | BIT7;
         break;
     }
-}
-
-
-// TODO: Function to switch capacitor to either side of inductor.
-void switch_net_config(void)
-{
-    // Not Implemented
-    asm("    NOP");
-}
-
-
-// TODO Implement function to switch known impedance in and out.
-void switch_known_impedance(void)
-{
-    // Not Implemented
-    asm("    NOP");
 }
