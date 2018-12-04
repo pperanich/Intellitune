@@ -48,10 +48,6 @@ void initialize_stepper_control(void)
     P4DIR |= BIT7;
     P5DIR |= BIT4;
 
-    // Enable pin logic high disables FETs on driver.
-    P3OUT |= BIT2;
-    P5OUT |= BIT4;
-
     // Pull MS1 pin for capacitor microstep high
     P4OUT |= BIT7;
 
@@ -59,9 +55,22 @@ void initialize_stepper_control(void)
     P1OUT &= ~BIT1;
     P1OUT &= ~BIT3;
 
-    // Initialize direction pins low (Forward)
+    // Enable pin logic low enables FETs on driver.
+    P3OUT &= ~BIT2;
+    P5OUT &= ~BIT4;
+
+    // Pulse DIR pin to initialize direction
+    P1OUT |= BIT4;
+    P2OUT |= BIT4;
+
+    __delay_cycles(12000);
+
     P1OUT &= ~BIT4;
     P2OUT &= ~BIT4;
+
+    // Enable pin logic high disables FETs on driver.
+    P3OUT |= BIT2;
+    P5OUT |= BIT4;
 
     TB2R = 0;
     TB2CTL   = (CNTL_0 | TBSSEL_1 | MC__CONTINUOUS); // ACLK as clock source, continuous mode
@@ -100,8 +109,8 @@ inline void step_cap_motor(uint32_t command)
             break;
         case CMD_POS_MODE:
             position = (command >> 4);
-            if(position < cap_sample) { direction = INCREASE_CAP_DIR; }
-            else { direction = DECREASE_CAP_DIR; }
+            if(position < cap_sample) { direction = DECREASE_CAP_DIR; }
+            else { direction = INCREASE_CAP_DIR; }
             break;
         default:
             return;
@@ -140,9 +149,9 @@ inline void step_cap_motor(uint32_t command)
         {
             task_flag |= MOTOR_ACTIVE | CAP_ACTIVE;
             P5OUT &= ~BIT4; // Enable FETs on driver
-            if(direction) { P1OUT &= ~BIT4; }
-            else { P1OUT |= BIT4; }
-            TB2CCR1  = TB2R + 8;
+            if(direction == INCREASE_CAP_DIR) { P1OUT &= ~BIT4; }
+            else if(direction == DECREASE_CAP_DIR) { P1OUT |= BIT4; }
+            TB2CCR1  = TB2R + 16;
             cap_motor_task = STEP_HIGH;
             TB2CCTL1 = CCIE;
             break;
@@ -185,13 +194,13 @@ inline void step_cap_motor(uint32_t command)
                 default:
                     return;
             }
-            if(step_status == 0) { cap_motor_task = DISABLE_DRIVER; }
+            if(step_status == 0) { cap_motor_task = DISABLE_DRIVER; TB2CCR1  = TB2R + 18; }
             else if(step_status == 1)
             {
                 if(direction == INCREASE_CAP_DIR) { cap_sample++; }
                 else if(direction == DECREASE_CAP_DIR) { cap_sample--; }
                 P1OUT |= BIT1;
-                TB2CCR1  = TB2R + 24;
+                TB2CCR1  = TB2R + 18;
                 cap_motor_task = STEP_LOW;
             }
             break;
@@ -199,7 +208,7 @@ inline void step_cap_motor(uint32_t command)
         case STEP_LOW:
         {
             P1OUT &= ~BIT1;
-            TB2CCR1  = TB2R + 24;
+            TB2CCR1  = TB2R + 18;
             cap_motor_task = STEP_HIGH;
             break;
         }
@@ -249,8 +258,8 @@ inline void step_ind_motor(uint32_t command)
             break;
         case CMD_POS_MODE:
             position = (command >> 4);
-            if(position < ind_sample) { direction = INCREASE_IND_DIR; }
-            else { direction = DECREASE_IND_DIR; }
+            if(position < ind_sample) { direction = DECREASE_IND_DIR; }
+            else { direction = INCREASE_IND_DIR; }
             break;
         default:
             return;
@@ -269,9 +278,9 @@ inline void step_ind_motor(uint32_t command)
         {
             task_flag |= MOTOR_ACTIVE | IND_ACTIVE;
             P3OUT &= ~BIT2; // Enable FETs on driver
-            if(direction) { P2OUT &= ~BIT4; }
-            else { P2OUT |= BIT4; }
-            TB2CCR2  = TB2R + 8;
+            if(direction) { P2OUT |= BIT4; }
+            else { P2OUT &= ~BIT4; }
+            TB2CCR2  = TB2R + 16;
             ind_motor_task = STEP_HIGH;
             TB2CCTL2 = CCIE;
             break;
@@ -295,15 +304,15 @@ inline void step_ind_motor(uint32_t command)
                 }
                 case CMD_POS_MODE:
                 {
-                    if((position < ind_sample) && (direction == INCREASE_IND_DIR)) { step_status = 1; }
-                    else if((position > ind_sample) && (direction == DECREASE_IND_DIR)) { step_status = 1; }
+                    if((position < ind_sample) && (direction == DECREASE_IND_DIR)) { step_status = 1; }
+                    else if((position > ind_sample) && (direction == INCREASE_IND_DIR)) { step_status = 1; }
                     else { step_status = 0; }
                     break;
                 }
                 default:
                     return;
             }
-            if(step_status == 0) { ind_motor_task = DISABLE_DRIVER; }
+            if(step_status == 0) { ind_motor_task = DISABLE_DRIVER; TB2CCR2  = TB2R + 24; }
             else if(step_status == 1)
             {
                 if(direction == INCREASE_IND_DIR) { ind_sample++; }

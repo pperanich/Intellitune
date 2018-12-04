@@ -48,18 +48,18 @@
 #define STEP_HIGH                   1
 #define STEP_LOW                    2
 #define DISABLE_DRIVER              3
-#define L_LOWER_LIMIT               2004
-#define L_UPPER_LIMIT               4186
-#define C_LOWER_LIMIT               0002
+#define L_LOWER_LIMIT               0003
+#define L_UPPER_LIMIT               6180
+#define C_LOWER_LIMIT               0001
 #define C_UPPER_LIMIT               5374
 #define BTN_CONTROL_MODE            2
 #define RETURN_START_MODE           4
 #define CMD_POS_MODE                8
 #define FINE_TUNE_MODE              10
-#define Lup_CMD                     3
-#define Ldn_CMD                     2
-#define Cup_CMD                     3
-#define Cdn_CMD                     2
+#define Lup_CMD                     (BIT1 | INCREASE_IND_DIR)
+#define Ldn_CMD                     (BIT1 | DECREASE_IND_DIR)
+#define Cup_CMD                     (BIT1 | INCREASE_CAP_DIR)
+#define Cdn_CMD                     (BIT1 | DECREASE_CAP_DIR)
 // Macros for SWR sense
 #define KNOWN_SWITCHED_OUT          0
 #define KNOWN_SWITCHED_IN           1
@@ -95,6 +95,7 @@
 #define DEFAULT_SETTING_MENU        TARGET_SWR
 // Macros for other
 #define CAP_MAX                     500.00 // in pF
+#define CAP_MIN                     30.0   // in pF
 #define ADDITIONAL_CAP              3290.0 // in pF
 #define IND_MAX                     24.6    // in uH
 
