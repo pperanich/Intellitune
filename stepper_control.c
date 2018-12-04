@@ -94,11 +94,12 @@ inline void step_cap_motor(uint32_t command)
      */
 
     static uint16_t position;
+    uint32_t position_long;
     static uint8_t direction, mode;
     uint8_t step_status;
     if(command != 0)
     {
-        mode = command & 0x000E;
+        mode = command & 0x0006;
         switch(mode)
         {
         case BTN_CONTROL_MODE:
@@ -108,7 +109,8 @@ inline void step_cap_motor(uint32_t command)
             direction = DECREASE_CAP_DIR;
             break;
         case CMD_POS_MODE:
-            position = (command >> 4);
+            position_long = (command >> 3);
+            position = position_long;
             if(position < cap_sample) { direction = DECREASE_CAP_DIR; }
             else { direction = INCREASE_CAP_DIR; }
             break;
@@ -247,7 +249,7 @@ inline void step_ind_motor(uint32_t command)
     uint8_t step_status;
     if(command != 0)
     {
-        mode = command & 0x0E;
+        mode = command & 0x0006;
         switch(mode)
         {
         case BTN_CONTROL_MODE:
@@ -257,7 +259,7 @@ inline void step_ind_motor(uint32_t command)
             direction = DECREASE_IND_DIR;
             break;
         case CMD_POS_MODE:
-            position = (command >> 4);
+            position = (command >> 3);
             if(position < ind_sample) { direction = DECREASE_IND_DIR; }
             else { direction = INCREASE_IND_DIR; }
             break;

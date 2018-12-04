@@ -54,7 +54,7 @@
 #define C_UPPER_LIMIT               5374
 #define BTN_CONTROL_MODE            2
 #define RETURN_START_MODE           4
-#define CMD_POS_MODE                8
+#define CMD_POS_MODE                6
 #define FINE_TUNE_MODE              10
 #define Lup_CMD                     (BIT1 | INCREASE_IND_DIR)
 #define Ldn_CMD                     (BIT1 | DECREASE_IND_DIR)
