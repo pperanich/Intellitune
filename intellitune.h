@@ -130,7 +130,7 @@ extern uint16_t median_fwd_sample_25;
 extern char cap_val[8];
 extern char ind_val[6];
 extern char swr_val[5];
-extern char load_imp[7];
+extern char load_imp[8];
 
 
 // Subsystem function declarations

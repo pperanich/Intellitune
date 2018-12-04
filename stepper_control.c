@@ -97,6 +97,8 @@ inline void step_cap_motor(uint32_t command)
     uint32_t position_long;
     static uint8_t direction, mode;
     uint8_t step_status;
+
+    task_flag |= MOTOR_ACTIVE;
     if(command != 0)
     {
         mode = command & 0x0006;
@@ -115,6 +117,7 @@ inline void step_cap_motor(uint32_t command)
             else { direction = INCREASE_CAP_DIR; }
             break;
         default:
+            task_flag &= ~MOTOR_ACTIVE;
             return;
         }
     }
@@ -149,7 +152,7 @@ inline void step_cap_motor(uint32_t command)
     {
         case SET_ENABLE_AND_DIRECTION:
         {
-            task_flag |= MOTOR_ACTIVE | CAP_ACTIVE;
+            task_flag |= CAP_ACTIVE;
             P5OUT &= ~BIT4; // Enable FETs on driver
             if(direction == INCREASE_CAP_DIR) { P1OUT &= ~BIT4; }
             else if(direction == DECREASE_CAP_DIR) { P1OUT |= BIT4; }
@@ -194,6 +197,7 @@ inline void step_cap_motor(uint32_t command)
                     break;
                 }
                 default:
+                    task_flag &= ~MOTOR_ACTIVE & ~CAP_ACTIVE;
                     return;
             }
             if(step_status == 0) { cap_motor_task = DISABLE_DRIVER; TB2CCR1  = TB2R + 18; }
@@ -202,7 +206,7 @@ inline void step_cap_motor(uint32_t command)
                 if(direction == INCREASE_CAP_DIR) { cap_sample++; }
                 else if(direction == DECREASE_CAP_DIR) { cap_sample--; }
                 P1OUT |= BIT1;
-                TB2CCR1  = TB2R + 18;
+                TB2CCR1  = TB2R + 8;
                 cap_motor_task = STEP_LOW;
             }
             break;
@@ -210,7 +214,7 @@ inline void step_cap_motor(uint32_t command)
         case STEP_LOW:
         {
             P1OUT &= ~BIT1;
-            TB2CCR1  = TB2R + 18;
+            TB2CCR1  = TB2R + 8;
             cap_motor_task = STEP_HIGH;
             break;
         }
@@ -247,6 +251,7 @@ inline void step_ind_motor(uint32_t command)
     static uint16_t position;
     static uint8_t direction, mode;
     uint8_t step_status;
+    task_flag |= MOTOR_ACTIVE;
     if(command != 0)
     {
         mode = command & 0x0006;
@@ -264,6 +269,7 @@ inline void step_ind_motor(uint32_t command)
             else { direction = INCREASE_IND_DIR; }
             break;
         default:
+            task_flag &= ~MOTOR_ACTIVE;
             return;
         }
     }
@@ -278,7 +284,7 @@ inline void step_ind_motor(uint32_t command)
     {
         case SET_ENABLE_AND_DIRECTION:
         {
-            task_flag |= MOTOR_ACTIVE | IND_ACTIVE;
+            task_flag |= IND_ACTIVE;
             P3OUT &= ~BIT2; // Enable FETs on driver
             if(direction) { P2OUT |= BIT4; }
             else { P2OUT &= ~BIT4; }
@@ -312,6 +318,7 @@ inline void step_ind_motor(uint32_t command)
                     break;
                 }
                 default:
+                    task_flag &= ~MOTOR_ACTIVE & ~IND_ACTIVE;
                     return;
             }
             if(step_status == 0) { ind_motor_task = DISABLE_DRIVER; TB2CCR2  = TB2R + 24; }

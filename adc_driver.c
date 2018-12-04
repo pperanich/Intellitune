@@ -18,14 +18,16 @@ inline void update_adc_value(uint16_t adc_reading);
 uint16_t median(uint16_t samples[]);
 
 
+
+
 // Globals
 uint8_t adc_channel_select = FWD_PIN;
-uint16_t cap_sample = 1;
-uint16_t ind_sample = 3;
 uint16_t fwd_sample[24] = {0};
 uint16_t ref_sample[24] = {0};
 uint16_t fwd_25_sample[24] = {0};
 uint16_t ref_25_sample[24] = {0};
+uint16_t cap_sample = 3;
+uint16_t ind_sample = 3;
 uint16_t median_fwd_sample = 0;
 uint16_t median_ref_sample = 0;
 uint16_t median_ref_sample_25 = 0;
