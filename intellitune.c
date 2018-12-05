@@ -227,7 +227,7 @@ void tune(void)
                 tune_task = CALCULATE_SWR;
             } else {
                 error += _IQ16toa(q_val_1, "%2.2f", Q_factor_1);
-                error += _IQ16toa(load_imp_1, "%4.2f", Z_load_1);
+                error += _IQ16toa(load_imp_1, "%4.1f", Z_load_1);
                 error += _IQ16toa(str_cap_react_1, "%4.2f", cap_react_1);
                 error += _IQ16toa(str_ind_react_1, "%4.2f", ind_react_1);
                 error += _IQ16toa(cap_val_1, "%4.2f", estimated_capacitance_1);
@@ -255,7 +255,7 @@ void tune(void)
                 tune_task = CALCULATE_SWR;
             } else {
                 error += _IQ16toa(q_val_2, "%2.2f", Q_factor_2);
-                error += _IQ16toa(load_imp_2, "%4.2f", Z_load_2);
+                error += _IQ16toa(load_imp_2, "%4.1f", Z_load_2);
                 error += _IQ16toa(str_cap_react_2, "%4.2f", cap_react_2);
                 error += _IQ16toa(str_ind_react_2, "%4.2f", ind_react_2);
                 error += _IQ16toa(cap_val_2, "%4.2f", estimated_capacitance_2);
@@ -386,7 +386,7 @@ void tune(void)
                 } else if(vswr_high_load < vswr_low_load) {
                     // perform search algorithm around estimate 1.
                     P3OUT &= ~BIT4; // Capacitors switched to output side.
-                    error += _IQ16toa(load_imp, "%4.2f", Z_load_1);
+                    error += _IQ16toa(load_imp, "%4.1f", Z_load_1);
                     error += _IQ16toa(cap_val, "%4.2f", estimated_capacitance_1);
                     error += _IQ16toa(ind_val, "%2.2f", estimated_inductance_1);
                     task_status++;
@@ -399,7 +399,7 @@ void tune(void)
                 } else {
                     // perform search algorithm around estimate 2.
                     P3OUT |= BIT4; // Capacitors switched to input side.
-                    error += _IQ16toa(load_imp, "%4.2f", Z_load_2);
+                    error += _IQ16toa(load_imp, "%4.1f", Z_load_2);
                     error += _IQ16toa(cap_val, "%4.2f", estimated_capacitance_2);
                     error += _IQ16toa(ind_val, "%2.2f", estimated_inductance_2);
                     task_status++;
@@ -497,7 +497,7 @@ void tune(void)
                     if(fine_tune_limits.lower_inductance > ind_position_2) { fine_tune_limits.lower_inductance = ind_position_2; }
                     if(fine_tune_limits.upper_inductance < ind_position_2) { fine_tune_limits.upper_inductance = ind_position_2; }
                     P3OUT |= BIT4; // Capacitors switched to input side.
-                    error += _IQ16toa(load_imp, "%4.2f", Z_load_2);
+                    error += _IQ16toa(load_imp, "%4.1f", Z_load_2);
                     error += _IQ16toa(cap_val, "%4.2f", estimated_capacitance_2);
                     error += _IQ16toa(ind_val, "%2.2f", estimated_inductance_2);
                     step_ind_motor((uint32_t)((fine_tune_limits.lower_inductance << 3) | CMD_POS_MODE));
@@ -508,7 +508,7 @@ void tune(void)
                     if(fine_tune_limits.lower_inductance > ind_position_1) { fine_tune_limits.lower_inductance = ind_position_1; }
                     if(fine_tune_limits.upper_inductance < ind_position_1) { fine_tune_limits.upper_inductance = ind_position_1; }
                     P3OUT &= ~BIT4; // Capacitors switched to input side.
-                    error += _IQ16toa(load_imp, "%4.2f", Z_load_1);
+                    error += _IQ16toa(load_imp, "%4.1f", Z_load_1);
                     error += _IQ16toa(cap_val, "%4.2f", estimated_capacitance_1);
                     error += _IQ16toa(ind_val, "%2.2f", estimated_inductance_1);
                     step_ind_motor((uint32_t)((fine_tune_limits.lower_inductance << 3) | CMD_POS_MODE));
