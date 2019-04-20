@@ -327,7 +327,7 @@ inline void step_ind_motor(uint32_t command)
                 if(direction == INCREASE_IND_DIR) { ind_sample++; }
                 else if(direction == DECREASE_IND_DIR) { ind_sample--; }
                 P1OUT |= BIT3;
-                TB2CCR2  = TB2R + 24;
+                TB2CCR2  = TB2R + 30;
                 ind_motor_task = STEP_LOW;
             }
             break;
@@ -335,7 +335,7 @@ inline void step_ind_motor(uint32_t command)
         case STEP_LOW:
         {
             P1OUT &= ~BIT3;
-            TB2CCR2  = TB2R + 24;
+            TB2CCR2  = TB2R + 30;
             ind_motor_task = STEP_HIGH;
             update_swr();
             break;

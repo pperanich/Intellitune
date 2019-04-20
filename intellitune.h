@@ -119,10 +119,10 @@ extern uint16_t cap_sample, ind_sample;
 extern uint8_t adc_channel_select, adc_flg, task_flag,
                display_menu, cap_motor_task, ind_motor_task,
                tune_task, button_press, relay_setting, target_btn;
-extern uint16_t fwd_25_sample[24];
-extern uint16_t ref_25_sample[24];
-extern uint16_t fwd_sample[24];
-extern uint16_t ref_sample[24];
+extern uint16_t fwd_25_sample[16];
+extern uint16_t ref_25_sample[16];
+extern uint16_t fwd_sample[16];
+extern uint16_t ref_sample[16];
 extern uint16_t median_fwd_sample;
 extern uint16_t median_ref_sample;
 extern uint16_t median_ref_sample_25;
@@ -131,6 +131,10 @@ extern char cap_val[8];
 extern char ind_val[6];
 extern char swr_val[5];
 extern char load_imp[8];
+extern uint8_t adc_index_25;
+extern uint8_t adc_index;
+extern uint16_t latest_fwd;
+extern uint16_t latest_ref;
 
 
 // Subsystem function declarations

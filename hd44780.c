@@ -11,6 +11,10 @@
 
 #include "hd44780.h"
 
+//Globals
+uint8_t  u8__buffer_counter = 0;
+uint8_t  u8__data_byte;
+uint16_t u16__flags = 0x00;
 
 #ifdef HD44780_PARALLEL_MODE
   #ifdef HD44780_MIXED_PINS_MODE
@@ -235,9 +239,7 @@ static volatile uint8_t u8__hd44780_data_buffer[HD44780_DATA_BUFFER_SIZE];
 
 void hd44780_timer_isr( void )
 {
-  static uint8_t  u8__buffer_counter = 0;
-  static uint8_t  u8__data_byte;
-  static uint16_t u16__flags = 0x00;
+
 
   #ifdef HD44780_SERIAL_MODE
     uint8_t u8__sr_bit_counter;

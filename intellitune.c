@@ -128,7 +128,7 @@ void tune(void)
     static char swrl[7] = {'\0'};
     static char min_swr[7] = {'\0'};
 
-    if(median_fwd_sample < 100) { return; }
+    if(latest_fwd < 100) { return; }
     task_flag |= TUNE_BUSY;
     switch(tune_task)
     {
@@ -159,8 +159,16 @@ void tune(void)
 
         case CALCULATE_SWR:
         {
-            gamma_1 = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
-            if(gamma_1 != 0) { tune_task++; }
+            if(task_status == 0) {
+                adc_flg &= ~SWR_SENSE;
+                adc_channel_select = FWD_PIN;
+                adc_index = 0;
+                TB0CCR1  = TB0R + 400;
+                task_status++;
+            } else if(task_status == 1) {
+                gamma_1 = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
+                if(gamma_1 != 0) { tune_task++; task_status = 0; }
+            }
             break;
         }
 
@@ -171,11 +179,18 @@ void tune(void)
                 P3OUT |= BIT6;
                 adc_flg |= IMP_SWITCH;
                 adc_channel_select = FWD_PIN;
+                adc_index_25 = 0;
                 TB0CCR1  = TB0R + 400;
                 task_status++;
+            } else if(task_status == 1){
+                gamma_2 = calculate_ref_coeff(KNOWN_SWITCHED_IN);
+                if(gamma_2 != 0) { task_status++; }
+            } else if(task_status == 2){
+                P3OUT &= ~BIT6; // Switch out impedance after reading FWD and REF
+                adc_flg &= ~IMP_SWITCH;
+                tune_task++;
+                task_status = 0;
             }
-            gamma_2 = calculate_ref_coeff(KNOWN_SWITCHED_IN);
-            if(gamma_2 != 0) { tune_task++; task_status = 0; }
             break;
         }
 
@@ -304,6 +319,8 @@ void tune(void)
                 if(!(task_flag & MOTOR_ACTIVE)) {
                     task_status++;
                     adc_flg &= ~SWR_SENSE;
+                    adc_channel_select = FWD_PIN;
+                    adc_index = 0;
                     break;
                 }
             } else if(task_status == 2) {
@@ -352,6 +369,8 @@ void tune(void)
                 if(!(task_flag & MOTOR_ACTIVE)) {
                     task_status++;
                     adc_flg &= ~SWR_SENSE;
+                    adc_channel_select = FWD_PIN;
+                    adc_index = 0;
                     break;
                 }
             } else if(task_status == 2) {
@@ -426,7 +445,7 @@ void tune(void)
         case FINE_TUNE:
         {
             uint8_t error = 0;
-            _iq16 ref_coeff = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
+            _iq16 ref_coeff = calculate_ref_coeff(FINE_TUNE);
             if(ref_coeff != 0) {
                 numerator = iq_one + ref_coeff;
                 denominator = iq_one - ref_coeff;
@@ -599,18 +618,18 @@ SearchParams search_parameters(uint8_t settings) {
         iterations = 1;
         lower_ind_search = ind_pos - 512;
         if((lower_ind_search < L_LOWER_LIMIT) || (lower_ind_search > ind_pos)) { lower_ind_search = L_LOWER_LIMIT; }
-        upper_ind_search = ind_pos + 1024;
+        upper_ind_search = ind_pos + 512;
         if(upper_ind_search > max_ind_pos) { upper_ind_search = max_ind_pos; }
-        lower_cap_search = cap_pos - 3072;
+        lower_cap_search = cap_pos - 1536;
         if((lower_cap_search < C_LOWER_LIMIT) || (lower_cap_search > cap_pos)) {
             if(cap_relay > 0) {
-                lower_cap_search = C_UPPER_LIMIT - 3072;
+                lower_cap_search = C_UPPER_LIMIT - 1536;
                 lower_relay_setting = cap_relay - 1;
             } else {
                 lower_cap_search = C_LOWER_LIMIT;
             }
         }
-        upper_cap_search = cap_pos + 3072;
+        upper_cap_search = cap_pos + 1536;
         if(upper_cap_search > C_UPPER_LIMIT) {
             if(cap_relay < max_relay_setting) {
                 upper_cap_search = C_LOWER_LIMIT + (upper_cap_search - C_UPPER_LIMIT);

@@ -65,6 +65,15 @@ _iq16 calculate_ref_coeff(uint8_t reflection_to_calc)
                 return 0;
             }
         }
+        case FINE_TUNE:
+        {
+            numerator = _IQ19(latest_ref);
+            denominator = _IQ19(latest_fwd);
+            if(numerator > denominator) { return 0; }
+            if(median_fwd_sample < 100) { return 0; }
+            reflection_coefficient = _IQ19div(numerator, denominator);
+            return _IQ19toIQ(reflection_coefficient);
+        }
         default:
             return 0;
     }
@@ -145,12 +154,22 @@ void update_internal_reference(void)
 void update_swr(void)
 {
     static const _iq16 iq_one = _IQ16(1.0);
+    static uint8_t task = 0;
     uint8_t error = 0;
     _iq16 numerator, denominator, vswr;
-    _iq16 reflection_coefficient = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
-    if(reflection_coefficient == 0) { return; }
-    numerator = iq_one + reflection_coefficient;
-    denominator = iq_one - reflection_coefficient;
-    vswr = _IQ16div(numerator, denominator);
-    if(vswr >= _IQ16(1.0)) { error += _IQ16toa(swr_val,"%2.1f", vswr); }
+    if(task == 0){
+        adc_flg &= ~SWR_SENSE;
+        adc_index = 0;
+        TB0CCR1  = TB0R + 400;
+        task++;
+    }
+    else if(task == 1){
+        _iq16 reflection_coefficient = calculate_ref_coeff(KNOWN_SWITCHED_OUT);
+        if(reflection_coefficient == 0) { return; }
+        task = 0;
+        numerator = iq_one + reflection_coefficient;
+        denominator = iq_one - reflection_coefficient;
+        vswr = _IQ16div(numerator, denominator);
+        if(vswr >= _IQ16(1.0)) { error += _IQ16toa(swr_val,"%2.1f", vswr); }
+    }
 }

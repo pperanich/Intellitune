@@ -22,16 +22,20 @@ uint16_t median(uint16_t samples[]);
 
 // Globals
 uint8_t adc_channel_select = FWD_PIN;
-uint16_t fwd_sample[24] = {0};
-uint16_t ref_sample[24] = {0};
-uint16_t fwd_25_sample[24] = {0};
-uint16_t ref_25_sample[24] = {0};
+uint16_t fwd_sample[16] = {0};
+uint16_t ref_sample[16] = {0};
+uint16_t fwd_25_sample[16] = {0};
+uint16_t ref_25_sample[16] = {0};
 uint16_t cap_sample = 3;
 uint16_t ind_sample = 3;
 uint16_t median_fwd_sample = 0;
 uint16_t median_ref_sample = 0;
 uint16_t median_ref_sample_25 = 0;
 uint16_t median_fwd_sample_25 = 0;
+uint16_t latest_fwd = 0;
+uint16_t latest_ref = 0;
+uint8_t  adc_index = 0;
+uint8_t  adc_index_25 = 0;
 
 // TODO: Initialize ADC module
 void initialize_adc(void)
@@ -57,7 +61,7 @@ void initialize_adc(void)
 
     adc_flg |= ADC_STATUS;
     TB0R = 0;
-    TB0CCR1  = 64; // First interrupt will start the first sample and conversion
+    TB0CCR1  = TB0R + 64; // Time delay to let adc channel RC circuit charge
     TB0CCTL1 = CCIE; // Compare interrupt enable
     TB0CTL   = (CNTL_0 | TBSSEL_1 | MC__CONTINUOUS); // ACLK as clock source, continuous mode
 }
@@ -70,28 +74,28 @@ inline void sample_adc_channel(uint8_t adc_channel)
     ADCMCTL0 &= ~ADCINCH;
     ADCMCTL0 |= adc_channel;
     adc_flg &= ~ADC_STATUS;
-    TB0CCR1  = TB0R + 40; // Time delay to let adc channel RC circuit charge
+    TB0CCR1  = TB0R + 48; // Time delay to let adc channel RC circuit charge
 }
 
 
 // TODO: Function to update adc sample to most recent value
 inline void update_adc_value(uint16_t adc_reading)
 {
-    static uint8_t i = 0;
-    static uint8_t j = 0;
-    if(i == 24) {
-        i = 0;
-        median_fwd_sample = median(fwd_sample);
-        median_ref_sample = median(ref_sample);
-        adc_flg |= SWR_SENSE;
+    if(adc_index == 16) {
+        adc_index = 0;
+        if(!(adc_flg & SWR_SENSE)) {
+            median_fwd_sample = median(fwd_sample);
+            median_ref_sample = median(ref_sample);
+            adc_flg |= SWR_SENSE;
+        }
     }
-    if(j == 24) {
-        j = 0;
-        median_fwd_sample_25 = median(fwd_25_sample);
-        median_ref_sample_25 = median(ref_25_sample);
-        adc_flg |= SWR_KNOWN_SENSE;
-        P3OUT &= ~BIT6; // Switch out impedance after reading FWD and REF
-        adc_flg &= ~IMP_SWITCH;
+    if(adc_index_25 == 16) {
+        adc_index_25 = 0;
+        if(!(adc_flg & SWR_KNOWN_SENSE)){
+            median_fwd_sample_25 = median(fwd_25_sample);
+            median_ref_sample_25 = median(ref_25_sample);
+            adc_flg |= SWR_KNOWN_SENSE;
+        }
     }
     switch(adc_channel_select)
     {
@@ -99,9 +103,10 @@ inline void update_adc_value(uint16_t adc_reading)
         adc_channel_select = REF_PIN;
         if(adc_flg & IMP_SWITCH) // The known impedance is switched in
         {
-            fwd_25_sample[j] = adc_reading;
+            fwd_25_sample[adc_index_25] = adc_reading;
         } else {
-            fwd_sample[i] = adc_reading;
+            fwd_sample[adc_index] = adc_reading;
+            latest_fwd = adc_reading;
         }
         break;
 
@@ -109,14 +114,15 @@ inline void update_adc_value(uint16_t adc_reading)
         adc_channel_select = FWD_PIN;
         if(adc_flg & IMP_SWITCH) // The known impedance is switched in
         {
-            ref_25_sample[j++] = adc_reading;
+            ref_25_sample[adc_index_25++] = adc_reading;
         } else {
-            ref_sample[i++] = adc_reading;
+            ref_sample[adc_index++] = adc_reading;
+            latest_ref = adc_reading;
         }
         break;
     }
     adc_flg |= ADC_STATUS;
-    TB0CCR1  = TB0R + 40; // Time delay to next adc sample interval
+    TB0CCR1  = TB0R + 48; // Time delay to next adc sample interval
 }
 
 
@@ -176,7 +182,7 @@ __interrupt void Timer0_B1(void)
 uint16_t median(uint16_t samples[]) {
     uint16_t temp;
     uint8_t i, j;
-    uint16_t n = sizeof(samples)/sizeof(uint16_t);
+    uint16_t n = 16;
     // the following two loops sort the array of samples in ascending order
     for(i=0; i<n-1; i++) {
         for(j=i+1; j<n; j++) {
@@ -188,12 +194,5 @@ uint16_t median(uint16_t samples[]) {
             }
         }
     }
-
-    if(n%2==0) {
-        // if there is an even number of elements, return mean of the two elements in the middle
-        return((samples[n/2] + samples[n/2 - 1]) / 2);
-    } else {
-        // else return the element in the middle
-        return samples[n/2];
-    }
+    return samples[n >> 1];
 }

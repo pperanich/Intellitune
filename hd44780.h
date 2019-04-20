@@ -13,6 +13,10 @@
 #include "stdint.h" // Don't touch
 
 
+extern uint8_t  u8__buffer_counter;
+extern uint8_t  u8__data_byte;
+extern uint16_t u16__flags;
+
 // INFORMATION - please read this first:
 //
 // Version: 1.00 - Initial realease

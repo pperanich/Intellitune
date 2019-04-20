@@ -123,7 +123,9 @@ void C0(void)
 void A1(void)
 //--------------------------------------------------------
 {
+
     hd44780_timer_isr(); // Call HD44780 state machine
+
     //-------------------
     //the next time Timer3 counter 1 reaches Period value go to A2
     A_Task_Ptr = &A2;
@@ -163,9 +165,11 @@ void B1(void)
 //----------------------------------------
 {
     if(button_press & ANT) {
-        if(relay_setting < 7) { relay_setting++; }
-        else { relay_setting = 0; }
-        switch_cap_relay(relay_setting);
+        //if(relay_setting < 7) { relay_setting++; }
+        //else { relay_setting = 0; }
+        //switch_cap_relay(relay_setting);
+        u8__buffer_counter = 0;
+        u16__flags = 0x00;
         button_press &= ~ANT & ~MODE_LOCK;
     }
     //-----------------
@@ -182,7 +186,6 @@ void B2(void) //  SPARE
     {
         P3OUT &= ~BIT6;
         //P3OUT &= ~BIT4;
-        update_swr();
         if(button_press & Lup)
         {
             step_ind_motor(Lup_CMD);
@@ -230,7 +233,16 @@ void C1(void)
 void C2(void) //  SPARE
 //----------------------------------------
 {
-    //measure_freq();
+    static uint8_t delay = 0;
+    if(!(button_press & TUNE)){
+        //measure_freq();
+        if(delay > 0) {
+            delay--;
+        } else {
+            update_swr();
+            delay = 5;
+        }
+    }
 
     //-----------------
     //the next time Timer3 counter 3 reaches period value go to C3
