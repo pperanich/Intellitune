@@ -37,7 +37,7 @@ void mode_23(void);
 // Display variables and titles
 static const char period[2] = {'.', '\0'};
 static const char f_unit[4] = {'M', 'H', 'z', '\0'};
-static const char name[13] = "Intellitune\0";
+//static const char name[13] = "Intellitune\0";
 static const char cap_disp[3] = {'C', ':', '\0'};
 static const char ind_disp[3] = {'L', ':', '\0'};
 static const char cap_unit[4] = {'p', 'F', ' ', '\0'};
@@ -155,9 +155,13 @@ void mode_1(void)  // Default display w/ frequ.
     utoa(str_length, buf3);
     if(buf3[0]!='1') buf3[1] = ' ';
     // Write text string to second row and first column
-    strcat(row2, name);
+    strcat(row2, swr_label);
+    strcat(row2, fine_swr);
+    str_length = strlen(row2);
+    //strcat(row2, name);
     hd44780_write_string(row2, 2, 1, CR_LF );
-    hd44780_write_string(buf3, 2, 14, NO_CR_LF );
+    hd44780_blank_out_remaining_row(2,str_length+1);
+    //hd44780_write_string(buf3, 2, 14, NO_CR_LF );
 }
 
 void mode_2(void)  // Tuning display with impedance network
@@ -208,8 +212,8 @@ void mode_3(void)  // Tuning display with impedance network
         if(curr_ind[i] == '\0') { curr_ind[i] = '0'; }
     } i = 0;
 
-    _iq18 cap_scale = _IQ18div(_IQ18(CAP_MAX), _IQ18(cap_range));
-    _iq18 current_capacitance = _IQ18mpy(_IQ18(cap_sample), cap_scale);
+    _iq18 cap_scale = _IQ18div(_IQ18(CAP_MAX-CAP_MIN), _IQ18(cap_range));
+    _iq18 current_capacitance = _IQ18mpy(_IQ18(cap_sample), cap_scale) + _IQ18(CAP_MIN);
     _iq18 relay_capacitance = _IQ18mpy(_IQ18(relay_setting), _IQ18(470.0));
     current_capacitance += relay_capacitance;
     error = _IQ18toa(curr_cap, "%4.2f", current_capacitance);

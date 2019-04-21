@@ -170,6 +170,9 @@ void update_swr(void)
         numerator = iq_one + reflection_coefficient;
         denominator = iq_one - reflection_coefficient;
         vswr = _IQ16div(numerator, denominator);
-        if(vswr >= _IQ16(1.0)) { error += _IQ16toa(swr_val,"%2.1f", vswr); }
+        if(vswr >= _IQ16(1.0)) {
+            error += _IQ16toa(swr_val,"%2.1f", vswr);
+            error += _IQ16toa(fine_swr,"%2.4f", vswr);
+        }
     }
 }

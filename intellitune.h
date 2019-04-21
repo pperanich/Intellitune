@@ -94,10 +94,11 @@
 #define DEFAULT_QUICK_MENU          DEFAULT_DISPLAY
 #define DEFAULT_SETTING_MENU        TARGET_SWR
 // Macros for other
-#define CAP_MAX                     500.00 // in pF
+#define CAP_MAX                     470.00 // in pF
 #define CAP_MIN                     30.0   // in pF
 #define ADDITIONAL_CAP              3290.0 // in pF
-#define IND_MAX                     24.6    // in uH
+#define IND_MAX                     24.6   // in uH
+#define PARASITIC_CAP               120.0  // in pF
 
 
 typedef struct {
@@ -130,6 +131,7 @@ extern uint16_t median_fwd_sample_25;
 extern char cap_val[8];
 extern char ind_val[6];
 extern char swr_val[5];
+extern char fine_swr[8];
 extern char load_imp[8];
 extern uint8_t adc_index_25;
 extern uint8_t adc_index;

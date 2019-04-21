@@ -1,7 +1,7 @@
 ******************************************************************************
                   MSP430 Linker PC v18.1.4                     
 ******************************************************************************
->> Linked Fri Apr 19 22:39:27 2019
+>> Linked Sun Apr 21 00:29:48 2019
 
 OUTPUT FILE NAME:   <Intellitune.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 0000c132
@@ -16,7 +16,7 @@ MEMORY CONFIGURATION
   INFO                  00001800   00000200  00000000  00000200  RWIX
   TLVMEM                00001a00   00000200  00000000  00000200  RWIX
   BOOTCODE              00001c00   00000400  00000000  00000400  RWIX
-  RAM                   00002000   00001000  00000243  00000dbd  RWIX
+  RAM                   00002000   00001000  00000257  00000da9  RWIX
   FRAM                  00008000   00007f80  00004160  00003e20  RWIX
   JTAGSIGNATURE         0000ff80   00000004  00000004  00000000  RWIX  ffff 
   BSLSIGNATURE          0000ff84   00000004  00000004  00000000  RWIX  ffff 
@@ -79,28 +79,35 @@ SECTION ALLOCATION MAP
  output                                  attributes/
 section   page    origin      length       input sections
 --------  ----  ----------  ----------   ----------------
-.data      0    00002000    000000da     UNINITIALIZED
+.data      0    00002000    000000ee     UNINITIALIZED
                   00002000    00000020     adc_driver.obj (.data:fwd_25_sample)
                   00002020    00000020     adc_driver.obj (.data:fwd_sample)
                   00002040    00000020     adc_driver.obj (.data:ref_25_sample)
                   00002060    00000020     adc_driver.obj (.data:ref_sample)
                   00002080    00000014     adc_driver.obj (.data)
                   00002094    00000008     intellitune.obj (.data:cap_val)
-                  0000209c    00000008     intellitune.obj (.data:load_imp)
-                  000020a4    00000007     intellitune.obj (.data:min_swr$38)
-                  000020ab    00000001     --HOLE--
-                  000020ac    00000007     intellitune.obj (.data:swrh$36)
+                  0000209c    00000008     intellitune.obj (.data:fine_swr)
+                  000020a4    00000008     intellitune.obj (.data:load_imp)
+                  000020ac    00000007     intellitune.obj (.data:min_swr$38)
                   000020b3    00000001     --HOLE--
-                  000020b4    00000007     intellitune.obj (.data:swrl$37)
+                  000020b4    00000007     intellitune.obj (.data:swrh$36)
                   000020bb    00000001     --HOLE--
-                  000020bc    00000006     intellitune.obj (.data:ind_val)
-                  000020c2    00000005     intellitune.obj (.data:swr_val)
-                  000020c7    00000005     user_iface.obj (.data)
-                  000020cc    00000004     hd44780.obj (.data)
-                  000020d0    00000004     intellitune.obj (.data)
-                  000020d4    00000002     standing_wave_sensor.obj (.data)
-                  000020d6    00000002     state_machine.obj (.data)
-                  000020d8    00000002     stepper_control.obj (.data)
+                  000020bc    00000007     intellitune.obj (.data:swrl$37)
+                  000020c3    00000001     --HOLE--
+                  000020c4    00000006     intellitune.obj (.data:ind_val)
+                  000020ca    00000005     intellitune.obj (.data:swr_val)
+                  000020cf    00000005     user_iface.obj (.data)
+                  000020d4    00000004     hd44780.obj (.data)
+                  000020d8    00000004     intellitune.obj (.data)
+                  000020dc    00000002     adc_driver.obj (.data:d_fwd_avg$update_adc_value_1)
+                  000020de    00000002     adc_driver.obj (.data:d_ref_avg$update_adc_value_1)
+                  000020e0    00000002     adc_driver.obj (.data:l_fwd_avg$update_adc_value_1)
+                  000020e2    00000002     adc_driver.obj (.data:l_ref_avg$update_adc_value_1)
+                  000020e4    00000002     adc_driver.obj (.data:short_fwd_avg$update_adc_value_1)
+                  000020e6    00000002     adc_driver.obj (.data:short_ref_avg$update_adc_value_1)
+                  000020e8    00000002     standing_wave_sensor.obj (.data)
+                  000020ea    00000002     state_machine.obj (.data)
+                  000020ec    00000002     stepper_control.obj (.data)
 
 .TI.persistent 
 *          0    00008000    00000000     UNINITIALIZED
@@ -110,8 +117,7 @@ section   page    origin      length       input sections
 .sysmem    0    00008000    00000000     UNINITIALIZED
 
 .cinit     0    00008000    0000003a     
-                  00008000    00000017     (.cinit..data.load) [load image, compression = lzss]
-                  00008017    00000001     --HOLE-- [fill = 0]
+                  00008000    00000018     (.cinit..data.load) [load image, compression = lzss]
                   00008018    0000000c     (__TI_handler_table)
                   00008024    00000006     (.cinit..bss.load) [load image, compression = zero_init]
                   0000802a    00000010     (__TI_cinit_table)
@@ -129,57 +135,54 @@ section   page    origin      length       input sections
 .mspabi.extab 
 *          0    0000803a    00000000     UNINITIALIZED
 
-.const     0    0000803a    000001a4     
+.const     0    0000803a    0000019c     
                   0000803a    000000c0     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNtables.o (.const:_IQ14sqrt_lookup)
                   000080fa    00000041                                                                : _IQNtables.o (.const:.string:_IQ6div_lookup)
                   0000813b    00000001     --HOLE-- [fill = 0]
                   0000813c    00000024     intellitune.obj (.const:.string)
                   00008160    00000014     user_iface.obj (.const:.string)
                   00008174    0000000e     user_iface.obj (.const:.string:threshold_mode_name)
-                  00008182    0000000d     user_iface.obj (.const:.string:name)
-                  0000818f    00000001     --HOLE-- [fill = 0]
-                  00008190    0000000b     user_iface.obj (.const:.string:target_mode_name)
-                  0000819b    00000001     --HOLE-- [fill = 0]
-                  0000819c    0000000a     user_iface.obj (.const:.string:tune_disp)
-                  000081a6    00000009     user_iface.obj (.const:.string:lclimit_mode_name)
-                  000081af    00000001     --HOLE-- [fill = 0]
-                  000081b0    00000007     hd44780.obj (.const:.string:$P$T0$1)
-                  000081b7    00000001     --HOLE-- [fill = 0]
-                  000081b8    00000006     standing_wave_sensor.obj (.const:.string)
-                  000081be    00000006     user_iface.obj (.const:.string:swr_label)
-                  000081c4    00000004     user_iface.obj (.const:.string:cap_unit)
-                  000081c8    00000004     user_iface.obj (.const:.string:f_unit)
-                  000081cc    00000004     user_iface.obj (.const:.string:ind_unit)
-                  000081d0    00000003     user_iface.obj (.const:.string:$P$T0$1)
+                  00008182    0000000c     standing_wave_sensor.obj (.const:.string)
+                  0000818e    0000000b     user_iface.obj (.const:.string:target_mode_name)
+                  00008199    00000001     --HOLE-- [fill = 0]
+                  0000819a    0000000a     user_iface.obj (.const:.string:tune_disp)
+                  000081a4    00000009     user_iface.obj (.const:.string:lclimit_mode_name)
+                  000081ad    00000001     --HOLE-- [fill = 0]
+                  000081ae    00000007     hd44780.obj (.const:.string:$P$T0$1)
+                  000081b5    00000001     --HOLE-- [fill = 0]
+                  000081b6    00000006     user_iface.obj (.const:.string:swr_label)
+                  000081bc    00000004     user_iface.obj (.const:.string:cap_unit)
+                  000081c0    00000004     user_iface.obj (.const:.string:f_unit)
+                  000081c4    00000004     user_iface.obj (.const:.string:ind_unit)
+                  000081c8    00000003     user_iface.obj (.const:.string:$P$T0$1)
+                  000081cb    00000001     --HOLE-- [fill = 0]
+                  000081cc    00000003     user_iface.obj (.const:.string:cap_disp)
+                  000081cf    00000001     --HOLE-- [fill = 0]
+                  000081d0    00000003     user_iface.obj (.const:.string:ind_disp)
                   000081d3    00000001     --HOLE-- [fill = 0]
-                  000081d4    00000003     user_iface.obj (.const:.string:cap_disp)
-                  000081d7    00000001     --HOLE-- [fill = 0]
-                  000081d8    00000003     user_iface.obj (.const:.string:ind_disp)
-                  000081db    00000001     --HOLE-- [fill = 0]
-                  000081dc    00000002     user_iface.obj (.const:.string:period)
+                  000081d4    00000002     user_iface.obj (.const:.string:period)
 
-.text      0    000081de    00003b26     
-                  000081de    0000104a     intellitune.obj (.text:tune)
-                  00009228    0000045a     intellitune.obj (.text:search_parameters)
-                  00009682    000002c8     stepper_control.obj (.text:step_cap_motor)
-                  0000994a    0000026c     user_iface.obj (.text:mode_3)
-                  00009bb6    0000021e     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNtoa.o (.text:_IQ18toa)
-                  00009dd4    00000210                                                                : _IQNtoa.o (.text:_IQ16toa)
-                  00009fe4    000001f8     stepper_control.obj (.text:step_ind_motor)
-                  0000a1dc    000001d2     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNdiv.o (.text:_IQ16div)
-                  0000a3ae    000001d2                                                                : _IQNdiv.o (.text:_IQ18div)
-                  0000a580    000001d2                                                                : _IQNdiv.o (.text:_IQ19div)
-                  0000a752    00000174     hd44780.obj (.text:hd44780_timer_isr)
-                  0000a8c6    00000170     standing_wave_sensor.obj (.text:calculate_ref_coeff)
-                  0000aa36    00000152     user_iface.obj (.text:mode_1)
-                  0000ab88    0000013a     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNsqrt.o (.text:_IQ16sqrt)
-                  0000acc2    000000ee     rts430x_lc_sd_eabi.lib : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
-                  0000adb0    000000ec     adc_driver.obj (.text:update_adc_value)
-                  0000ae9c    000000d6     user_iface.obj (.text:mode_2)
-                  0000af72    000000b0     standing_wave_sensor.obj (.text:update_swr)
-                  0000b022    000000ac     hd44780.obj (.text:hd44780_write_string)
-                  0000b0ce    0000009e     relay.obj (.text:switch_cap_relay)
-                  0000b16c    0000009a     adc_driver.obj (.text:median)
+.text      0    000081d6    00003b2e     
+                  000081d6    0000106a     intellitune.obj (.text:tune)
+                  00009240    0000045e     intellitune.obj (.text:search_parameters)
+                  0000969e    000002c8     stepper_control.obj (.text:step_cap_motor)
+                  00009966    00000272     user_iface.obj (.text:mode_3)
+                  00009bd8    0000021e     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNtoa.o (.text:_IQ18toa)
+                  00009df6    00000210                                                                : _IQNtoa.o (.text:_IQ16toa)
+                  0000a006    000001f8     stepper_control.obj (.text:step_ind_motor)
+                  0000a1fe    000001d2     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNdiv.o (.text:_IQ16div)
+                  0000a3d0    000001d2                                                                : _IQNdiv.o (.text:_IQ18div)
+                  0000a5a2    000001d2                                                                : _IQNdiv.o (.text:_IQ19div)
+                  0000a774    00000174     hd44780.obj (.text:hd44780_timer_isr)
+                  0000a8e8    00000170     standing_wave_sensor.obj (.text:calculate_ref_coeff)
+                  0000aa58    00000168     user_iface.obj (.text:mode_1)
+                  0000abc0    0000013a     IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib : _IQNsqrt.o (.text:_IQ16sqrt)
+                  0000acfa    00000136     adc_driver.obj (.text:update_adc_value)
+                  0000ae30    000000ee     rts430x_lc_sd_eabi.lib : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
+                  0000af1e    000000d6     user_iface.obj (.text:mode_2)
+                  0000aff4    000000c8     standing_wave_sensor.obj (.text:update_swr)
+                  0000b0bc    000000ac     hd44780.obj (.text:hd44780_write_string)
+                  0000b168    0000009e     relay.obj (.text:switch_cap_relay)
                   0000b206    00000094     standing_wave_sensor.obj (.text:update_digipot)
                   0000b29a    00000078     user_iface.obj (.text:ui_init)
                   0000b312    00000072     state_machine.obj (.text:B2)
@@ -246,30 +249,30 @@ section   page    origin      length       input sections
                   0000c14e    0000000a     freq_counter.obj (.text:_isr:Timer1_B1)
                   0000c158    00000008     rts430x_lc_sd_eabi.lib : isr_trap.asm.obj (.text:_isr:__TI_ISR_TRAP)
 
-.bss       0    000020da    000000c9     UNINITIALIZED
-                  000020da    00000072     intellitune.obj (.bss)
-                  0000214c    00000020     hd44780.obj (.bss:u8__hd44780_data_buffer)
-                  0000216c    0000000c     intellitune.obj (.bss:fine_tune_limits$32)
-                  00002178    00000004     (.common:A_Task_Ptr)
-                  0000217c    00000004     (.common:Alpha_State_Ptr)
-                  00002180    00000004     (.common:B_Task_Ptr)
-                  00002184    00000004     (.common:C_Task_Ptr)
-                  00002188    00000004     (.common:total_pulses)
-                  0000218c    00000002     stepper_control.obj (.bss:position$step_cap_motor_1)
-                  0000218e    00000002     stepper_control.obj (.bss:position$step_ind_motor_1)
-                  00002190    00000002     (.common:cap_position_1)
-                  00002192    00000002     (.common:cap_position_2)
-                  00002194    00000002     (.common:frequency)
-                  00002196    00000002     (.common:ind_position_1)
-                  00002198    00000002     (.common:ind_position_2)
-                  0000219a    00000002     (.common:overflowCount)
-                  0000219c    00000001     stepper_control.obj (.bss:direction$step_cap_motor_1)
-                  0000219d    00000001     stepper_control.obj (.bss:direction$step_ind_motor_1)
-                  0000219e    00000001     stepper_control.obj (.bss:mode$step_cap_motor_1)
-                  0000219f    00000001     stepper_control.obj (.bss:mode$step_ind_motor_1)
-                  000021a0    00000001     (.common:cap_relay_1)
-                  000021a1    00000001     (.common:cap_relay_2)
-                  000021a2    00000001     (.common:u8__data_byte)
+.bss       0    000020ee    000000c9     UNINITIALIZED
+                  000020ee    00000072     intellitune.obj (.bss)
+                  00002160    00000020     hd44780.obj (.bss:u8__hd44780_data_buffer)
+                  00002180    0000000c     intellitune.obj (.bss:fine_tune_limits$32)
+                  0000218c    00000004     (.common:A_Task_Ptr)
+                  00002190    00000004     (.common:Alpha_State_Ptr)
+                  00002194    00000004     (.common:B_Task_Ptr)
+                  00002198    00000004     (.common:C_Task_Ptr)
+                  0000219c    00000004     (.common:total_pulses)
+                  000021a0    00000002     stepper_control.obj (.bss:position$step_cap_motor_1)
+                  000021a2    00000002     stepper_control.obj (.bss:position$step_ind_motor_1)
+                  000021a4    00000002     (.common:cap_position_1)
+                  000021a6    00000002     (.common:cap_position_2)
+                  000021a8    00000002     (.common:frequency)
+                  000021aa    00000002     (.common:ind_position_1)
+                  000021ac    00000002     (.common:ind_position_2)
+                  000021ae    00000002     (.common:overflowCount)
+                  000021b0    00000001     stepper_control.obj (.bss:direction$step_cap_motor_1)
+                  000021b1    00000001     stepper_control.obj (.bss:direction$step_ind_motor_1)
+                  000021b2    00000001     stepper_control.obj (.bss:mode$step_cap_motor_1)
+                  000021b3    00000001     stepper_control.obj (.bss:mode$step_ind_motor_1)
+                  000021b4    00000001     (.common:cap_relay_1)
+                  000021b5    00000001     (.common:cap_relay_2)
+                  000021b6    00000001     (.common:u8__data_byte)
 
 .stack     0    00002f60    000000a0     UNINITIALIZED
                   00002f60    00000002     rts430x_lc_sd_eabi.lib : boot.c.obj (.stack)
@@ -381,17 +384,17 @@ MODULE SUMMARY
        Module                       code    ro data   rw data
        ------                       ----    -------   -------
     .\
-       intellitune.obj              5530    36        188    
-       user_iface.obj               2650    114       5      
+       intellitune.obj              5566    36        196    
+       user_iface.obj               2678    101       5      
        stepper_control.obj          1370    2         10     
-       adc_driver.obj               654     4         148    
-       standing_wave_sensor.obj     722     6         2      
+       standing_wave_sensor.obj     746     12        2      
+       adc_driver.obj               574     4         160    
        hd44780.obj                  670     7         37     
        state_machine.obj            410     0         18     
        relay.obj                    186     0         0      
        freq_counter.obj             70      2         8      
     +--+----------------------------+-------+---------+---------+
-       Total:                       12262   171       416    
+       Total:                       12270   164       436    
                                                              
     ../IQmathLib_CCS_MPY32_5xx_6xx_CPUX_large_code_small_data.lib
        _IQNdiv.o                    1398    0         0      
@@ -445,16 +448,16 @@ MODULE SUMMARY
        Total:                       1010    34        0      
                                                              
        Stack:                       0       0         160    
-       Linker Generated:            0       57        0      
+       Linker Generated:            0       58        0      
     +--+----------------------------+-------+---------+---------+
-       Grand Total:                 16258   519       576    
+       Grand Total:                 16266   513       596    
 
 
 LINKER GENERATED COPY TABLES
 
 __TI_cinit_table @ 0000802a records: 2, size/record: 8, table size: 16
-	.data: load addr=00008000, load size=00000017 bytes, run addr=00002000, run size=000000da bytes, compression=lzss
-	.bss: load addr=00008024, load size=00000006 bytes, run addr=000020da, run size=000000c9 bytes, compression=zero_init
+	.data: load addr=00008000, load size=00000018 bytes, run addr=00002000, run size=000000ee bytes, compression=lzss
+	.bss: load addr=00008024, load size=00000006 bytes, run addr=000020ee, run size=000000c9 bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
@@ -504,8 +507,8 @@ address   name
 00000713  ADCMEM0_H                              
 00000712  ADCMEM0_L                              
 0000c0d4  ADC_ISR                                
-00002178  A_Task_Ptr                             
-0000217c  Alpha_State_Ptr                        
+0000218c  A_Task_Ptr                             
+00002190  Alpha_State_Ptr                        
 0000bc32  B0                                     
 0000bb8e  B1                                     
 0000b312  B2                                     
@@ -557,7 +560,7 @@ address   name
 00000672  BAKMEM9                                
 00000673  BAKMEM9_H                              
 00000672  BAKMEM9_L                              
-00002180  B_Task_Ptr                             
+00002194  B_Task_Ptr                             
 0000bcf8  C$$EXIT                                
 0000bc4a  C0                                     
 0000bcce  C1                                     
@@ -640,8 +643,8 @@ address   name
 00000190  CSCTL8                                 
 00000191  CSCTL8_H                               
 00000190  CSCTL8_L                               
-00002184  C_Task_Ptr                             
-000020d4  DATA_BYTE                              
+00002198  C_Task_Ptr                             
+000020e8  DATA_BYTE                              
 000001a0  FRCTL0                                 
 000001a1  FRCTL0_H                               
 000001a0  FRCTL0_L                               
@@ -687,7 +690,7 @@ address   name
 000004c6  MACS_L                                 
 000004c5  MAC_H                                  
 000004c4  MAC_L                                  
-000020c8  MODE_SWITCH                            
+000020d0  MODE_SWITCH                            
 000004c0  MPY                                    
 000004ec  MPY32CTL0                              
 000004ed  MPY32CTL0_H                            
@@ -1019,7 +1022,7 @@ address   name
 0000012a  PMMIFG                                 
 0000012b  PMMIFG_H                               
 0000012a  PMMIFG_L                               
-000020c9  PREV_MODE                              
+000020d1  PREV_MODE                              
 0000bf9a  Port_2                                 
 0000bd04  Port_3                                 
 0000c04a  Port_4                                 
@@ -1502,16 +1505,16 @@ address   name
 000001cd  WDTCTL_H                               
 000001cc  WDTCTL_L                               
 0000803a  _IQ14sqrt_lookup                       
-0000a1dc  _IQ16div                               
+0000a1fe  _IQ16div                               
 0000bcdc  _IQ16frac                              
 0000ba80  _IQ16mpy                               
 0000b858  _IQ16rmpy                              
-0000ab88  _IQ16sqrt                              
-00009dd4  _IQ16toa                               
-0000a3ae  _IQ18div                               
+0000abc0  _IQ16sqrt                              
+00009df6  _IQ16toa                               
+0000a3d0  _IQ18div                               
 0000b78c  _IQ18mpy                               
-00009bb6  _IQ18toa                               
-0000a580  _IQ19div                               
+00009bd8  _IQ18toa                               
+0000a5a2  _IQ19div                               
 000080fa  _IQ6div_lookup                         
 00003000  __STACK_END                            
 000000a0  __STACK_SIZE                           
@@ -1521,7 +1524,7 @@ address   name
 00008024  __TI_Handler_Table_Limit               
 0000c158  __TI_ISR_TRAP                          
 0000b462  __TI_auto_init_nobinit_nopinit_hold_wdt
-0000acc2  __TI_decompress_lzss                   
+0000ae30  __TI_decompress_lzss                   
 0000ba0a  __TI_decompress_none                   
 0000ffce  __TI_int22                             
 0000ffd0  __TI_int23                             
@@ -1610,36 +1613,39 @@ ffffffff  __c_args__
 0000bcfe  _system_pre_init                       
 0000bcf8  abort                                  
 00002080  adc_channel_select                     
-000020d2  adc_flg                                
+000020da  adc_flg                                
 00002092  adc_index                              
 00002093  adc_index_25                           
-000020ca  button_press                           
-0000a8c6  calculate_ref_coeff                    
-000020d8  cap_motor_task                         
-00002190  cap_position_1                         
-00002192  cap_position_2                         
-000021a0  cap_relay_1                            
-000021a1  cap_relay_2                            
+000020d2  button_press                           
+0000a8e8  calculate_ref_coeff                    
+000020ec  cap_motor_task                         
+000021a4  cap_position_1                         
+000021a6  cap_position_2                         
+000021b4  cap_relay_1                            
+000021b5  cap_relay_2                            
 00002082  cap_sample                             
 00002094  cap_val                                
 0000b740  clock_configure                        
-0000219c  direction$step_cap_motor_1             
-0000219d  direction$step_ind_motor_1             
-000020c7  display_menu                           
+000020dc  d_fwd_avg$update_adc_value_1           
+000020de  d_ref_avg$update_adc_value_1           
+000021b0  direction$step_cap_motor_1             
+000021b1  direction$step_ind_motor_1             
+000020cf  display_menu                           
+0000209c  fine_swr                               
 00008000  fram_rw_start                          
 00008000  fram_rx_start                          
-00002194  frequency                              
+000021a8  frequency                              
 00002000  fwd_25_sample                          
 00002020  fwd_sample                             
 0000b592  hd44780_blank_out_remaining_row        
 0000bb68  hd44780_clear_screen                   
-0000a752  hd44780_timer_isr                      
-0000b022  hd44780_write_string                   
-000020d9  ind_motor_task                         
-00002196  ind_position_1                         
-00002198  ind_position_2                         
+0000a774  hd44780_timer_isr                      
+0000b0bc  hd44780_write_string                   
+000020ed  ind_motor_task                         
+000021aa  ind_position_1                         
+000021ac  ind_position_2                         
 00002084  ind_sample                             
-000020bc  ind_val                                
+000020c4  ind_val                                
 0000b4cc  init_gpio                              
 0000b3f4  initialize_adc                         
 0000bc78  initialize_freq_counter                
@@ -1647,54 +1653,57 @@ ffffffff  __c_args__
 0000bbac  initialize_spi                         
 0000b384  initialize_stepper_control             
 0000b5ea  initialize_task_manager                
+000020e0  l_fwd_avg$update_adc_value_1           
+000020e2  l_ref_avg$update_adc_value_1           
 0000208e  latest_fwd                             
 00002090  latest_ref                             
 0000b6ee  lcd_update                             
-0000209c  load_imp                               
+000020a4  load_imp                               
 0000b7d4  main                                   
 0000bb1a  measure_freq                           
-0000b16c  median                                 
 00002086  median_fwd_sample                      
 0000208c  median_fwd_sample_25                   
 00002088  median_ref_sample                      
 0000208a  median_ref_sample_25                   
 0000bca0  memcpy                                 
 0000bc8c  memset                                 
-0000219e  mode$step_cap_motor_1                  
-0000219f  mode$step_ind_motor_1                  
-0000aa36  mode_1                                 
-0000ae9c  mode_2                                 
+000021b2  mode$step_cap_motor_1                  
+000021b3  mode$step_ind_motor_1                  
+0000aa58  mode_1                                 
+0000af1e  mode_2                                 
 0000bab8  mode_21                                
 0000b98e  mode_22                                
 0000b9cc  mode_23                                
-0000994a  mode_3                                 
-0000219a  overflowCount                          
-0000218c  position$step_cap_motor_1              
-0000218e  position$step_ind_motor_1              
+00009966  mode_3                                 
+000021ae  overflowCount                          
+000021a0  position$step_cap_motor_1              
+000021a2  position$step_ind_motor_1              
 00002040  ref_25_sample                          
 00002060  ref_sample                             
-000020d1  relay_setting                          
+000020d9  relay_setting                          
 0000b69a  reverse                                
 0000baee  sample_adc_channel                     
-00009228  search_parameters                      
-00009682  step_cap_motor                         
-00009fe4  step_ind_motor                         
+00009240  search_parameters                      
+000020e4  short_fwd_avg$update_adc_value_1       
+000020e6  short_ref_avg$update_adc_value_1       
+0000969e  step_cap_motor                         
+0000a006  step_ind_motor                         
 0000bc00  strcat                                 
 0000bcea  strlen                                 
-0000b0ce  switch_cap_relay                       
-000020c2  swr_val                                
-000020cb  target_btn                             
-000020d6  task_flag                              
-00002188  total_pulses                           
-000081de  tune                                   
-000020d0  tune_task                              
-000020ce  u16__flags                             
-000020cc  u8__buffer_counter                     
-000021a2  u8__data_byte                          
+0000b168  switch_cap_relay                       
+000020ca  swr_val                                
+000020d3  target_btn                             
+000020ea  task_flag                              
+0000219c  total_pulses                           
+000081d6  tune                                   
+000020d8  tune_task                              
+000020d6  u16__flags                             
+000020d4  u8__buffer_counter                     
+000021b6  u8__data_byte                          
 0000b29a  ui_init                                
-0000adb0  update_adc_value                       
+0000acfa  update_adc_value                       
 0000b206  update_digipot                         
-0000af72  update_swr                             
+0000aff4  update_swr                             
 0000b532  utoa                                   
 
 
@@ -2725,43 +2734,50 @@ address   name
 00002092  adc_index                              
 00002093  adc_index_25                           
 00002094  cap_val                                
-0000209c  load_imp                               
-000020bc  ind_val                                
-000020c2  swr_val                                
-000020c7  display_menu                           
-000020c8  MODE_SWITCH                            
-000020c9  PREV_MODE                              
-000020ca  button_press                           
-000020cb  target_btn                             
-000020cc  u8__buffer_counter                     
-000020ce  u16__flags                             
-000020d0  tune_task                              
-000020d1  relay_setting                          
-000020d2  adc_flg                                
-000020d4  DATA_BYTE                              
-000020d6  task_flag                              
-000020d8  cap_motor_task                         
-000020d9  ind_motor_task                         
-00002178  A_Task_Ptr                             
-0000217c  Alpha_State_Ptr                        
-00002180  B_Task_Ptr                             
-00002184  C_Task_Ptr                             
-00002188  total_pulses                           
-0000218c  position$step_cap_motor_1              
-0000218e  position$step_ind_motor_1              
-00002190  cap_position_1                         
-00002192  cap_position_2                         
-00002194  frequency                              
-00002196  ind_position_1                         
-00002198  ind_position_2                         
-0000219a  overflowCount                          
-0000219c  direction$step_cap_motor_1             
-0000219d  direction$step_ind_motor_1             
-0000219e  mode$step_cap_motor_1                  
-0000219f  mode$step_ind_motor_1                  
-000021a0  cap_relay_1                            
-000021a1  cap_relay_2                            
-000021a2  u8__data_byte                          
+0000209c  fine_swr                               
+000020a4  load_imp                               
+000020c4  ind_val                                
+000020ca  swr_val                                
+000020cf  display_menu                           
+000020d0  MODE_SWITCH                            
+000020d1  PREV_MODE                              
+000020d2  button_press                           
+000020d3  target_btn                             
+000020d4  u8__buffer_counter                     
+000020d6  u16__flags                             
+000020d8  tune_task                              
+000020d9  relay_setting                          
+000020da  adc_flg                                
+000020dc  d_fwd_avg$update_adc_value_1           
+000020de  d_ref_avg$update_adc_value_1           
+000020e0  l_fwd_avg$update_adc_value_1           
+000020e2  l_ref_avg$update_adc_value_1           
+000020e4  short_fwd_avg$update_adc_value_1       
+000020e6  short_ref_avg$update_adc_value_1       
+000020e8  DATA_BYTE                              
+000020ea  task_flag                              
+000020ec  cap_motor_task                         
+000020ed  ind_motor_task                         
+0000218c  A_Task_Ptr                             
+00002190  Alpha_State_Ptr                        
+00002194  B_Task_Ptr                             
+00002198  C_Task_Ptr                             
+0000219c  total_pulses                           
+000021a0  position$step_cap_motor_1              
+000021a2  position$step_ind_motor_1              
+000021a4  cap_position_1                         
+000021a6  cap_position_2                         
+000021a8  frequency                              
+000021aa  ind_position_1                         
+000021ac  ind_position_2                         
+000021ae  overflowCount                          
+000021b0  direction$step_cap_motor_1             
+000021b1  direction$step_ind_motor_1             
+000021b2  mode$step_cap_motor_1                  
+000021b3  mode$step_ind_motor_1                  
+000021b4  cap_relay_1                            
+000021b5  cap_relay_2                            
+000021b6  u8__data_byte                          
 00002f60  _stack                                 
 00003000  __STACK_END                            
 00008000  fram_rw_start                          
@@ -2772,27 +2788,26 @@ address   name
 0000803a  _IQ14sqrt_lookup                       
 0000803a  __TI_CINIT_Limit                       
 000080fa  _IQ6div_lookup                         
-000081de  tune                                   
-00009228  search_parameters                      
-00009682  step_cap_motor                         
-0000994a  mode_3                                 
-00009bb6  _IQ18toa                               
-00009dd4  _IQ16toa                               
-00009fe4  step_ind_motor                         
-0000a1dc  _IQ16div                               
-0000a3ae  _IQ18div                               
-0000a580  _IQ19div                               
-0000a752  hd44780_timer_isr                      
-0000a8c6  calculate_ref_coeff                    
-0000aa36  mode_1                                 
-0000ab88  _IQ16sqrt                              
-0000acc2  __TI_decompress_lzss                   
-0000adb0  update_adc_value                       
-0000ae9c  mode_2                                 
-0000af72  update_swr                             
-0000b022  hd44780_write_string                   
-0000b0ce  switch_cap_relay                       
-0000b16c  median                                 
+000081d6  tune                                   
+00009240  search_parameters                      
+0000969e  step_cap_motor                         
+00009966  mode_3                                 
+00009bd8  _IQ18toa                               
+00009df6  _IQ16toa                               
+0000a006  step_ind_motor                         
+0000a1fe  _IQ16div                               
+0000a3d0  _IQ18div                               
+0000a5a2  _IQ19div                               
+0000a774  hd44780_timer_isr                      
+0000a8e8  calculate_ref_coeff                    
+0000aa58  mode_1                                 
+0000abc0  _IQ16sqrt                              
+0000acfa  update_adc_value                       
+0000ae30  __TI_decompress_lzss                   
+0000af1e  mode_2                                 
+0000aff4  update_swr                             
+0000b0bc  hd44780_write_string                   
+0000b168  switch_cap_relay                       
 0000b206  update_digipot                         
 0000b29a  ui_init                                
 0000b312  B2                                     
@@ -2930,4 +2945,4 @@ ffffffff  __TI_prof_data_size
 ffffffff  __TI_prof_data_start                   
 ffffffff  __c_args__                             
 
-[1227 symbols]
+[1233 symbols]

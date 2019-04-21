@@ -45,6 +45,7 @@ void init_gpio(void);
 char cap_val[8] = {'\0'};
 char ind_val[6] = {'\0'};
 char swr_val[5] = {'\0'};
+char fine_swr[8] = {'\0'};
 char load_imp[8] = {'\0'};
 uint8_t tune_task = 0;
 uint8_t relay_setting = 0;
@@ -146,6 +147,7 @@ void tune(void)
                 switch_cap_relay(relay_setting);
                 step_cap_motor(RETURN_START_MODE);
                 step_ind_motor(RETURN_START_MODE);
+                P3OUT &= ~BIT6;
                 task_status++;
                 break;
             } else if(task_status == 1) {
@@ -458,6 +460,10 @@ void tune(void)
                     minimum_vswr = vswr_search;
                     _IQ16toa(min_swr, "%2.3f", minimum_vswr);
                 }
+                adc_flg &= ~SWR_SENSE;
+                adc_channel_select = FWD_PIN;
+                adc_index = 0;
+                TB0CCR1  = TB0R + 48;
             }
             if(task_status == 0) {
                 relay_setting = fine_tune_limits.lower_relay;
@@ -616,26 +622,28 @@ SearchParams search_parameters(uint8_t settings) {
 
     if(settings & BIT1) {
         iterations = 1;
-        lower_ind_search = ind_pos - 512;
+        lower_ind_search = ind_pos;
         if((lower_ind_search < L_LOWER_LIMIT) || (lower_ind_search > ind_pos)) { lower_ind_search = L_LOWER_LIMIT; }
-        upper_ind_search = ind_pos + 512;
+        upper_ind_search = ind_pos + 1600;
         if(upper_ind_search > max_ind_pos) { upper_ind_search = max_ind_pos; }
-        lower_cap_search = cap_pos - 1536;
+        lower_cap_search = cap_pos - 3072;
         if((lower_cap_search < C_LOWER_LIMIT) || (lower_cap_search > cap_pos)) {
             if(cap_relay > 0) {
-                lower_cap_search = C_UPPER_LIMIT - 1536;
+                lower_cap_search = C_UPPER_LIMIT - 3072;
                 lower_relay_setting = cap_relay - 1;
             } else {
                 lower_cap_search = C_LOWER_LIMIT;
+                lower_relay_setting = 0;
             }
         }
-        upper_cap_search = cap_pos + 1536;
+        upper_cap_search = cap_pos + 3072;
         if(upper_cap_search > C_UPPER_LIMIT) {
             if(cap_relay < max_relay_setting) {
                 upper_cap_search = C_LOWER_LIMIT + (upper_cap_search - C_UPPER_LIMIT);
                 upper_relay_setting = cap_relay + 1;
             } else {
                 upper_cap_search = C_UPPER_LIMIT;
+                upper_relay_setting = cap_relay;
             }
         }
     } else {

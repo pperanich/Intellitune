@@ -74,26 +74,46 @@ inline void sample_adc_channel(uint8_t adc_channel)
     ADCMCTL0 &= ~ADCINCH;
     ADCMCTL0 |= adc_channel;
     adc_flg &= ~ADC_STATUS;
-    TB0CCR1  = TB0R + 48; // Time delay to let adc channel RC circuit charge
+    TB0CCR1  = TB0R + 36; // Time delay to let adc channel RC circuit charge
 }
 
 
 // TODO: Function to update adc sample to most recent value
 inline void update_adc_value(uint16_t adc_reading)
 {
-    if(adc_index == 16) {
+    static uint16_t short_fwd_avg = 0;
+    static uint16_t short_ref_avg = 0;
+    static uint16_t l_fwd_avg = 0;
+    static uint16_t l_ref_avg = 0;
+    static uint16_t d_fwd_avg = 0;
+    static uint16_t d_ref_avg = 0;
+    if(adc_index % 4 == 0){
+        latest_fwd = short_fwd_avg >> 4;
+        latest_ref = short_ref_avg >> 4;
+        short_ref_avg = 0;
+        short_fwd_avg = 0;
+    }
+    if(adc_index == 15) {
         adc_index = 0;
+        median_fwd_sample = l_fwd_avg >> 4;
+        median_ref_sample = l_ref_avg >> 4;
+        l_fwd_avg = 0;
+        l_ref_avg = 0;
         if(!(adc_flg & SWR_SENSE)) {
-            median_fwd_sample = median(fwd_sample);
-            median_ref_sample = median(ref_sample);
+            //median_fwd_sample = median(fwd_sample);
+            //median_ref_sample = median(ref_sample);
             adc_flg |= SWR_SENSE;
         }
     }
-    if(adc_index_25 == 16) {
+    if(adc_index_25 == 15) {
         adc_index_25 = 0;
         if(!(adc_flg & SWR_KNOWN_SENSE)){
-            median_fwd_sample_25 = median(fwd_25_sample);
-            median_ref_sample_25 = median(ref_25_sample);
+            //median_fwd_sample_25 = median(fwd_25_sample);
+            //median_ref_sample_25 = median(ref_25_sample);
+            median_fwd_sample = d_fwd_avg >> 4;
+            median_ref_sample = d_ref_avg >> 4;
+            d_fwd_avg = 0;
+            d_ref_avg = 0;
             adc_flg |= SWR_KNOWN_SENSE;
         }
     }
@@ -104,9 +124,11 @@ inline void update_adc_value(uint16_t adc_reading)
         if(adc_flg & IMP_SWITCH) // The known impedance is switched in
         {
             fwd_25_sample[adc_index_25] = adc_reading;
+            d_fwd_avg += adc_reading;
         } else {
             fwd_sample[adc_index] = adc_reading;
-            latest_fwd = adc_reading;
+            short_fwd_avg += adc_reading;
+            l_fwd_avg += adc_reading;
         }
         break;
 
@@ -115,14 +137,16 @@ inline void update_adc_value(uint16_t adc_reading)
         if(adc_flg & IMP_SWITCH) // The known impedance is switched in
         {
             ref_25_sample[adc_index_25++] = adc_reading;
+            d_ref_avg += adc_reading;
         } else {
             ref_sample[adc_index++] = adc_reading;
-            latest_ref = adc_reading;
+            short_ref_avg += adc_reading;
+            l_ref_avg += adc_reading;
         }
         break;
     }
     adc_flg |= ADC_STATUS;
-    TB0CCR1  = TB0R + 48; // Time delay to next adc sample interval
+    TB0CCR1  = TB0R + 36; // Time delay to next adc sample interval
 }
 
 
